@@ -376,8 +376,8 @@
         <ol>
           <li>年度・問題を選びます。</li>
           <li>答案を入力します。</li>
-          <li><strong>「ChatGPTで添削する」</strong>を押します。<br>問題文・採点基準・入力した答案データがコピーされ，ChatGPTが開きます。</li>
-          <li>ChatGPTの入力欄に貼り付けて送信します。</li>
+          <li><strong>「ChatGPTを開く」</strong>を押します。<br>ChatGPTが開き，入力した答案データが自動的に入力されます。採点用データはバックグラウンドでコピーされます。</li>
+          <li>コピーされた採点用データをChatGPTの入力欄に貼り付けて送信します。<br>※ Windowsでは Ctrl＋V，Macでは ⌘＋V，スマートフォン・タブレットでは入力欄をタップまたは長押しして「貼り付け」を選びます。</li>
         </ol>
       </div>
     </div>
@@ -429,7 +429,7 @@
       </div>
 
       <div class="actions">
-        <button id="gradeBtn" class="btn primary">ChatGPTで添削する</button>
+        <button id="gradeBtn" class="btn primary">ChatGPTを開く</button>
         <button id="resubmitBtn" class="btn" hidden>書き直して再提出</button>
         <button id="showAnswerBtn" class="btn ghost" disabled>教材の解答例を見る</button>
       </div>
@@ -777,7 +777,7 @@ async function handoffToChatGPT(basePrompt){
     sampleFn = null;
     sampleReady = true;
     sampleUnavailableBox.hidden = false;
-    sampleUnavailableBox.textContent = "この公開版では，添削用の指示文を作成して生徒自身のChatGPTへ渡します。「ChatGPTで添削する」を押し，開いたチャットに貼り付けて送信してください。";
+    sampleUnavailableBox.textContent = "この公開版では，添削用の指示文を作成して生徒自身のChatGPTへ渡します。「ChatGPTを開く」を押し，開いたチャットに貼り付けて送信してください。";
     gradeBtn.disabled = false;
   }
 
@@ -1115,7 +1115,7 @@ async function handoffToChatGPT(basePrompt){
       submissionCount += 1;
       submitCountEl.textContent = "送信準備：" + submissionCount + "回";
       showAnswerBtn.disabled = false;
-      gradeBtn.textContent = "もう一度ChatGPTで添削する";
+      gradeBtn.textContent = "もう一度ChatGPTを開く";
       resubmitBtn.hidden = true;
     } catch (err) {
       errorBox.hidden = false;
