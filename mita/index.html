@@ -982,8 +982,8 @@ function createImporter(opt){
       '<p class="hint">氏名・学校名・受験番号などの個人情報は写さないでください。</p>' +
       '<button type="button" class="primary" id="' + k + 'PhotoChatGPTBtn">写真・PDFをChatGPTで添削する</button>' +
     '</div>' +
-    '<details class="pdf-import-details" hidden><summary>PDF内部処理（非表示）</summary>' +
-      '<p class="hint">文字データを含むPDFは，ここから答案欄へ取り込めます。画像だけのスキャンPDFは，上の「写真・PDFをChatGPTで添削する」を使ってください。</p>' +
+    '<details class="pdf-import-details" hidden><summary>PDF内部処理（公開版では使用しません）</summary>' +
+      '<p class="hint">公開版ではPDFをこのページに取り込みません。ChatGPT側に直接添付してください。</p>' +
       '<label class="dropzone" id="' + k + 'Dropzone">' +
         '<input type="file" id="' + k + 'File" accept="application/pdf,.pdf">' +
         '<b>PDFをここにドラッグ＆ドロップ</b>' +
@@ -1073,6 +1073,9 @@ function createImporter(opt){
   }
 
   async function handleFiles(fileList){
+    setMode("photo");
+    showHandoffToast("写真・PDFはこのページには取り込みません。ChatGPT側に直接添付してください。");
+    return;
     if(st.busy || st.locked || !importIsVisible(panel)) return;
     const token = ++st.token;
     const all = Array.from(fileList || []);
@@ -1189,7 +1192,7 @@ function createImporter(opt){
     panel.addEventListener("drop", e => {
       if(!hasFiles(e)) return; e.preventDefault(); e.stopPropagation(); off();
       if(st.busy || st.locked) return;
-      const fs = Array.from(e.dataTransfer.files || []); setMode("photo"); handleFiles(fs);
+      setMode("photo"); showHandoffToast("写真・PDFはこのページには取り込みません。ChatGPT側に直接添付してください。");
     });
     window.addEventListener("dragend", off); window.addEventListener("drop", off);
   })();
@@ -1228,7 +1231,7 @@ document.addEventListener("paste", e => {
   const text = cd.getData("text/plain");
   if(e.target === imp.textarea && text && text.trim()) return; // 答案欄への文章の貼り付けは妨げない
   if(imp.isBusy() || imp.isLocked()) return;
-  e.preventDefault(); imp.setMode("photo"); imp.handleFiles(files);
+  imp.setMode("photo"); showHandoffToast("写真・PDFはこのページには取り込みません。ChatGPT側に直接添付してください。"); return;
 });
 
 // 既存の sample を再利用して，画像入力の可否・枚数・サイズ・形式を取得する（新しい sample は作らない）
