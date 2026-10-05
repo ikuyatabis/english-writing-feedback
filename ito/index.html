@@ -207,7 +207,7 @@
           <li><strong>「ChatGPTで添削する」</strong>を押します。<br>問題文・採点基準・入力した答案データがコピーされ，ChatGPTが開きます。</li>
           <li>ChatGPTの入力欄に貼り付けて送信します。</li>
         </ol>
-        <p class="hand-title">手書き答案の場合</p><p class="hand-line">2.で「手書き答案（写真・スキャンPDF）」を選び，3. 4. の後で<strong>ChatGPTに答案の写真またはスキャンPDFを添付</strong>します。</p>
+        <p class="hand-title">写真・PDFの場合</p><p class="hand-line">2.で「手書き答案（写真・PDF）」を選び，3. 4. の後で<strong>ChatGPTに答案の写真またはPDFを添付</strong>します。</p>
       </div>
     </div>
   </header>
@@ -236,23 +236,23 @@
       <p class="section-label">あなたの答案</p>
       <div class="tabs" role="tablist">
         <button class="tab" role="tab" id="tabText" aria-selected="true">テキストで入力</button>
-        <button class="tab" role="tab" id="tabPhoto" aria-selected="false">手書き答案（写真・スキャンPDF）</button>
+        <button class="tab" role="tab" id="tabPhoto" aria-selected="false">手書き答案（写真・PDF）</button>
       </div>
       <div id="photoPane" class="photo-pane" hidden>
         <div class="photo-chatgpt-guide">
-          <p class="photo-guide-title">手書き答案は，写真・スキャンPDFのまま添削できます。</p>
+          <p class="photo-guide-title">写真・PDFの答案は，ChatGPTにそのまま添付して添削できます。</p>
           <ol>
-            <li>下の「写真・スキャンPDFをChatGPTで添削する」を押します。</li>
-            <li>ChatGPTが開いたら，答案の写真またはスキャンPDFを添付します。</li>
+            <li>下の「写真・PDFをChatGPTで添削する」を押します。</li>
+            <li>ChatGPTが開いたら，答案の写真またはPDFを添付します。</li>
             <li>コピーされた指示文を貼り付けて送信します。</li>
           </ol>
           <p class="hint">氏名・学校名・受験番号などの個人情報は写さないでください。</p>
-          <button type="button" class="btn" id="photoChatGPTBtn">写真・スキャンPDFをChatGPTで添削する</button>
+          <button type="button" class="btn" id="photoChatGPTBtn">写真・PDFをChatGPTで添削する</button>
         </div>
-        <details class="pdf-import-details">
+        <details class="pdf-import-details" hidden>
           <summary>文字データ入りPDFを使う場合</summary>
           <div class="pdf-import-inner">
-        <p class="hint" style="margin-top:0">文字データを含むPDFは，ここから答案欄へ取り込めます。画像だけのスキャンPDFや手書き写真は，上の「写真・スキャンPDFをChatGPTで添削する」を使ってください。</p>
+        <p class="hint" style="margin-top:0">文字データを含むPDFは，ここから答案欄へ取り込めます。画像だけのスキャンPDFや手書き写真は，上の「写真・PDFをChatGPTで添削する」を使ってください。</p>
         <label class="dropzone" id="dropzone">
           <input type="file" id="photo" accept="image/jpeg,image/png,image/webp,application/pdf,.pdf" multiple>
           <b>PDFをここにドラッグ＆ドロップ</b>
@@ -773,17 +773,17 @@ ${JSON.stringify(ans)}
 }
 
 function buildPhotoPrompt(k){
-  const base = buildPrompt(k, "[答案はこのチャットに添付する写真またはスキャンPDFです]", 0, "text");
+  const base = buildPrompt(k, "[答案はこのチャットに添付する写真またはPDFです]", 0, "text");
   return base + `
 
 =====
-【写真・スキャンPDF答案についての最優先指示】
-今回の採点対象は，上の【答案データ】ではなく，このChatGPTのチャットに添付された手書き答案の写真またはスキャンPDFです。
-1. 添付された写真またはスキャンPDFから答案の英文を忠実に読み取ってください。氏名・学校名・受験番号などの個人情報は読み取っても出力しないでください。
+【写真・PDF答案についての最優先指示】
+今回の採点対象は，上の【答案データ】ではなく，このChatGPTのチャットに添付された手書き答案の写真またはPDFです。
+1. 添付された写真またはPDFから答案の英文を忠実に読み取ってください。氏名・学校名・受験番号などの個人情報は読み取っても出力しないでください。
 2. 判読できない箇所は推測で補わず，[?] として示してください。採点に影響する判読不能箇所がある場合は，まずその箇所を生徒に確認してください。
-3. 上にある【確定語数】0語という表示は無視し，写真またはスキャンPDFから読み取った答案を使って語数を数え直してください。
+3. 上にある【確定語数】0語という表示は無視し，写真またはPDFから読み取った答案を使って語数を数え直してください。
 4. 読み取った英文全体を生徒の答案として，上記の問題文・採点基準・詳細指示に従って添削してください。
-5. 写真またはスキャンPDFがまだ添付されていない場合は，添削を始めず，「答案の写真またはスキャンPDFを添付してください」とだけ案内してください。
+5. 写真またはPDFがまだ添付されていない場合は，添削を始めず，「答案の写真またはPDFを添付してください」とだけ案内してください。
 =====`;
 }
 
