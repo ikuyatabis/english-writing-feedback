@@ -63,6 +63,15 @@
   .kicker { margin: 0 0 6px; font-size: 0.82rem; letter-spacing: 0.04em; color: var(--wine); font-weight: 500; }
   h1 { margin: 0 0 4px; font-family: var(--font-serif); font-weight: 800; font-size: clamp(1.5rem, 5vw, 2rem); letter-spacing: 0.03em; color: var(--ink); }
   .lede { margin: 0 auto; color: var(--ink-soft); font-size: 0.9rem; max-width: 42em; }
+  .tool-howto { max-width: 680px; margin: 16px auto 0; padding: 14px 16px; text-align: left; background: var(--card, var(--panel)); border: 1px solid var(--paper-line, var(--line)); border-radius: 4px; }
+  .tool-howto-title { margin: 0 0 7px; font-family: var(--font-serif); font-size: .95rem; font-weight: 700; }
+  .tool-howto ol { margin: 0; padding-left: 1.45em; font-size: .84rem; line-height: 1.7; }
+  .tool-howto li { margin: 2px 0; }
+  .tool-howto .hand-title { margin: 8px 0 0; font-family: var(--font-serif); font-size: .88rem; font-weight: 700; }
+  .tool-howto .hand-line { margin: 0; font-size: .84rem; line-height: 1.7; }
+  .tool-howto { border-left: 4px solid var(--wine); }
+  .tool-howto-title, .tool-howto .hand-title { color: var(--wine-deep); }
+
 
   .sheet-wrap { padding-top: 18px; }
   .controls { display: flex; gap: 14px; flex-wrap: wrap; background: var(--card); border: 1px solid var(--paper-line); border-top: 3px solid var(--wine);
@@ -190,11 +199,21 @@
       <h1>伊都への恋文｜自由英作文</h1>
       <div class="tricolor" aria-hidden="true"><span></span><span></span><span></span></div>
       <p class="lede">2024～2026年度の自由英作文（第4問・第5問）を，独自の採点基準に基づいて試験的に添削します。答案はテキスト入力・写真・PDFに対応します。氏名などの個人情報は入力・撮影しないでください。</p>
+      <div class="tool-howto">
+        <p class="tool-howto-title">このページの使い方</p>
+        <ol>
+          <li>年度・問題を選びます。</li>
+          <li>答案を入力します。</li>
+          <li><strong>「ChatGPTで添削する」</strong>を押します。<br>問題文・採点基準・入力した答案データがコピーされ，ChatGPTが開きます。</li>
+          <li>ChatGPTの入力欄に貼り付けて送信します。</li>
+        </ol>
+        <p class="hand-title">手書き答案の場合</p><p class="hand-line">2.で「手書き答案（写真）」を選び，3. 4. の後で<strong>ChatGPTに答案の写真を添付</strong>します。</p>
+      </div>
     </div>
   </header>
 
   <div class="sheet-wrap">
-    <div id="unavailable" class="note" hidden><strong>手書き答案も利用できます。</strong> 答案欄の「手書き答案（写真）」を選ぶと，ChatGPTに写真を添付してそのまま添削できます。</div>
+    <div id="unavailable" class="note" hidden style="display:none"></div>
 
     <section class="controls">
       <div class="field"><label for="year">年度</label>
