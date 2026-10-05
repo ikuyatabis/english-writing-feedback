@@ -250,9 +250,9 @@
           <button type="button" class="btn" id="photoChatGPTBtn">写真・PDFをChatGPTで添削する</button>
         </div>
         <details class="pdf-import-details" hidden>
-          <summary>文字データ入りPDFを使う場合</summary>
+          <summary>PDF内部処理（公開版では使用しません）</summary>
           <div class="pdf-import-inner">
-        <p class="hint" style="margin-top:0">文字データを含むPDFは，ここから答案欄へ取り込めます。画像だけのスキャンPDFや手書き写真は，上の「写真・PDFをChatGPTで添削する」を使ってください。</p>
+        <p class="hint" style="margin-top:0">公開版ではPDFをこのページに取り込みません。ChatGPT側に直接添付してください。</p>
         <label class="dropzone" id="dropzone">
           <input type="file" id="photo" accept="image/jpeg,image/png,image/webp,application/pdf,.pdf" multiple>
           <b>PDFをここにドラッグ＆ドロップ</b>
@@ -363,8 +363,8 @@ const LIMITS = { pdfBytes: 30 * 1024 * 1024, pdfPages: 10 };
 const SOURCE_LABEL = {
   text: "テキスト入力",
   pdf_text: "PDFから抽出したテキスト",
-  ocr_lines: "写真・スキャンPDFから読み取った答案（答案用紙の行に対応）",
-  ocr_nolines: "写真・スキャンPDFから読み取った答案（行の対応は不明）",
+  ocr_lines: "写真・PDFから読み取った答案（答案用紙の行に対応）",
+  ocr_nolines: "写真・PDFから読み取った答案（行の対応は不明）",
 };
 
 const DATA = JSON.parse(new TextDecoder().decode(Uint8Array.from(atob(DATA_B64), c => c.charCodeAt(0))));
@@ -560,6 +560,9 @@ async function loadPdfAsImages(pdf, token){
 }
 
 async function handleFiles(fileList){
+  setMode("photo");
+  showHandoffToast("写真・PDFはこのページには取り込みません。ChatGPT側に直接添付してください。");
+  return;
   if(!key() || busy) return;
   const token = ++fileToken;
   const all = Array.from(fileList || []);
@@ -628,7 +631,7 @@ $("photo").onchange = (ev) => { const fs = Array.from(ev.target.files || []); ev
   sheet.addEventListener("drop", e => {
     if(!hasFiles(e)) return; e.preventDefault(); off();
     if(busy) return;
-    const fs = Array.from(e.dataTransfer.files || []); setMode("photo"); handleFiles(fs);
+    setMode("photo"); showHandoffToast("写真・PDFはこのページには取り込みません。ChatGPT側に直接添付してください。");
   });
 })();
 
@@ -641,10 +644,10 @@ document.addEventListener("paste", e => {
   if(!files.length) return;                       // ファイルがなければ通常の貼り付け
   const text = cd.getData("text/plain");
   if(e.target === $("answer") && text && text.trim()) return; // 答案欄への文章の貼り付けは妨げない
-  e.preventDefault(); setMode("photo"); handleFiles(files);
+  setMode("photo"); showHandoffToast("写真・PDFはこのページには取り込みません。ChatGPT側に直接添付してください。"); return;
 });
 
-/* ---------- 写真・スキャンPDFの読み取り ---------- */
+/* ---------- 写真・PDFの読み取り ---------- */
 $("ocrBtn").onclick = async () => {
   const k = key(); if(!k || !photos.length || busy) return;
   const token = fileToken;
@@ -820,7 +823,7 @@ $("showAnswerBtn").onclick = () => {
   sample = null; imagesOK = false;
   $("unavailable").hidden = false;
   $("photo").accept = "application/pdf,.pdf";
-  $("dropHint").textContent = "文字データを含むPDFは読み込めます。手書き写真・スキャンPDFはChatGPT側に直接添付してください。";
+  $("dropHint").textContent = "文字データを含むPDFは読み込めます。手書き写真・PDFはChatGPT側に直接添付してください。";
   refreshCount();
 })();
 </script>
