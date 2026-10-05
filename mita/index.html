@@ -332,7 +332,7 @@
           <li><strong>「ChatGPTで添削する」</strong>を押します。<br>問題文・採点基準・入力した答案データがコピーされ，ChatGPTが開きます。</li>
           <li>ChatGPTの入力欄に貼り付けて送信します。</li>
         </ol>
-        <p class="hand-title">手書き答案の場合</p><p class="hand-line">2.で「手書き答案（写真）」を選び，3. 4. の後で<strong>ChatGPTに答案の写真を添付</strong>します。</p>
+        <p class="hand-title">手書き答案の場合</p><p class="hand-line">2.で「手書き答案（写真・スキャンPDF）」を選び，3. 4. の後で<strong>ChatGPTに答案の写真またはスキャンPDFを添付</strong>します。</p>
       </div>
     </div>
   </header>
@@ -546,16 +546,16 @@ function resetResult(){
 
 // ---------- prompt building ----------
 function buildPhotoPrompt(problem){
-  const base = buildPrompt(problem, "[答案はこのチャットに添付する手書き画像です]", false, null, null);
+  const base = buildPrompt(problem, "[答案はこのチャットに添付する写真またはスキャンPDFです]", false, null, null);
   return base + `
 
-【写真答案についての最優先指示】
-今回の採点対象は，上の【今回の生徒の答案】ではなく，このChatGPTのチャットに添付された手書き答案の画像です。
-1. 添付画像から答案の英文を忠実に読み取ってください。氏名・学校名・受験番号などの個人情報は読み取っても出力しないでください。
+【写真・スキャンPDF答案についての最優先指示】
+今回の採点対象は，上の【今回の生徒の答案】ではなく，このChatGPTのチャットに添付された手書き答案の写真またはスキャンPDFです。
+1. 添付された写真またはスキャンPDFから答案の英文を忠実に読み取ってください。氏名・学校名・受験番号などの個人情報は読み取っても出力しないでください。
 2. 判読できない箇所は推測で補わず，[?] として示してください。採点に影響する判読不能箇所がある場合は，まずその箇所を生徒に確認してください。
-3. 上記の機械的語数は無視し，画像から読み取った答案を使って語数を数え直してください。
+3. 上記の機械的語数は無視し，写真またはスキャンPDFから読み取った答案を使って語数を数え直してください。
 4. 読み取った英文全体を生徒の答案として，実際の設問・注意事項・本文・添削基準に従って添削してください。
-5. 画像がまだ添付されていない場合は，添削を始めず，「答案の写真を添付してください」とだけ案内してください。
+5. 写真またはスキャンPDFがまだ添付されていない場合は，添削を始めず，「答案の写真またはスキャンPDFを添付してください」とだけ案内してください。
 `;
 }
 
@@ -972,18 +972,18 @@ function createImporter(opt){
   tabs.className = "tabs"; tabs.setAttribute("role", "tablist");
   tabs.innerHTML =
     '<button type="button" class="tab" role="tab" id="' + k + 'TabText" aria-selected="true">テキストで入力</button>' +
-    '<button type="button" class="tab" role="tab" id="' + k + 'TabPhoto" aria-selected="false" aria-controls="' + k + 'PhotoPane">手書き答案（写真）</button>';
+    '<button type="button" class="tab" role="tab" id="' + k + 'TabPhoto" aria-selected="false" aria-controls="' + k + 'PhotoPane">手書き答案（写真・スキャンPDF）</button>';
   const pane = document.createElement("div");
   pane.className = "photo-pane"; pane.id = k + "PhotoPane"; pane.hidden = true;
   pane.innerHTML =
     '<div class="photo-chatgpt-guide">' +
-      '<p class="photo-guide-title">手書き答案は，写真のまま添削できます。</p>' +
-      '<ol><li>下の「写真答案をChatGPTで添削する」を押します。</li><li>ChatGPTが開いたら，答案の写真を添付します。</li><li>コピーされた指示文を貼り付けて送信します。</li></ol>' +
+      '<p class="photo-guide-title">手書き答案は，写真・スキャンPDFのまま添削できます。</p>' +
+      '<ol><li>下の「写真・スキャンPDFをChatGPTで添削する」を押します。</li><li>ChatGPTが開いたら，答案の写真またはスキャンPDFを添付します。</li><li>コピーされた指示文を貼り付けて送信します。</li></ol>' +
       '<p class="hint">氏名・学校名・受験番号などの個人情報は写さないでください。</p>' +
-      '<button type="button" class="primary" id="' + k + 'PhotoChatGPTBtn">写真答案をChatGPTで添削する</button>' +
+      '<button type="button" class="primary" id="' + k + 'PhotoChatGPTBtn">写真・スキャンPDFをChatGPTで添削する</button>' +
     '</div>' +
     '<details class="pdf-import-details"><summary>文字データ入りPDFを使う場合</summary>' +
-      '<p class="hint">文字データを含むPDFを選ぶと，答案欄へ取り込めます。スキャン画像だけのPDFは，上の写真答案の方法を使ってください。</p>' +
+      '<p class="hint">文字データを含むPDFは，ここから答案欄へ取り込めます。画像だけのスキャンPDFは，上の「写真・スキャンPDFをChatGPTで添削する」を使ってください。</p>' +
       '<label class="dropzone" id="' + k + 'Dropzone">' +
         '<input type="file" id="' + k + 'File" accept="application/pdf,.pdf">' +
         '<b>PDFをここにドラッグ＆ドロップ</b>' +
