@@ -108,6 +108,15 @@
     color:var(--ink);
   }
   .lede{ margin:0 auto; color:var(--sub); font-size:.9rem; max-width:42em; }
+  .tool-howto { max-width: 680px; margin: 16px auto 0; padding: 14px 16px; text-align: left; background: var(--card, var(--panel)); border: 1px solid var(--paper-line, var(--line)); border-radius: 4px; }
+  .tool-howto-title { margin: 0 0 7px; font-family: var(--font-serif); font-size: .95rem; font-weight: 700; }
+  .tool-howto ol { margin: 0; padding-left: 1.45em; font-size: .84rem; line-height: 1.7; }
+  .tool-howto li { margin: 2px 0; }
+  .tool-howto .hand-title { margin: 8px 0 0; font-family: var(--font-serif); font-size: .88rem; font-weight: 700; }
+  .tool-howto .hand-line { margin: 0; font-size: .84rem; line-height: 1.7; }
+  .tool-howto { border-left: 4px solid var(--navy); }
+  .tool-howto-title, .tool-howto .hand-title { color: var(--navy-deep); }
+
   .sheet-wrap{ padding-top:18px; }
   .panel{
     background:var(--panel);
@@ -315,6 +324,16 @@
       <h1>三田キャンへの道｜自由英作文</h1>
       <div class="tricolor" aria-hidden="true"><span></span><span></span><span></span></div>
       <p class="lede">過去問を解いたあと、自分で書いた答案を入力してください。実際の問題本文・設問と照合しながら添削します。</p>
+      <div class="tool-howto">
+        <p class="tool-howto-title">このページの使い方</p>
+        <ol>
+          <li>年度・問題を選びます。</li>
+          <li>答案を入力します。</li>
+          <li><strong>「ChatGPTで添削する」</strong>を押します。<br>問題文・採点基準・入力した答案データがコピーされ，ChatGPTが開きます。</li>
+          <li>ChatGPTの入力欄に貼り付けて送信します。</li>
+        </ol>
+        <p class="hand-title">手書き答案の場合</p><p class="hand-line">2.で「手書き答案（写真）」を選び，3. 4. の後で<strong>ChatGPTに答案の写真を添付</strong>します。</p>
+      </div>
     </div>
   </header>
 
@@ -332,7 +351,7 @@
     <textarea id="essayInput" spellcheck="false" autocorrect="off" autocomplete="off" autocapitalize="off" placeholder="ここに英作文を入力してください"></textarea>
     <div class="wordcount" id="wordCount">語数: 0 語</div>
     <div class="error-box" id="errorBox"></div>
-    <div class="notice-box" id="noGrantNotice"><strong>手書き答案も利用できます。</strong> 「手書き答案（写真）」を選ぶと，ChatGPTに写真を添付してそのまま添削できます。</div>
+    <div class="notice-box" id="noGrantNotice" style="display:none"></div>
     <button class="primary" id="submitBtn">ChatGPTで添削する</button>
     <div class="loading" id="loadingBox">添削しています…（本文照合・論理構成の確認をしています。1分ほどかかることがあります）</div>
   </div>
