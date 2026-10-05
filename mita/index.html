@@ -277,6 +277,12 @@
   .tab[aria-selected="true"]{ color:var(--navy-deep); border-bottom-color:var(--navy); font-weight:700; }
   .tab:disabled{ opacity:.5; cursor:not-allowed; }
   .photo-pane{ margin-bottom:14px; }
+  .photo-chatgpt-guide{ background:var(--navy-soft); border:1px solid var(--line); border-left:3px solid var(--navy); border-radius:3px; padding:15px; margin-bottom:14px; }
+  .photo-guide-title{ margin:0 0 8px; font-family:var(--font-serif); font-weight:700; color:var(--navy-deep); }
+  .photo-chatgpt-guide ol{ margin:8px 0 12px; padding-left:1.4em; }
+  .photo-chatgpt-guide li{ margin-bottom:5px; }
+  .pdf-import-details{ margin-top:14px; border-top:1px solid var(--line); padding-top:8px; }
+  .pdf-import-details > summary{ cursor:pointer; color:var(--sub); font-size:.86rem; padding:7px 0; }
   .privacy-note{
     font-size:.85rem; font-weight:700; color:var(--warn); background:var(--warn-soft);
     border-left:3px solid var(--warn); border-radius:2px; padding:9px 13px; margin:0 0 10px;
@@ -326,7 +332,7 @@
     <textarea id="essayInput" spellcheck="false" autocorrect="off" autocomplete="off" autocapitalize="off" placeholder="ここに英作文を入力してください"></textarea>
     <div class="wordcount" id="wordCount">語数: 0 語</div>
     <div class="error-box" id="errorBox"></div>
-    <div class="notice-box" id="noGrantNotice">この公開版では，添削用の指示文を作成して生徒自身のChatGPTへ渡します。手書き写真の自動読み取りは行いません。文字データを含むPDFは読み込めます。手書き答案はChatGPT側に画像を添付してください。</div>
+    <div class="notice-box" id="noGrantNotice"><strong>手書き答案も利用できます。</strong> 「手書き答案（写真）」を選ぶと，ChatGPTに写真を添付してそのまま添削できます。</div>
     <button class="primary" id="submitBtn">ChatGPTで添削する</button>
     <div class="loading" id="loadingBox">添削しています…（本文照合・論理構成の確認をしています。1分ほどかかることがあります）</div>
   </div>
@@ -520,6 +526,20 @@ function resetResult(){
 }
 
 // ---------- prompt building ----------
+function buildPhotoPrompt(problem){
+  const base = buildPrompt(problem, "[答案はこのチャットに添付する手書き画像です]", false, null, null);
+  return base + `
+
+【写真答案についての最優先指示】
+今回の採点対象は，上の【今回の生徒の答案】ではなく，このChatGPTのチャットに添付された手書き答案の画像です。
+1. 添付画像から答案の英文を忠実に読み取ってください。氏名・学校名・受験番号などの個人情報は読み取っても出力しないでください。
+2. 判読できない箇所は推測で補わず，[?] として示してください。採点に影響する判読不能箇所がある場合は，まずその箇所を生徒に確認してください。
+3. 上記の機械的語数は無視し，画像から読み取った答案を使って語数を数え直してください。
+4. 読み取った英文全体を生徒の答案として，実際の設問・注意事項・本文・添削基準に従って添削してください。
+5. 画像がまだ添付されていない場合は，添削を始めず，「答案の写真を添付してください」とだけ案内してください。
+`;
+}
+
 function buildPrompt(problem, essay, isResubmission, prevEssay, prevOverall){
   let passagesText = '';
   Object.keys(problem.passages).forEach(roman => {
@@ -933,29 +953,36 @@ function createImporter(opt){
   tabs.className = "tabs"; tabs.setAttribute("role", "tablist");
   tabs.innerHTML =
     '<button type="button" class="tab" role="tab" id="' + k + 'TabText" aria-selected="true">テキストで入力</button>' +
-    '<button type="button" class="tab" role="tab" id="' + k + 'TabPhoto" aria-selected="false" aria-controls="' + k + 'PhotoPane">写真・PDFから読み取る</button>';
+    '<button type="button" class="tab" role="tab" id="' + k + 'TabPhoto" aria-selected="false" aria-controls="' + k + 'PhotoPane">手書き答案（写真）</button>';
   const pane = document.createElement("div");
   pane.className = "photo-pane"; pane.id = k + "PhotoPane"; pane.hidden = true;
   pane.innerHTML =
-    '<p class="privacy-note">' + escapeHtml(IMPORT_MSG.privacy) + '</p>' +
-    '<p class="hint" style="margin-top:0">写真（JPEG・PNG・WebP）またはPDFを選んでください。撮影する場合は，答案部分が画面いっぱいになるよう，真上から明るい場所で撮ってください。写真は約120万画素に縮小してからClaudeへ送るため，小さく写った文字は読み取れないことがあります。</p>' +
-    '<label class="dropzone" id="' + k + 'Dropzone">' +
-      '<input type="file" id="' + k + 'File" accept="image/jpeg,image/png,image/webp,application/pdf,.pdf" multiple>' +
-      '<b>ここにファイルをドラッグ＆ドロップ</b>' +
-      '<span>またはクリックしてファイルを選択（写真・PDF）</span>' +
-      '<span class="drop-hint" id="' + k + 'DropHint">画面にコピーした画像やPDFは，Ctrl+V（Macは⌘+V）で貼り付けられる場合があります。</span>' +
-      '<span class="file-name" id="' + k + 'FileName"></span>' +
-    '</label>' +
-    '<div class="thumbs" id="' + k + 'Thumbs"></div>' +
-    '<div class="loading" id="' + k + 'PrepLoading">PDFを開いています…</div>' +
-    '<div class="notice-box warn" id="' + k + 'FileNote"></div>' +
-    '<div class="import-actions">' +
-      '<button type="button" class="secondary" id="' + k + 'ReloadAsImage" hidden>画像として読み取り直す</button>' +
-      '<button type="button" class="secondary" id="' + k + 'OcrBtn" disabled>英文を読み取る</button>' +
+    '<div class="photo-chatgpt-guide">' +
+      '<p class="photo-guide-title">手書き答案は，写真のまま添削できます。</p>' +
+      '<ol><li>下の「写真答案をChatGPTで添削する」を押します。</li><li>ChatGPTが開いたら，答案の写真を添付します。</li><li>コピーされた指示文を貼り付けて送信します。</li></ol>' +
+      '<p class="hint">氏名・学校名・受験番号などの個人情報は写さないでください。</p>' +
+      '<button type="button" class="primary" id="' + k + 'PhotoChatGPTBtn">写真答案をChatGPTで添削する</button>' +
     '</div>' +
-    '<div class="loading" id="' + k + 'OcrLoading">読み取っています…（数十秒かかることがあります）</div>' +
-    '<div class="notice-box warn" id="' + k + 'OcrNote"></div>' +
-    '<div class="error-box" id="' + k + 'OcrError"></div>';
+    '<details class="pdf-import-details"><summary>文字データ入りPDFを使う場合</summary>' +
+      '<p class="hint">文字データを含むPDFを選ぶと，答案欄へ取り込めます。スキャン画像だけのPDFは，上の写真答案の方法を使ってください。</p>' +
+      '<label class="dropzone" id="' + k + 'Dropzone">' +
+        '<input type="file" id="' + k + 'File" accept="application/pdf,.pdf">' +
+        '<b>PDFをここにドラッグ＆ドロップ</b>' +
+        '<span>またはクリックしてPDFを選択</span>' +
+        '<span class="drop-hint" id="' + k + 'DropHint"></span>' +
+        '<span class="file-name" id="' + k + 'FileName"></span>' +
+      '</label>' +
+      '<div class="thumbs" id="' + k + 'Thumbs"></div>' +
+      '<div class="loading" id="' + k + 'PrepLoading">PDFを開いています…</div>' +
+      '<div class="notice-box warn" id="' + k + 'FileNote"></div>' +
+      '<div class="import-actions" hidden>' +
+        '<button type="button" class="secondary" id="' + k + 'ReloadAsImage" hidden>画像として読み取り直す</button>' +
+        '<button type="button" class="secondary" id="' + k + 'OcrBtn" disabled>英文を読み取る</button>' +
+      '</div>' +
+      '<div class="loading" id="' + k + 'OcrLoading"></div>' +
+      '<div class="notice-box warn" id="' + k + 'OcrNote"></div>' +
+      '<div class="error-box" id="' + k + 'OcrError"></div>' +
+    '</details>';
   ta.parentNode.insertBefore(tabs, ta);
   ta.parentNode.insertBefore(pane, ta);
   const unclearNote = document.createElement("div");
@@ -969,6 +996,12 @@ function createImporter(opt){
   const dropHint = el("DropHint"), fileName = el("FileName"), thumbs = el("Thumbs"), prepLoading = el("PrepLoading");
   const fileNote = el("FileNote"), reloadBtn = el("ReloadAsImage"), ocrBtn = el("OcrBtn"), ocrLoading = el("OcrLoading");
   const ocrNote = el("OcrNote"), ocrError = el("OcrError");
+  const photoChatGPTBtn = el("PhotoChatGPTBtn");
+  photoChatGPTBtn.addEventListener("click", async () => {
+    if(!currentProblem){ note(ocrError, "年度・問題を選択してください。"); return; }
+    try{ await handoffToChatGPT(buildPhotoPrompt(currentProblem)); }
+    catch(_){ note(ocrError, "ChatGPTを開く準備ができませんでした。もう一度お試しください。"); }
+  });
 
   const st = { mode: "text", photos: [], thumbURLs: [], lastPdf: null, token: 0, busy: false, locked: false };
 
@@ -1204,7 +1237,7 @@ async function initImportCaps(){
 
 essayImporter = createImporter({
   key: "essay", textareaId: "essayInput", panelId: "answerPanel", submitBtnId: "submitBtn", wordCountId: "wordCount",
-  isUnavailable: () => sampleReady && !sampleFn,
+  isUnavailable: () => false,
 });
 resubmitImporter = createImporter({
   key: "resubmit", textareaId: "resubmitInput", panelId: "resubmitPanel", submitBtnId: "resubmitBtn", wordCountId: "resubmitWordCount",
