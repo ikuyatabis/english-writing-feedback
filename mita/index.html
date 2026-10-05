@@ -329,8 +329,8 @@
         <ol>
           <li>年度・問題を選びます。</li>
           <li>答案を入力します。</li>
-          <li><strong>「ChatGPTで添削する」</strong>を押します。<br>問題文・採点基準・入力した答案データがコピーされ，ChatGPTが開きます。</li>
-          <li>ChatGPTの入力欄に貼り付けて送信します。</li>
+          <li><strong>「ChatGPTを開く」</strong>を押します。<br>ChatGPTが開き，入力した答案データが自動的に入力されます。採点用データはバックグラウンドでコピーされます。</li>
+          <li>コピーされた採点用データをChatGPTの入力欄に貼り付けて送信します。<br>※ Windowsでは Ctrl＋V，Macでは ⌘＋V，スマートフォン・タブレットでは入力欄をタップまたは長押しして「貼り付け」を選びます。</li>
         </ol>
         <p class="hand-title">写真・PDFの場合</p><p class="hand-line">2.で「手書き答案（写真・PDF）」を選び，3. 4. の後で<strong>ChatGPTに答案の写真またはPDFを添付</strong>します。</p>
       </div>
@@ -352,7 +352,7 @@
     <div class="wordcount" id="wordCount">語数: 0 語</div>
     <div class="error-box" id="errorBox"></div>
     <div class="notice-box" id="noGrantNotice" style="display:none"></div>
-    <button class="primary" id="submitBtn">ChatGPTで添削する</button>
+    <button class="primary" id="submitBtn">ChatGPTを開く</button>
     <div class="loading" id="loadingBox">添削しています…（本文照合・論理構成の確認をしています。1分ほどかかることがあります）</div>
   </div>
 
@@ -787,7 +787,7 @@ document.getElementById('submitBtn').addEventListener('click', async () => {
     const prompt = buildPrompt(currentProblem, essay, false, null, null);
     await handoffToChatGPT(prompt);
     lastEssay = essay;
-    btn.textContent = 'もう一度ChatGPTで添削する';
+    btn.textContent = 'もう一度ChatGPTを開く';
   }catch(err){ errorBox.textContent = '添削用の指示文を準備できませんでした。もう一度お試しください。'; errorBox.classList.add('show'); }
   finally{ btn.disabled = false; }
 });
@@ -978,9 +978,9 @@ function createImporter(opt){
   pane.innerHTML =
     '<div class="photo-chatgpt-guide">' +
       '<p class="photo-guide-title">写真・PDFの答案は，ChatGPTにそのまま添付して添削できます。</p>' +
-      '<ol><li>下の「写真・PDFをChatGPTで添削する」を押します。</li><li>ChatGPTが開いたら，答案の写真またはPDFを添付します。</li><li>コピーされた指示文を貼り付けて送信します。</li></ol>' +
+      '<ol><li>下の「ChatGPTを開く」を押します。</li><li>ChatGPTが開いたら，答案の写真またはPDFを添付します。</li><li>コピーされた指示文を貼り付けて送信します。</li></ol>' +
       '<p class="hint">氏名・学校名・受験番号などの個人情報は写さないでください。</p>' +
-      '<button type="button" class="primary" id="' + k + 'PhotoChatGPTBtn">写真・PDFをChatGPTで添削する</button>' +
+      '<button type="button" class="primary" id="' + k + 'PhotoChatGPTBtn">ChatGPTを開く</button>' +
     '</div>' +
     '<details class="pdf-import-details" hidden><summary>PDF内部処理（公開版では使用しません）</summary>' +
       '<p class="hint">公開版ではPDFをこのページに取り込みません。ChatGPT側に直接添付してください。</p>' +
