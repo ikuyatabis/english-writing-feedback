@@ -370,11 +370,6 @@
     padding: 22px; text-align: center; color: var(--ink-soft);
   }
 
-  .sample-unavailable {
-    background: var(--warn-bg); color: var(--warn); border-radius: 4px;
-    padding: 14px 16px; margin-bottom: 18px; font-size: 0.92rem;
-  }
-
   .disclaimer { font-size: 0.76rem; color: var(--ink-soft); text-align: center; margin-top: 30px; }
 
   [hidden] { display: none !important; }
@@ -402,8 +397,6 @@
   </header>
 
   <div class="sheet-wrap">
-    <div id="sampleUnavailable" class="sample-unavailable" hidden></div>
-
     <section class="controls">
       <div class="field">
         <label for="yearSelect">年度</label>
@@ -493,7 +486,6 @@ const PROBLEMS = [{"id": "2017_文化構想", "year": "2017", "faculty": "文化
   const errorBox = document.getElementById("errorBox");
   const resultArea = document.getElementById("resultArea");
   const modelAnswers = document.getElementById("modelAnswers");
-  const sampleUnavailableBox = document.getElementById("sampleUnavailable");
 
   years.forEach(function (y) {
     const opt = document.createElement("option");
@@ -830,14 +822,6 @@ async function handoffToChatGPT(basePrompt){
   async function initSample() {
     sampleFn = null;
     sampleReady = true;
-    sampleUnavailableBox.hidden = false;
-    sampleUnavailableBox.textContent = "";
-    gradeBtn.disabled = false;
-  }
-
-  function showSampleUnavailable(msg) {
-    sampleUnavailableBox.hidden = false;
-    sampleUnavailableBox.textContent = msg;
     gradeBtn.disabled = false;
   }
 
