@@ -379,7 +379,7 @@
       <details class="tool-howto">
         <summary class="tool-howto-title"><strong>事前にChatGPTへログインしてから使ってください（使い方はこちら）</strong></summary>
         <ol>
-          <li>① 年度・問題を選びます。</li>
+          <li>① 年度・学部を選びます。</li>
           <li>② 答案を入力します。</li>
           <li>③ <strong>「ChatGPTを開く」</strong>を押します。採点基準と答案をまとめた採点用データが自動でコピーされます。</li>
           <li>④ ChatGPTに貼り付けて送信します。</li>
@@ -394,11 +394,12 @@
     <section class="controls">
       <div class="field">
         <label for="yearSelect">年度</label>
-        <select id="yearSelect"></select>
+        <select id="yearSelect"><option value="">選択してください</option></select>
       </div>
       <div class="field">
         <label for="facultySelect">学部</label>
         <select id="facultySelect">
+          <option value="">選択してください</option>
           <option value="文化構想">文化構想学部</option>
           <option value="文">文学部</option>
         </select>
@@ -716,6 +717,12 @@ const PROBLEMS = [{"id": "2017_文化構想", "year": "2017", "faculty": "文化
   }
 
   function loadProblem() {
+    if (!yearSelect.value || !facultySelect.value) {
+      problemArea.hidden = true;
+      notFound.hidden = true;
+      currentProblem = null;
+      return;
+    }
     const id = yearSelect.value + "_" + facultySelect.value;
     const problem = problemById[id];
     if (!problem) {
@@ -743,8 +750,7 @@ const PROBLEMS = [{"id": "2017_文化構想", "year": "2017", "faculty": "文化
   facultySelect.addEventListener("change", loadProblem);
   answerInput.addEventListener("input", saveDraft);
 
-  // default selection
-  yearSelect.value = years[0];
+  // 初期状態では問題を表示しない
   loadProblem();
 
   /* ---------- ChatGPT handoff ---------- */
