@@ -141,6 +141,25 @@
   }
   .tool-howto { max-width: 680px; margin: 10px auto 0; padding: 7px 12px; text-align: left; background: var(--card, var(--panel)); border: 1px solid var(--paper-line, var(--line)); border-left: 4px solid var(--maroon); border-radius: 4px; }
   .tool-howto-title { margin: 0; font-family: var(--font-serif); font-size: .88rem; font-weight: 700; color: var(--maroon-deep); cursor: pointer; line-height: 1.45; }
+  /* fixed how-to disclosure marker */
+  .tool-howto > summary.tool-howto-title { list-style: none; }
+  .tool-howto > summary.tool-howto-title::-webkit-details-marker { display: none; }
+  .tool-howto > summary.tool-howto-title::before {
+    content: "";
+    display: inline-block;
+    width: 0;
+    height: 0;
+    border-top: 4.5px solid transparent;
+    border-bottom: 4.5px solid transparent;
+    border-left: 7px solid currentColor;
+    margin-right: 8px;
+    vertical-align: 1px;
+  }
+  .tool-howto[open] > summary.tool-howto-title::before {
+    transform: rotate(90deg);
+    transform-origin: 3px 4.5px;
+  }
+  /* end fixed how-to disclosure marker */
   .tool-howto[open] .tool-howto-title { margin-bottom: 7px; }
   .tool-howto ol { margin: 0; padding-left: 0; list-style: none; font-size: .81rem; line-height: 1.55; }
   .tool-howto li { margin: 1px 0; }
