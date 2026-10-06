@@ -63,14 +63,13 @@
   .kicker { margin: 0 0 6px; font-size: 0.82rem; letter-spacing: 0.04em; color: var(--wine); font-weight: 500; }
   h1 { margin: 0 0 4px; font-family: var(--font-serif); font-weight: 800; font-size: clamp(1.5rem, 5vw, 2rem); letter-spacing: 0.03em; color: var(--ink); }
   .lede { margin: 0 auto; color: var(--ink-soft); font-size: 0.9rem; max-width: 42em; }
-  .tool-howto { max-width: 680px; margin: 16px auto 0; padding: 14px 16px; text-align: left; background: var(--card, var(--panel)); border: 1px solid var(--paper-line, var(--line)); border-radius: 4px; }
-  .tool-howto-title { margin: 0 0 7px; font-family: var(--font-serif); font-size: .95rem; font-weight: 700; }
-  .tool-howto ol { margin: 0; padding-left: 1.45em; font-size: .84rem; line-height: 1.7; }
-  .tool-howto li { margin: 2px 0; }
-  .tool-howto .hand-title { margin: 8px 0 0; font-family: var(--font-serif); font-size: .88rem; font-weight: 700; }
-  .tool-howto .hand-line { margin: 0; font-size: .84rem; line-height: 1.7; }
-  .tool-howto { border-left: 4px solid var(--wine); }
-  .tool-howto-title, .tool-howto .hand-title { color: var(--wine-deep); }
+  .tool-howto { max-width: 680px; margin: 10px auto 0; padding: 7px 12px; text-align: left; background: var(--card, var(--panel)); border: 1px solid var(--paper-line, var(--line)); border-left: 4px solid var(--wine); border-radius: 4px; }
+  .tool-howto-title { margin: 0; font-family: var(--font-serif); font-size: .88rem; font-weight: 700; color: var(--wine-deep); cursor: pointer; line-height: 1.45; }
+  .tool-howto[open] .tool-howto-title { margin-bottom: 7px; }
+  .tool-howto ol { margin: 0; padding-left: 0; list-style: none; font-size: .81rem; line-height: 1.55; }
+  .tool-howto li { margin: 1px 0; }
+  .tool-howto .hand-title { margin: 7px 0 0; font-family: var(--font-serif); font-size: .84rem; font-weight: 700; color: var(--wine-deep); }
+  .tool-howto .hand-line { margin: 0; font-size: .81rem; line-height: 1.55; }
 
 
   .sheet-wrap { padding-top: 18px; }
@@ -199,16 +198,16 @@
       <h1>伊都への恋文｜自由英作文</h1>
       <div class="tricolor" aria-hidden="true"><span></span><span></span><span></span></div>
       <p class="lede">2024～2026年度の自由英作文（第4問・第5問）を，独自の採点基準に基づいて試験的に添削します。</p>
-      <div class="tool-howto">
-        <p class="tool-howto-title">このページの使い方</p>
-        <ol style="list-style:none;padding-left:0">
+      <details class="tool-howto">
+        <summary class="tool-howto-title">このページの使い方</summary>
+        <ol>
           <li>① 年度・問題を選びます。</li>
           <li>② 答案を入力します。</li>
-          <li>③ <strong>「ChatGPTを開く」</strong>を押します。<br>ChatGPTが開きます。バックグラウンドでは，<strong>採点基準および②で入力した答案をまとめた採点用データ</strong>が自動的にコピーされます。</li>
-          <li>④ ③でコピーされた採点用データをChatGPTの入力欄に貼り付けて，送信します。<br>※ Windowsでは Ctrl＋V，Macでは ⌘＋V，スマートフォン・タブレットでは入力欄をタップまたは長押しして「貼り付け」を選びます。</li>
+          <li>③ <strong>「ChatGPTを開く」</strong>を押します。採点基準と答案をまとめた採点用データが自動でコピーされます。</li>
+          <li>④ ChatGPTに貼り付けて送信します。</li>
         </ol>
-        <p class="hand-title">写真・PDFの場合</p><p class="hand-line">写真・PDFは採点用データには含まれません。<br>②で「手書き答案（写真・PDF）」を選び，③でChatGPTを開きます。④で採点用データを貼り付けた後，<strong>答案の写真またはPDFを添付して送信</strong>します。</p>
-      </div>
+        <p class="hand-title">写真・PDFの場合</p><p class="hand-line">②で「手書き答案（写真・PDF）」を選び，④で採点用データを貼り付けた後，答案の写真またはPDFを添付して送信します。</p>
+      </details>
     </div>
   </header>
 
