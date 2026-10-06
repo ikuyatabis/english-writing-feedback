@@ -215,6 +215,11 @@
     transition: transform 0.15s ease;
   }
   details[open] > summary::before { transform: rotate(90deg); }
+  /* 「使い方」は三田ページと同じブラウザ標準の開閉マーカーを使う */
+  .tool-howto > summary.tool-howto-title { padding: 0; list-style: disclosure-closed; }
+  .tool-howto[open] > summary.tool-howto-title { list-style: disclosure-open; }
+  .tool-howto > summary.tool-howto-title::-webkit-details-marker { display: inline; }
+  .tool-howto > summary.tool-howto-title::before { content: none; display: none; transform: none; }
   .passage-text, .translation-text {
     padding: 0 16px 16px;
     font-size: 0.98rem;
