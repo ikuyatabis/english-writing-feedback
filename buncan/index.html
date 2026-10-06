@@ -200,7 +200,7 @@
     margin-bottom: 14px;
     background: var(--paper);
   }
-  details > summary {
+  details:not(.tool-howto) > summary {
     cursor: pointer;
     padding: 10px 14px;
     font-weight: 500;
@@ -208,19 +208,13 @@
     color: var(--maroon-deep);
     list-style: none;
   }
-  details > summary::-webkit-details-marker { display: none; }
-  details > summary::before {
+  details:not(.tool-howto) > summary::-webkit-details-marker { display: none; }
+  details:not(.tool-howto) > summary::before {
     content: "▸ ";
     display: inline-block;
     transition: transform 0.15s ease;
   }
-  details[open] > summary::before { transform: rotate(90deg); }
-  /* 「使い方」は三田ページと同じブラウザ標準の開閉マーカーを使う */
-  .tool-howto > summary.tool-howto-title { padding: 0; list-style: disclosure-closed; }
-  .tool-howto[open] > summary.tool-howto-title { list-style: disclosure-open; }
-  .tool-howto > summary.tool-howto-title::-webkit-details-marker { display: inline; }
-  .tool-howto > summary.tool-howto-title::marker { font-size: 1.28em; }
-  .tool-howto > summary.tool-howto-title::before { content: none; display: none; transform: none; }
+  details:not(.tool-howto)[open] > summary::before { transform: rotate(90deg); }
   .passage-text, .translation-text {
     padding: 0 16px 16px;
     font-size: 0.98rem;
