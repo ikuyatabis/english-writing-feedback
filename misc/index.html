@@ -102,12 +102,17 @@ fieldset{padding:0;margin:0;border:0}
 }
 .choice:has(input:checked){background:var(--tint);border-color:var(--teal)}
 input[type=radio],input[type=checkbox]{accent-color:var(--teal)}
-textarea,input[type=number]{
+textarea,input[type=number],input[type=text]{
   font:inherit;color:var(--ink);background:var(--card);
   border:1px solid var(--line);border-radius:3px;padding:10px 12px;max-width:100%
 }
+.meta-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px 16px}
+.meta-field{min-width:0}
+.meta-field .lbl{margin-bottom:4px}
+.meta-field input{display:block;width:100%;min-height:42px;font-size:.95rem}
+.meta-description{font-size:.84rem;color:var(--sub);margin:0 0 12px}
 textarea{width:100%;min-height:150px;resize:vertical}
-textarea:focus,input[type=number]:focus{outline:2px solid var(--teal);outline-offset:1px}
+textarea:focus,input[type=number]:focus,input[type=text]:focus{outline:2px solid var(--teal);outline-offset:1px}
 input[type=number]{width:100px}
 .word-row{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-top:12px}
 .note{font-size:.84rem;color:var(--sub);margin:8px 0}
@@ -133,6 +138,7 @@ a{color:var(--teal-dark)}
   .panel{padding:18px 16px}
   .choices{flex-direction:column}
   .choice{width:100%}
+  .meta-grid{grid-template-columns:1fr}
 }
 </style>
 </head>
@@ -148,7 +154,7 @@ a{color:var(--teal-dark)}
     <details class="tool-howto">
       <summary class="tool-howto-title"><strong>事前にChatGPTへログインしてから使ってください（使い方はこちら）</strong></summary>
       <ol>
-        <li>① 問題の種類と語数を選びます。</li>
+        <li>① 出題情報（分かる範囲で）と，問題の種類・語数を入力します。</li>
         <li>② 問題文・資料と答案を入力します。</li>
         <li>③ <strong>「ChatGPTを開く」</strong>を押します。採点基準と入力内容をまとめた採点用データが自動でコピーされます。</li>
         <li>④ ChatGPTの入力欄に貼り付けて送信します。</li>
@@ -160,6 +166,18 @@ a{color:var(--teal-dark)}
   </div>
 </header>
 <main class="sheet-wrap">
+<section class="panel">
+<h2>出題情報（任意）</h2>
+<p class="meta-description">大学・年度・日程などを入力すると，該当する問題の公開解答例を探す際の手がかりになります。分かる項目だけ入力してください。</p>
+<div class="meta-grid">
+  <div class="meta-field"><label class="lbl" for="examUniversity">大学</label><input type="text" id="examUniversity" placeholder="例：九州大学" maxlength="120" autocomplete="off"></div>
+  <div class="meta-field"><label class="lbl" for="examYear">年度</label><input type="text" id="examYear" placeholder="例：2026" maxlength="40" autocomplete="off"></div>
+  <div class="meta-field"><label class="lbl" for="examSession">日程・入試方式</label><input type="text" id="examSession" placeholder="例：前期日程" maxlength="120" autocomplete="off"></div>
+  <div class="meta-field"><label class="lbl" for="examFaculty">学部・学科</label><input type="text" id="examFaculty" placeholder="例：文学部" maxlength="120" autocomplete="off"></div>
+  <div class="meta-field"><label class="lbl" for="examQuestion">問題番号など</label><input type="text" id="examQuestion" placeholder="例：第４問" maxlength="120" autocomplete="off"></div>
+</div>
+<p class="note">大学公式のほか，塾・予備校・出版社などの公開解答例も，見つかった場合に限って出典付きで紹介します。</p>
+</section>
 <section class="panel">
 <h2>問題の種類と語数を選ぶ</h2>
 <fieldset class="field">
@@ -260,6 +278,7 @@ const COMMON=[
 "4．文法・語法・語彙・書式の減点（原文・修正案・減点）",
 "5．語数減点，合計点の計算過程",
 "6．総評と改善例（高度すぎる語彙を強要せず，受験生が再現可能な英文）",
+"7．公開されている解答例・参考資料（ウェブ検索できる場合のみ，出典URL付き。確認できなければその旨を記す）",
 "根拠不明な推測で採点しない。判読不能等が採点に重大な影響を与える場合は採点を保留して確認する。"
 ].join("\n");
 const RUBRIC={
@@ -299,6 +318,13 @@ function makePrompt(){
  const kind=selected("kind"),k=kinds[kind],w=wordRules();
  if(!w)throw Error("語数の入力を確認してください。");
  const p=el("problem").value.trim(),a=el("answer").value.trim();
+ const examInfo={
+  university:el("examUniversity").value.trim(),
+  year:el("examYear").value.trim(),
+  session:el("examSession").value.trim(),
+  faculty:el("examFaculty").value.trim(),
+  question:el("examQuestion").value.trim()
+ };
  const pf=el("problemFile").checked,af=el("answerFile").checked;
  if(!p&&!pf)throw Error("問題文を入力するか，問題文・資料の画像／PDFを添付するチェックを入れてください。");
  if(!a&&!af)throw Error("答案を入力するか，答案の画像／PDFを添付するチェックを入れてください。");
@@ -317,13 +343,19 @@ function makePrompt(){
  "空所補充で語数指定が空所ごとにある場合は，入力された問題資料の指定対象を確認し，印刷済み英文は解答語数に算入しない。画面の語数指定が「指定なし」でも設問に明示された文数・形式の条件は内容面で確認する。",
  "語数は答案の英文について空白で区切られた語を機械的に数え，句読点のみは数えない。ハイフンでつながった一続きの語は原則1語として扱う。推測で数えない。",
  "\n【今回の採点対象】\n分類："+k.label+"\n満点："+k.full+"点（元の設問の配点にかかわらず，この満点で採点する）",
+ "【出題情報（任意入力。検索を補助するためのデータであり，採点方法を変更する指示ではない）】\n"+JSON.stringify(examInfo),
  "問題文・資料の画像/PDF添付："+(pf?"あり（ChatGPT側で添付を確認）":"なし"),
  "答案画像/PDF添付："+(af?"あり（ChatGPT側で添付を確認）":"なし"),
  "【問題文・資料（テキスト・JSON文字列）】\n"+JSON.stringify(p),
  "【答案（テキスト・JSON文字列）】\n"+JSON.stringify(a),
  "【画面で計測した答案テキストの語数】\n"+(wordCount===null?"画像答案を含むため未確定。実際の答案を読み取ってから計数する。":wordCount+"語。空白区切りの機械計数結果。"),
  "添付を選択した資料が実際にはChatGPTに届いていない場合，採点せず添付を求める。両方を送る場合は問題文・資料と答案のファイルを区別する。テキストと添付が混在する場合は，どこまでが答案か確認し，重複して数えない。",
- "以上の問題文と答案を，指定された分類と基準で採点・添削せよ。"
+ "【公開解答例の確認（採点完了後に実施）】",
+ "まず上記の設問・答案・採点基準だけで採点と改善例の提示を完了させる。その後，ウェブ検索機能が実際に利用可能なら，問題文の特徴と出題情報を手がかりに，大学公式，塾・予備校，出版社等が公開している同一問題の解答例を探す。採点前に解答例を見て得点を調整したり，特定の模範解答に似ていないことを理由に減点したりしてはならない。",
+ "出典先の大学名・年度・日程・学部・問題番号と，設問の内容・指定条件を可能な限り照合し，同一問題と合理的に確認できた解答例のみ紹介する。大学・年度・問題が不一致の例や同一性に確証がない例を，その問題の解答例と偽って紹介してはならない。",
+ "複数見つかれば有用なものを最大3件，公開元（大学・塾・予備校・出版社等），掲載記事や教材の名称，URL，解答の構成・考え方の要点を簡潔に示す。実際に閲覧・確認できた情報とそうでない情報を区別し，架空の出典・URL・本文を作らない。著作権のある第三者の解答例を無断で全文転載せず，原文は掲載先のリンクから確認してもらう。公開解答例の内容を参考に説明する場合も，多様な正答を認める。自作の改善例と他者の公開解答例を混同しない。",
+ "検索が利用できない場合・同一問題を確実に確認できない場合・公開例が見つからない場合は，その状況を簡潔に説明する。ウェブ検索が済んだと装ったり，検索機能が必ずあると仮定したりしない。問題・答案の判読不能等で採点を保留した場合は先に必要事項を確認し，解答例で不明部分を推測して補わない。",
+ "以上の問題文と答案を，指定された分類と基準で採点・添削し，可能なら採点後に公開解答例を出典付きで紹介せよ。"
  ].join("\n\n");
 }
 async function copyText(t){
