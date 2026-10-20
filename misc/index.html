@@ -243,9 +243,10 @@ el("go").addEventListener("click",async()=>{
  const f=el("feedback");f.className="";f.textContent="";el("manualBox").style.display="none";
  let prompt;
  try{prompt=makePrompt();}catch(e){f.className="error";f.textContent=e.message;return;}
+ const clipboardResult=copyText(prompt);
  const tab=window.open("https://chatgpt.com/","_blank");
  if(tab){try{tab.opener=null;}catch(e){}}
- const copied=await copyText(prompt);
+ const copied=await clipboardResult;
  el("manual").value=prompt;
  if(copied){f.textContent="採点用データをコピーしました。ChatGPTの入力欄に貼り付けてください。"+((el("problemFile").checked||el("answerFile").checked)?" 指定した画像・PDFも忘れずに添付してください。":"");}
  else {el("manualBox").style.display="block";f.className="error";f.textContent="自動コピーできませんでした。下の欄から手動でコピーしてください。";}
