@@ -30,7 +30,6 @@ textarea{width:100%;min-height:120px;resize:vertical}
 input[type=number]{width:100px}
 .word-row{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-top:12px}
 .note{font-size:.84rem;color:var(--sub);margin:8px 0}
-.word-summary{color:var(--teal-dark);font-size:.88rem;margin:10px 0 0;font-weight:700}
 .check{display:flex;gap:8px;align-items:flex-start;margin:10px 0;cursor:pointer}.check input{margin-top:6px}
 button{border:0;background:var(--teal);color:#fff;font:inherit;font-weight:700;border-radius:10px;padding:14px 20px;width:100%;cursor:pointer}
 button:hover{filter:brightness(.95)}
@@ -73,8 +72,6 @@ footer{font-size:.83rem;color:var(--sub);text-align:center;margin-top:24px}
 </div>
 <div id="approxBox" class="word-row"><input id="approxWords" type="number" min="1" max="5000" step="1" value="100" aria-label="目安語数">words程度</div>
 <div id="rangeBox" class="word-row" hidden><input id="minWords" type="number" min="1" max="5000" step="1" value="80" aria-label="語数の下限">～<input id="maxWords" type="number" min="1" max="5000" step="1" value="120" aria-label="語数の上限">words</div>
-<p id="wordSummary" class="word-summary" aria-live="polite"></p>
-<p class="note">約±10％を許容し，境界は10語単位に四捨五入します。許容範囲外は－15点。40点満点の大幅な語数不足は－30点，30点満点では－15点のみです。</p>
 </fieldset>
 </section>
 <section class="panel">
@@ -128,7 +125,7 @@ const kinds={opinion:{label:"意見の表明",full:40},chart:{label:"図表の�
 function validInt(v){return v!==""&&Number.isInteger(Number(v))&&Number(v)>=1&&Number(v)<=5000;}
 function wordRules(){
  const mode=selected("wordmode");
- if(mode==="none")return {mode,summary:"語数指定なし：語数減点はありません。"};
+ if(mode==="none")return {mode};
  const a=el("approxWords").value,lo=el("minWords").value,hi=el("maxWords").value;
  if(mode==="approx"&&!validInt(a))return null;
  if(mode==="range"&&(!validInt(lo)||!validInt(hi)||Number(lo)>Number(hi)))return null;
@@ -136,16 +133,14 @@ function wordRules(){
  const freeLow=near10(low*.9),freeHigh=near10(high*1.1);
  const full=kinds[selected("kind")].full;
  const severe=full===40?near10(((low+high)/2)*.6):null;
- return {mode,low,high,freeLow,freeHigh,severe,summary:"減点なし："+freeLow+"～"+freeHigh+"語／不足・超過：－15点"+(full===40?"／大幅不足（"+severe+"語未満）：－30点":"")};
+ return {mode,low,high,freeLow,freeHigh,severe};
 }
 function refresh(){
  const mode=selected("wordmode");
  el("approxBox").hidden=mode!=="approx";el("rangeBox").hidden=mode!=="range";
- const w=wordRules();
- el("wordSummary").textContent=w?w.summary:"正しい語数を入力してください。";
 }
-document.querySelectorAll('input[name="kind"],input[name="wordmode"],input[type="number"]').forEach(node=>{
- node.addEventListener("change",refresh);node.addEventListener("input",refresh);
+document.querySelectorAll('input[name="wordmode"]').forEach(node=>{
+ node.addEventListener("change",refresh);
 });
 const COMMON=[
 "【採点者としての役割】",
