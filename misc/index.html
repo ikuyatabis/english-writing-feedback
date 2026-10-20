@@ -150,25 +150,25 @@ a{color:var(--teal-dark)}
     <p class="kicker">よろず承ります</p>
     <h1>持ち込み診療所｜自由英作文</h1>
     <div class="tricolor" aria-hidden="true"><span></span><span></span><span></span></div>
-    <p class="lede">大学・年度を問わず，独自の採点基準に基づいて試験的に添削します。</p>
+    <p class="lede">大学・年度を問わず、独自の採点基準に基づいて試験的に添削します。</p>
     <details class="tool-howto">
       <summary class="tool-howto-title"><strong>事前にChatGPTへログインしてから使ってください（使い方はこちら）</strong></summary>
       <ol>
-        <li>① 出題情報（分かる範囲で）と，問題の種類・語数を入力します。</li>
+        <li>① 出題情報（分かる範囲で）と、問題の種類・語数を入力します。</li>
         <li>② 問題文・資料と答案を入力します。</li>
         <li>③ <strong>「ChatGPTを開く」</strong>を押します。採点基準と入力内容をまとめた採点用データが自動でコピーされます。</li>
         <li>④ ChatGPTの入力欄に貼り付けて送信します。</li>
       </ol>
       <p class="hand-title">写真・PDFの場合</p>
-      <p class="hand-line">問題・答案の画像／PDFを使う場合は，該当する欄にチェックを入れます。ChatGPTに採点用データを貼り付けた後，「問題」と「答案」を区別してファイルを添付し，一緒に送信します。画像・PDFは自動送信されません。</p>
-      <p class="share-note">氏名・学校名・受験番号などの個人情報は入力・添付しないでください。本ツールのURL・QRコードや内容を，許可なくSNS等で公開・転載したり，対象者以外へ共有したりしないでください。</p>
+      <p class="hand-line">問題・答案の画像／PDFを使う場合は、該当する欄にチェックを入れます。ChatGPTに採点用データを貼り付けた後、「問題」と「答案」を区別してファイルを添付し、一緒に送信します。画像・PDFは自動送信されません。</p>
+      <p class="share-note">氏名・学校名・受験番号などの個人情報は入力・添付しないでください。本ツールのURL・QRコードや内容を、許可なくSNS等で公開・転載したり、対象者以外へ共有したりしないでください。</p>
     </details>
   </div>
 </header>
 <main class="sheet-wrap">
 <section class="panel">
 <h2>出題情報（任意）</h2>
-<p class="meta-description">大学・年度・日程などを入力すると，該当する問題の公開解答例を探す際の手がかりになります。分かる項目だけ入力してください。</p>
+<p class="meta-description">大学・年度・日程などを入力すると、該当する問題の公開解答例を探す際の手がかりになります。分かる項目だけ入力してください。</p>
 <div class="meta-grid">
   <div class="meta-field"><label class="lbl" for="examUniversity">大学</label><input type="text" id="examUniversity" placeholder="例：九州大学" maxlength="120" autocomplete="off"></div>
   <div class="meta-field"><label class="lbl" for="examYear">年度</label><input type="text" id="examYear" placeholder="例：2026" maxlength="40" autocomplete="off"></div>
@@ -176,7 +176,7 @@ a{color:var(--teal-dark)}
   <div class="meta-field"><label class="lbl" for="examFaculty">学部・学科</label><input type="text" id="examFaculty" placeholder="例：文学部" maxlength="120" autocomplete="off"></div>
   <div class="meta-field"><label class="lbl" for="examQuestion">問題番号など</label><input type="text" id="examQuestion" placeholder="例：第４問" maxlength="120" autocomplete="off"></div>
 </div>
-<p class="note">大学公式のほか，塾・予備校・出版社などの公開解答例も，見つかった場合に限って出典付きで紹介します。</p>
+<p class="note">大学公式のほか、塾・予備校・出版社などの公開解答例も、見つかった場合に限って出典付きで紹介します。</p>
 </section>
 <section class="panel">
 <h2>問題の種類と語数を選ぶ</h2>
@@ -187,8 +187,8 @@ a{color:var(--teal-dark)}
 <label class="choice"><input type="radio" name="kind" value="chart">図表の説明（30点）</label>
 <label class="choice"><input type="radio" name="kind" value="task">課題の遂行（40点）</label>
 </div>
-<p class="note"><strong>※元の設問の配点にかかわらず，「意見の表明」「課題の遂行」は40点満点，「図表の説明」は30点満点で採点します。</strong></p>
-<p class="note">「課題の遂行」には，個人的な体験の記述，提案・助言，立場の選択，イラスト・写真の描写，会話文・手紙文・電子メール（空所補充を含む）などが含まれます。</p>
+<p class="note"><strong>※元の設問の配点にかかわらず、「意見の表明」「課題の遂行」は40点満点、「図表の説明」は30点満点で採点します。</strong></p>
+<p class="note">「課題の遂行」には、個人的な体験の記述、提案・助言、立場の選択、イラスト・写真の描写、会話文・手紙文・電子メール（空所補充を含む）などが含まれます。</p>
 </fieldset>
 <fieldset class="field">
 <legend>語数の指定</legend>
@@ -205,7 +205,7 @@ a{color:var(--teal-dark)}
 <h2>問題文・資料を入力する</h2>
 <div class="field">
 <label class="lbl" for="problem">問題文・資料（テキスト）</label>
-<textarea id="problem" placeholder="設問，指示，条件，グラフの数値などを入力します。画像・PDFを使う場合は空欄でも構いません。" spellcheck="false" autocorrect="off" autocomplete="off" autocapitalize="none" writingsuggestions="false" data-gramm="false" data-gramm_editor="false" data-enable-grammarly="false" data-lt-active="false"></textarea>
+<textarea id="problem" placeholder="設問、指示、条件、グラフの数値などを入力します。画像・PDFを使う場合は空欄でも構いません。" spellcheck="false" autocorrect="off" autocomplete="off" autocapitalize="none" writingsuggestions="false" data-gramm="false" data-gramm_editor="false" data-enable-grammarly="false" data-lt-active="false"></textarea>
 <label class="check"><input id="problemFile" type="checkbox">問題文・資料・図表の画像／PDFをChatGPTに添付する</label>
 </div>
 </section>
@@ -216,18 +216,18 @@ a{color:var(--teal-dark)}
 <textarea id="answer" placeholder="答案を入力します。手書きの画像・PDFを使う場合は空欄でも構いません。" spellcheck="false" autocorrect="off" autocomplete="off" autocapitalize="none" writingsuggestions="false" data-gramm="false" data-gramm_editor="false" data-enable-grammarly="false" data-lt-active="false"></textarea>
 <label class="check"><input id="answerFile" type="checkbox">答案の画像／PDFをChatGPTに添付する</label>
 </div>
-<p class="note">模範解答は不要です。画像・PDFはこのサイトから自動送信されません。ChatGPT側で添付してください。問題と答案のファイルは，それぞれ役割が分かるよう区別してください。</p>
+<p class="note">模範解答は不要です。画像・PDFはこのサイトから自動送信されません。ChatGPT側で添付してください。問題と答案のファイルは、それぞれ役割が分かるよう区別してください。</p>
 </section>
 <section class="panel">
 <button type="button" id="go">ChatGPTを開く</button>
 <p id="feedback" role="status" aria-live="polite"></p>
 <div id="manualBox">
-<label class="lbl" for="manual">コピーできなかった場合は，以下を全選択してコピーしてください。</label>
+<label class="lbl" for="manual">コピーできなかった場合は、以下を全選択してコピーしてください。</label>
 <textarea id="manual" readonly></textarea>
 <p><a href="https://chatgpt.com/" target="_blank" rel="noopener noreferrer">ChatGPTを開く</a></p>
 </div>
 </section>
-<p class="disclaimer">この添削は学習支援のための参考情報であり，実際の入試の採点・合否を保証するものではありません。</p>
+<p class="disclaimer">この添削は学習支援のための参考情報であり、実際の入試の採点・合否を保証するものではありません。</p>
 <footer>Shibata Writing Lab｜柴田答案ラボ（試験運用中）</footer>
 </main>
 </div>
