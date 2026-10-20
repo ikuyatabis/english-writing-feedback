@@ -332,8 +332,8 @@ function makePrompt(){
   question:el("examQuestion").value.trim()
  };
  const pf=el("problemFile").checked,af=el("answerFile").checked;
- if(!p&&!pf)throw Error("問題文を入力するか，問題文・資料の画像／PDFを添付するチェックを入れてください。");
- if(!a&&!af)throw Error("答案を入力するか，答案の画像／PDFを添付するチェックを入れてください。");
+ if(!p&&!pf)throw Error("問題文を入力するか、問題文・資料の画像／PDFを添付するチェックを入れてください。");
+ if(!a&&!af)throw Error("答案を入力するか、答案の画像／PDFを添付するチェックを入れてください。");
  const tolerance=w.exact?
  "（下限と上限が同じ範囲指定は，指定語数ちょうどを無減点とする）":
  w.short?"（短い指定の上下10％を１語単位で外側へ丸め，指定範囲を含める）":
@@ -386,7 +386,7 @@ el("go").addEventListener("click",async()=>{
  el("manual").value=prompt;
  if(copied){f.textContent="採点用データをコピーしました。ChatGPTの入力欄に貼り付けてください。"+((el("problemFile").checked||el("answerFile").checked)?" 指定した画像・PDFも忘れずに添付してください。":"");}
  else {el("manualBox").style.display="block";f.className="error";f.textContent="自動コピーできませんでした。下の欄から手動でコピーしてください。";}
- if(!tab){el("manualBox").style.display="block";f.textContent+="\n新しいタブが開かなかった場合は，下のリンクからChatGPTを開いてください。";}
+ if(!tab){el("manualBox").style.display="block";f.textContent+="\n新しいタブが開かなかった場合は、下のリンクからChatGPTを開いてください。";}
 });
 refresh();
 </script>
