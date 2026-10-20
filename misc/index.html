@@ -3,52 +3,163 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>持ち込み診療所｜柴田答案ラボ</title>
+<title>持ち込み診療所｜自由英作文</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;600;700;800&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
-:root{color-scheme:light dark;--bg:#eff9f5;--card:#fffffc;--ink:#193e3b;--sub:#587873;--line:#bcded4;--teal:#008d80;--teal-dark:#006b64;--tint:#dff5ef;--alert:#a34526}
-@media(prefers-color-scheme:dark){:root{--bg:#102723;--card:#203a34;--ink:#effaf5;--sub:#b4d4cb;--line:#466d62;--teal:#53d6c1;--teal-dark:#80e3d5;--tint:#2a5046;--alert:#ffae8d}}
+:root {
+  color-scheme: light dark;
+  --paper:#f7f1e4; --card:#fffdf7; --ink:#241f18; --sub:#736a5a; --line:#dfd3ba;
+  --teal:#137e76; --teal-dark:#095a55; --teal-soft:#85c5b9; --tint:#e2f3ed; --seal:#137e76;
+  --alert:#a34526; --focus:#197fbc;
+  --font-serif:"Shippori Mincho","Hiragino Mincho ProN","Yu Mincho",serif;
+  --font-sans:"Zen Kaku Gothic New","Hiragino Sans","Yu Gothic",sans-serif;
+}
+@media(prefers-color-scheme:dark){
+  :root{
+    --paper:#1b1712; --card:#241f18; --ink:#eee6d6; --sub:#b3a68f; --line:#4a4032;
+    --teal:#79d7c8; --teal-dark:#a1e8dd; --teal-soft:#43897d; --tint:#253d34; --seal:#215e58;
+    --alert:#ffae8d; --focus:#7db3e8;
+  }
+}
 *{box-sizing:border-box}
-body{margin:0;background:linear-gradient(140deg,var(--tint),var(--bg) 31%);color:var(--ink);font-family:"Hiragino Sans","Yu Gothic",system-ui,sans-serif;line-height:1.75}
-main{max-width:900px;margin:auto;padding:30px 17px 70px}
-a{color:var(--teal-dark)}header,.panel{border:1px solid var(--line);border-radius:13px;background:var(--card);box-shadow:0 5px 22px #117f7110}
-header{border-top:6px solid var(--teal);padding:24px;margin-bottom:20px}
-h1,h2{font-family:"Yu Mincho","Hiragino Mincho ProN",serif}
-h1{font-size:clamp(1.8rem,4vw,2.3rem);margin:0}.subtitle{font-size:1.07rem;color:var(--teal-dark);margin:2px 0 12px}
-.badge{font-size:.78rem;display:inline-block;border:1px solid var(--line);padding:1px 11px;border-radius:999px;margin-bottom:7px}
-.intro{font-size:.9rem;color:var(--sub);margin:0}
-.panel{padding:23px 25px;margin-bottom:17px}.panel h2{font-size:1.23rem;margin:0 0 13px}
-.field{margin:0 0 19px}.field:last-child{margin-bottom:0}
-legend,.lbl{font-weight:700;display:block;margin:0 0 8px}
+html{scroll-padding-top:env(safe-area-inset-top, 0px)}
+body{
+  margin:0;background:var(--paper);color:var(--ink);font-family:var(--font-sans);
+  line-height:1.75;-webkit-font-smoothing:antialiased;
+}
+::selection{background:var(--teal-soft);color:#142b26}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+.page{max-width:760px;margin:0 auto;padding:0 20px 64px}
+.masthead{
+  position:sticky;top:0;z-index:5;
+  padding-top:calc(env(safe-area-inset-top, 0px) + 22px);
+  background:linear-gradient(180deg,var(--paper) 82%,transparent);
+}
+.masthead-inner{max-width:760px;margin:0 auto;padding:0 20px 20px;text-align:center}
+.seal{
+  width:56px;height:56px;margin:0 auto 14px;border-radius:50%;
+  border:1px solid var(--teal-soft);
+  box-shadow:0 0 0 3px var(--paper),0 0 0 4px var(--tint);
+  background:var(--seal);color:#f7f2df;
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--font-serif);font-size:1.5rem;font-weight:700;
+}
+.kicker{margin:0 0 6px;font-size:.82rem;letter-spacing:.04em;color:var(--teal);font-weight:500}
+h1{
+  margin:0 0 4px;font-family:var(--font-serif);font-weight:800;
+  font-size:clamp(1.5rem,5vw,2rem);letter-spacing:.03em;color:var(--ink)
+}
+.tricolor{display:flex;height:4px;width:120px;margin:4px auto 16px;border-radius:2px;overflow:hidden}
+.tricolor span{flex:1}
+.tricolor span:nth-child(1),.tricolor span:nth-child(3){background:var(--teal)}
+.tricolor span:nth-child(2){background:var(--teal-soft)}
+.lede{margin:0 auto;color:var(--sub);font-size:.9rem;max-width:42em}
+.tool-howto{
+  max-width:680px;margin:10px auto 0;padding:7px 12px;text-align:left;
+  background:var(--card);border:1px solid var(--line);
+  border-left:4px solid var(--teal);border-radius:4px
+}
+.tool-howto-title{
+  margin:0;font-family:var(--font-serif);font-size:.88rem;
+  font-weight:700;color:var(--teal-dark);cursor:pointer;line-height:1.45
+}
+.tool-howto > summary.tool-howto-title{list-style:none}
+.tool-howto > summary.tool-howto-title::-webkit-details-marker{display:none}
+.tool-howto > summary.tool-howto-title::before{
+  content:"";display:inline-block;width:0;height:0;
+  border-top:4.5px solid transparent;border-bottom:4.5px solid transparent;
+  border-left:7px solid currentColor;margin-right:8px;vertical-align:1px
+}
+.tool-howto[open] > summary.tool-howto-title::before{transform:rotate(90deg);transform-origin:3px 4.5px}
+.tool-howto[open] .tool-howto-title{margin-bottom:7px}
+.tool-howto ol{margin:0;padding-left:0;list-style:none;font-size:.81rem;line-height:1.55}
+.tool-howto li{margin:1px 0}
+.tool-howto .hand-title{
+  margin:7px 0 0;font-family:var(--font-serif);
+  font-size:.84rem;font-weight:700;color:var(--teal-dark)
+}
+.tool-howto .hand-line{margin:0;font-size:.81rem;line-height:1.55}
+.tool-howto .share-note{margin:9px 0 0;font-size:.74rem;line-height:1.55;opacity:.72}
+.sheet-wrap{padding-top:18px}
+.panel{
+  padding:22px 24px;margin-bottom:20px;
+  background:var(--card);border:1px solid var(--line);
+  border-top:3px solid var(--teal);border-radius:4px;
+  box-shadow:0 1px 2px rgba(36,31,24,.05)
+}
+.panel h2{margin:0 0 13px;font-family:var(--font-serif);font-size:1.16rem;font-weight:700;color:var(--teal-dark)}
+.field{margin:0 0 19px}
+.field:last-child{margin-bottom:0}
+legend,.lbl{font-family:var(--font-serif);font-weight:700;display:block;margin:0 0 8px;font-size:.94rem}
 fieldset{padding:0;margin:0;border:0}
 .choices{display:flex;gap:8px;flex-wrap:wrap}
-.choice{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);border-radius:9px;padding:8px 12px;cursor:pointer}
+.choice{
+  display:inline-flex;align-items:center;gap:7px;
+  border:1px solid var(--line);border-radius:4px;padding:8px 12px;cursor:pointer;
+  font-size:.94rem
+}
 .choice:has(input:checked){background:var(--tint);border-color:var(--teal)}
 input[type=radio],input[type=checkbox]{accent-color:var(--teal)}
-textarea,input[type=number]{font:inherit;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:8px;padding:10px 12px;max-width:100%}
-textarea{width:100%;min-height:120px;resize:vertical}
+textarea,input[type=number]{
+  font:inherit;color:var(--ink);background:var(--card);
+  border:1px solid var(--line);border-radius:3px;padding:10px 12px;max-width:100%
+}
+textarea{width:100%;min-height:150px;resize:vertical}
+textarea:focus,input[type=number]:focus{outline:2px solid var(--teal);outline-offset:1px}
 input[type=number]{width:100px}
 .word-row{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-top:12px}
 .note{font-size:.84rem;color:var(--sub);margin:8px 0}
-.check{display:flex;gap:8px;align-items:flex-start;margin:10px 0;cursor:pointer}.check input{margin-top:6px}
-button{border:0;background:var(--teal);color:#fff;font:inherit;font-weight:700;border-radius:10px;padding:14px 20px;width:100%;cursor:pointer}
-button:hover{filter:brightness(.95)}
+.check{display:flex;gap:8px;align-items:flex-start;margin:10px 0;cursor:pointer;font-size:.92rem}
+.check input{margin-top:6px}
+button{
+  border:0;background:var(--seal);color:#fff9e9;font:inherit;
+  font-family:var(--font-serif);font-weight:700;
+  border-radius:3px;padding:14px 20px;width:100%;cursor:pointer
+}
+button:hover{filter:brightness(1.08)}
 #feedback{white-space:pre-wrap;font-weight:700;margin:13px 0}
 #feedback.error{color:var(--alert)}
 #manualBox{display:none}
 #manual{min-height:110px;font-size:.81rem}
-ol{padding-left:23px}li{margin:5px 0}
-footer{font-size:.83rem;color:var(--sub);text-align:center;margin-top:24px}
+.disclaimer{font-size:.83rem;line-height:1.7;text-align:center;color:var(--sub);margin:20px 0 0}
+footer{font-size:.78rem;color:var(--sub);text-align:center;margin-top:15px}
+a{color:var(--teal-dark)}
 [hidden]{display:none!important}
-@media(max-width:560px){main{padding:18px 12px 45px}.panel,header{padding:18px 16px}.choices{flex-direction:column}.choice{width:100%}}
+@media(max-width:560px){
+  .page{padding:0 14px 44px}
+  .masthead-inner{padding:0 0 18px}
+  .panel{padding:18px 16px}
+  .choices{flex-direction:column}
+  .choice{width:100%}
+}
 </style>
 </head>
-<body><main>
-<header>
-<span class="badge">試験運用中</span>
-<h1>持ち込み診療所</h1>
-<p class="subtitle">自由英作文、よろず承ります。</p>
-<p class="intro">大学・年度を問わず，問題と答案を持ち込んで九大方式に準じた採点・添削を受けられます。得点は学習用の参考点であり，実際の大学入試の得点を保証するものではありません。</p>
+<body>
+<div class="page">
+<header class="masthead">
+  <div class="masthead-inner">
+    <div class="seal" aria-hidden="true">万</div>
+    <p class="kicker">よろず承ります</p>
+    <h1>持ち込み診療所｜自由英作文</h1>
+    <div class="tricolor" aria-hidden="true"><span></span><span></span><span></span></div>
+    <p class="lede">大学・年度を問わず，独自の採点基準に基づいて試験的に添削します。</p>
+    <details class="tool-howto">
+      <summary class="tool-howto-title"><strong>事前にChatGPTへログインしてから使ってください（使い方はこちら）</strong></summary>
+      <ol>
+        <li>① 問題の種類と語数を選びます。</li>
+        <li>② 問題文・資料と答案を入力します。</li>
+        <li>③ <strong>「ChatGPTを開く」</strong>を押します。採点基準と入力内容をまとめた採点用データが自動でコピーされます。</li>
+        <li>④ ChatGPTの入力欄に貼り付けて送信します。</li>
+      </ol>
+      <p class="hand-title">写真・PDFの場合</p>
+      <p class="hand-line">問題・答案の画像／PDFを使う場合は，該当する欄にチェックを入れます。ChatGPTに採点用データを貼り付けた後，「問題」と「答案」を区別してファイルを添付し，一緒に送信します。画像・PDFは自動送信されません。</p>
+      <p class="share-note">氏名・学校名・受験番号などの個人情報は入力・添付しないでください。本ツールのURL・QRコードや内容を，許可なくSNS等で公開・転載したり，対象者以外へ共有したりしないでください。</p>
+    </details>
+  </div>
 </header>
+<main class="sheet-wrap">
 <section class="panel">
 <h2>① 問題の種類と語数を選ぶ</h2>
 <fieldset class="field">
@@ -101,19 +212,10 @@ footer{font-size:.83rem;color:var(--sub);text-align:center;margin-top:24px}
 </div>
 <p class="note">写真・PDFを使う場合は，データを貼り付けた後にファイルをChatGPTに添付して，まとめて送信します。ファイルが読めない場合は採点を保留します。</p>
 </section>
-<section class="panel">
-<h2>使い方</h2>
-<ol>
-<li>問題の種類と語数を選びます。</li>
-<li>問題文・資料と答案を入力します。写真・PDFを使う場合は，該当するチェックを入れます。</li>
-<li>「ChatGPTを開く」を押し，コピーされた採点用データを貼り付けます。</li>
-<li>チェックした写真・PDFを「問題」「答案」の区別がつくよう添付し，一緒に送信します。</li>
-<li>添削結果を確認します。不鮮明な手書き部分があれば，書き起こしを確認・修正してください。</li>
-</ol>
-<p class="note">氏名・学校名・受験番号などの個人情報は入力・添付しないでください。本ツールのURL・QRコードや内容を，許可なくSNS等で公開・転載したり，対象者以外へ共有したりしないでください。</p>
-</section>
-<footer>Shibata Writing Lab｜柴田答案ラボ</footer>
+<p class="disclaimer">この添削は学習支援のための参考情報であり，実際の入試の採点・合否を保証するものではありません。</p>
+<footer>Shibata Writing Lab｜柴田答案ラボ（試験運用中）</footer>
 </main>
+</div>
 <script>
 "use strict";
 const el=id=>document.getElementById(id);
