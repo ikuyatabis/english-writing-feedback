@@ -447,7 +447,7 @@ function onSelectChange(){
   $("year").value = current.year; $("qno").value = current.qno;
   pending = next;
   const to = (next.year && next.qno) ? `「${label(`${next.year}-${next.qno}`)}」に` : "";
-  $("changeText").textContent = `入力中の答案があります。問題を${to}変更すると，現在の答案・読み込んだ写真やPDF・読み取り結果・添削結果をリセットします。変更しますか？`;
+  $("changeText").textContent = `入力中の答案があります。問題を${to}変更すると、現在の答案・読み込んだ写真やPDF・読み取り結果・添削結果をリセットします。変更しますか？`;
   $("changeConfirm").hidden = false; $("changeYes").focus();
 }
 $("year").onchange = onSelectChange; $("qno").onchange = onSelectChange;
@@ -463,7 +463,7 @@ function refreshCount(){
     wc.className = "wc " + (inR ? "in" : "out");
     $("wcHint").textContent = inR ? "語数の減点なしの範囲です" : `減点なしの範囲（${r.min}〜${r.max}語）から外れています`; }
   const unclear = /\[\?/.test(t);
-  note("gradeNote", unclear ? "読み取りが不確かな箇所（[? ] の部分）が残っています。答案を見ながら正しい英文に直してから添削してください。読み取れない場合は，撮り直すかテキストで入力してください。" : "");
+  note("gradeNote", unclear ? "読み取りが不確かな箇所（[? ] の部分）が残っています。答案を見ながら正しい英文に直してから添削してください。読み取れない場合は、撮り直すかテキストで入力してください。" : "");
   $("gradeBtn").disabled = !k || n === 0 || unclear || busy;
 }
 function setMode(m){
@@ -484,11 +484,11 @@ $("answer").oninput = () => {
 $("tabText").onclick = () => setMode("text"); $("tabPhoto").onclick = () => setMode("photo");
 
 const ERR = {
-  not_granted:"Claudeの利用が許可されなかったため，添削できません。ページを開き直すと再度許可を求める表示が出ます。",
-  sampling_disabled:"このアカウントではClaudeを利用できないため，添削できません。",
-  rate_limited:"利用が集中しているか，Claudeの利用上限に達しました。しばらく時間をおいてから，もう一度お試しください。",
-  session_expired:"Claudeのログインが切れています。ログインし直してから，もう一度お試しください。",
-  image_rejected:"この画像は送信できませんでした。JPEG・PNG・WebP形式で，サイズの小さい画像にしてください。",
+  not_granted:"Claudeの利用が許可されなかったため、添削できません。ページを開き直すと再度許可を求める表示が出ます。",
+  sampling_disabled:"このアカウントではClaudeを利用できないため、添削できません。",
+  rate_limited:"利用が集中しているか、Claudeの利用上限に達しました。しばらく時間をおいてから、もう一度お試しください。",
+  session_expired:"Claudeのログインが切れています。ログインし直してから、もう一度お試しください。",
+  image_rejected:"この画像は送信できませんでした。JPEG・PNG・WebP形式で、サイズの小さい画像にしてください。",
   images_unavailable:"この環境では写真を送信できません。テキストで入力してください。",
   refused:"この内容は処理できませんでした。入力内容を確認してください。",
   prompt_too_large:"入力が長すぎます。答案の分量を確認してください。",
@@ -568,7 +568,7 @@ const PDF_ERR = {
 function pdfErr(e){ return e && e.pdf === "pages" ? `このPDFは${e.pages}ページあります。答案用のため${LIMITS.pdfPages}ページまでのPDFにしてください（答案のページだけを取り出したPDFなど）。` : (PDF_ERR[e && e.pdf] || PDF_ERR.broken); }
 
 async function loadPdfAsImages(pdf, token){
-  if(!imagesOK){ note("ocrError", "このPDFには文字データがありません。この環境では画像の読み取りを利用できないため，テキストで入力してください。"); return; }
+  if(!imagesOK){ note("ocrError", "このPDFには文字データがありません。この環境では画像の読み取りを利用できないため、テキストで入力してください。"); return; }
   const blobs = await pdfImages(pdf, maxImages);
   if(token !== fileToken) return;
   photos = blobs; showThumbs(photos);
@@ -589,7 +589,7 @@ async function handleFiles(fileList){
   const files = all.filter(isSupported);
   photos = []; releasePdf(); clearThumbs();
   note("fileNote", ""); note("ocrError", ""); note("ocrNote", ""); $("reloadAsImage").hidden = true; $("ocrBtn").disabled = true;
-  $("fileName").textContent = files.map(f => f.name || "貼り付けた画像").join("，");
+  $("fileName").textContent = files.map(f => f.name || "貼り付けた画像").join("、");
   if(!all.length) return;
   if(!files.length){ note("ocrError", "対応していない形式のファイルです。写真（JPEG・PNG・WebP）またはPDFを選んでください。"); return; }
   const pdfFile = files.find(isPdf);
@@ -603,7 +603,7 @@ async function handleFiles(fileList){
       if(token !== fileToken) return;
       if((text.match(/[A-Za-z]/g) || []).length >= 40){
         $("answer").value = text; source = "pdf_text"; lastPdf = pdf;
-        note("fileNote", extra + "このPDFには文字データが含まれていたため，読み取りをせずにそのまま下の欄に取り込みました。答案以外の文字（問題文や見出しなど）が入っていれば削除してから添削してください。単語のつながりや改行が崩れている場合は直してください。" + (imagesOK ? " スキャナーが自動で付けた文字データなどで内容が正しく取り込めていない場合は，「画像として読み取り直す」を押してください。" : ""));
+        note("fileNote", extra + "このPDFには文字データが含まれていたため、読み取りをせずにそのまま下の欄に取り込みました。答案以外の文字（問題文や見出しなど）が入っていれば削除してから添削してください。単語のつながりや改行が崩れている場合は直してください。" + (imagesOK ? " スキャナーが自動で付けた文字データなどで内容が正しく取り込めていない場合は、「画像として読み取り直す」を押してください。" : ""));
         $("reloadAsImage").hidden = !imagesOK;
       } else {
         lastPdf = pdf;
@@ -614,7 +614,7 @@ async function handleFiles(fileList){
     finally{ if(token === fileToken) showLoading("pdfLoading", false); setBusy(false); }
     return;
   }
-  if(!imagesOK){ note("ocrError", "この環境では写真の読み取りを利用できません。文字データを含むPDFを選ぶか，テキストで入力してください。"); return; }
+  if(!imagesOK){ note("ocrError", "この環境では写真の読み取りを利用できません。文字データを含むPDFを選ぶか、テキストで入力してください。"); return; }
   const usable = files.filter(f => imageTypes.includes(f.type));
   const tooBig = usable.filter(f => f.size > maxImageBytes);
   if(!usable.length){ note("ocrError", "この形式の画像は送信できません。JPEG・PNG・WebPのいずれかにしてください。"); return; }
@@ -748,7 +748,7 @@ function showHandoffBox(promptText){
   let wrap=document.getElementById("chatgptHandoffBox");
   if(!wrap){
     wrap=document.createElement("div"); wrap.id="chatgptHandoffBox"; wrap.style.cssText="position:fixed;inset:0;z-index:9998;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;padding:20px";
-    wrap.innerHTML=`<div style="width:min(760px,96vw);max-height:88vh;overflow:auto;background:#fff;color:#222;border-radius:8px;padding:18px;font-family:sans-serif"><h2 style="font-size:18px;margin:0 0 8px">採点用データ</h2><p style="font-size:14px;margin:0 0 10px">下の全文をコピーし，ChatGPTの新しいチャットに貼り付けて送信してください。</p><textarea id="chatgptHandoffText" style="width:100%;height:48vh;font:13px/1.5 monospace"></textarea><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px"><button type="button" id="chatgptHandoffCopy" style="padding:9px 14px">全文をコピー</button><a href="https://chatgpt.com/" target="_blank" rel="noopener" style="padding:9px 14px">ChatGPTを開く</a><button type="button" id="chatgptHandoffClose" style="padding:9px 14px">閉じる</button></div></div>`;
+    wrap.innerHTML=`<div style="width:min(760px,96vw);max-height:88vh;overflow:auto;background:#fff;color:#222;border-radius:8px;padding:18px;font-family:sans-serif"><h2 style="font-size:18px;margin:0 0 8px">採点用データ</h2><p style="font-size:14px;margin:0 0 10px">下の全文をコピーし、ChatGPTの新しいチャットに貼り付けて送信してください。</p><textarea id="chatgptHandoffText" style="width:100%;height:48vh;font:13px/1.5 monospace"></textarea><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px"><button type="button" id="chatgptHandoffCopy" style="padding:9px 14px">全文をコピー</button><a href="https://chatgpt.com/" target="_blank" rel="noopener" style="padding:9px 14px">ChatGPTを開く</a><button type="button" id="chatgptHandoffClose" style="padding:9px 14px">閉じる</button></div></div>`;
     document.body.appendChild(wrap);
     wrap.querySelector("#chatgptHandoffClose").onclick=()=>{wrap.style.display="none"};
     wrap.querySelector("#chatgptHandoffCopy").onclick=async()=>{const t=wrap.querySelector("#chatgptHandoffText");t.focus();t.select();try{await navigator.clipboard.writeText(t.value)}catch(_){document.execCommand("copy")}showHandoffToast("全文をコピーしました。ChatGPTに貼り付けて送信してください。")};
@@ -835,7 +835,7 @@ $("stopBtn").onclick = () => {};
 $("showAnswerBtn").onclick = () => {
   const k = key(); if(!k) return; const ma = DATA.model[k]; const box = $("modelAnswers");
   if(!box.hidden){ box.hidden = true; $("showAnswerBtn").textContent = "解答例を見る"; return; }
-  box.innerHTML = `<h3>解答例（${ma.words} words）</h3><p class="model-text">${esc(ma.text)}</p><p class="model-note">教材の採点基準に掲載された解答例です。内容・構成はこれに限らず，設問の条件を満たしていれば認められます。</p>`;
+  box.innerHTML = `<h3>解答例（${ma.words} words）</h3><p class="model-text">${esc(ma.text)}</p><p class="model-note">教材の採点基準に掲載された解答例です。内容・構成はこれに限らず、設問の条件を満たしていれば認められます。</p>`;
   box.hidden = false; $("showAnswerBtn").textContent = "解答例を閉じる";
 };
 
