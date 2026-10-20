@@ -256,15 +256,15 @@ function makePrompt(){
  const problemFile=el("problemFile").checked;
  const answerFile=el("answerFile").checked;
  const ptsInput=el("examPoints");
- if(ptsInput.validity&&ptsInput.validity.badInput)throw Error("配点の入力が途中です。数値を完成させるか，空欄にしてください。");
+ if(ptsInput.validity&&ptsInput.validity.badInput)throw Error("配点の入力が途中です。数値を完成させるか、空欄にしてください。");
  const ptsRaw=ptsInput.value.trim();
- if(!problem&&!problemFile)throw Error("日本語の原文・設問指示を入力するか，問題文の写真／PDFを添付するチェックを入れてください。");
- if(!answer&&!answerFile)throw Error("あなたの英訳を入力するか，答案の写真／PDFを添付するチェックを入れてください。");
+ if(!problem&&!problemFile)throw Error("日本語の原文・設問指示を入力するか、問題文の写真／PDFを添付するチェックを入れてください。");
+ if(!answer&&!answerFile)throw Error("あなたの英訳を入力するか、答案の写真／PDFを添付するチェックを入れてください。");
  let points=null;
  if(ptsRaw!==""){
    const parsed=Number(ptsRaw);
    if(!Number.isFinite(parsed)||parsed<.01||parsed>1000||Math.abs(parsed*100-Math.round(parsed*100))>1e-7){
-     throw Error("配点は0.01～1000点の範囲で，小数点以下2桁まで入力してください。");
+     throw Error("配点は0.01～1000点の範囲で、小数点以下2桁まで入力してください。");
    }
    points=Math.round(parsed*100)/100;
  }
@@ -304,7 +304,7 @@ el("go").addEventListener("click",async()=>{
  el("manual").value=prompt;
  if(copied){f.textContent="採点用データをコピーしました。ChatGPTの入力欄に貼り付けてください。"+((el("problemFile").checked||el("answerFile").checked)?" 指定した画像・PDFも忘れずに添付してください。":"");}
  else {el("manualBox").style.display="block";f.className="error";f.textContent="自動コピーできませんでした。下の欄から手動でコピーしてください。";}
- if(!tab){el("manualBox").style.display="block";f.textContent+="\n新しいタブが開かなかった場合は，下のリンクからChatGPTを開いてください。";}
+ if(!tab){el("manualBox").style.display="block";f.textContent+="\n新しいタブが開かなかった場合は、下のリンクからChatGPTを開いてください。";}
 });
 </script>
 </body></html>
