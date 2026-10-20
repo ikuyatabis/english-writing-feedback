@@ -466,7 +466,7 @@ function showHandoffBox(promptText){
   let wrap=document.getElementById("chatgptHandoffBox");
   if(!wrap){
     wrap=document.createElement("div"); wrap.id="chatgptHandoffBox"; wrap.style.cssText="position:fixed;inset:0;z-index:9998;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;padding:20px";
-    wrap.innerHTML=`<div style="width:min(760px,96vw);max-height:88vh;overflow:auto;background:#fff;color:#222;border-radius:8px;padding:18px;font-family:sans-serif"><h2 style="font-size:18px;margin:0 0 8px">採点用データ</h2><p style="font-size:14px;margin:0 0 10px">下の全文をコピーし，ChatGPTの新しいチャットに貼り付けて送信してください。</p><textarea id="chatgptHandoffText" style="width:100%;height:48vh;font:13px/1.5 monospace"></textarea><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px"><button type="button" id="chatgptHandoffCopy" style="padding:9px 14px">全文をコピー</button><a href="https://chatgpt.com/" target="_blank" rel="noopener" style="padding:9px 14px">ChatGPTを開く</a><button type="button" id="chatgptHandoffClose" style="padding:9px 14px">閉じる</button></div></div>`;
+    wrap.innerHTML=`<div style="width:min(760px,96vw);max-height:88vh;overflow:auto;background:#fff;color:#222;border-radius:8px;padding:18px;font-family:sans-serif"><h2 style="font-size:18px;margin:0 0 8px">採点用データ</h2><p style="font-size:14px;margin:0 0 10px">下の全文をコピーし、ChatGPTの新しいチャットに貼り付けて送信してください。</p><textarea id="chatgptHandoffText" style="width:100%;height:48vh;font:13px/1.5 monospace"></textarea><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px"><button type="button" id="chatgptHandoffCopy" style="padding:9px 14px">全文をコピー</button><a href="https://chatgpt.com/" target="_blank" rel="noopener" style="padding:9px 14px">ChatGPTを開く</a><button type="button" id="chatgptHandoffClose" style="padding:9px 14px">閉じる</button></div></div>`;
     document.body.appendChild(wrap);
     wrap.querySelector("#chatgptHandoffClose").onclick=()=>{wrap.style.display="none"};
     wrap.querySelector("#chatgptHandoffCopy").onclick=async()=>{const t=wrap.querySelector("#chatgptHandoffText");t.focus();t.select();try{await navigator.clipboard.writeText(t.value)}catch(_){document.execCommand("copy")}showHandoffToast("全文をコピーしました。ChatGPTに貼り付けて送信してください。")};
@@ -860,9 +860,9 @@ const IMPORT_LIMITS = { pdfBytes: 30 * 1024 * 1024, pdfPages: 10, targetPixels: 
 const importCaps = { ready: false, imagesOK: false, imageTypes: ["image/jpeg","image/png","image/webp"], maxImages: 1, maxImageBytes: 20 * 1024 * 1024 };
 const IMPORT_MSG = {
   privacy: "氏名・学校名・受験番号などの個人情報は入力・撮影しないでください。",
-  imagesUnavailable: "この環境では写真の読み取りは利用できません。文字データを含むPDFを選ぶか，テキストで入力してください。",
-  unclear: "読み取りが不確かな箇所（[? ] の部分）が残っているため，このままでは添削できません。写真・PDFの答案と見比べて正しい文字に直してください。読み取れない場合は，撮り直すかテキストで入力してください。",
-  ocrDone: "読み取った英文を下の欄に表示しました。答案と見比べて，読み取りの誤りがあれば直してから添削してください。答案そのものの書き間違いは直さないでください。",
+  imagesUnavailable: "この環境では写真の読み取りは利用できません。文字データを含むPDFを選ぶか、テキストで入力してください。",
+  unclear: "読み取りが不確かな箇所（[? ] の部分）が残っているため、このままでは添削できません。写真・PDFの答案と見比べて正しい文字に直してください。読み取れない場合は、撮り直すかテキストで入力してください。",
+  ocrDone: "読み取った英文を下の欄に表示しました。答案と見比べて、読み取りの誤りがあれば直してから添削してください。答案そのものの書き間違いは直さないでください。",
 };
 const IMPORT_PDF_ERR = {
   lib: "PDFを読み込む機能を準備できませんでした。ページを開き直すか，写真で選んでください。",
@@ -877,11 +877,11 @@ function importPdfErr(e){
 function importErrMsg(e){
   switch(e && e.code){
     case "cancelled": return "";
-    case "not_granted": return "Claudeの利用が許可されなかったため，読み取りできません。ページを開き直すと再度許可を求める表示が出ます。";
-    case "sampling_disabled": return "このアカウントではClaudeを利用できないため，読み取りできません。テキストで入力してください。";
-    case "rate_limited": return "利用が集中しているか，Claudeの利用上限に達しました。しばらく時間をおいてから，もう一度お試しください。";
-    case "session_expired": return "Claudeのログインが切れています。ログインし直してから，もう一度お試しください。";
-    case "image_rejected": return "この画像は送信できませんでした。JPEG・PNG・WebP形式で，サイズの小さい画像にしてください。";
+    case "not_granted": return "Claudeの利用が許可されなかったため、読み取りできません。ページを開き直すと再度許可を求める表示が出ます。";
+    case "sampling_disabled": return "このアカウントではClaudeを利用できないため、読み取りできません。テキストで入力してください。";
+    case "rate_limited": return "利用が集中しているか、Claudeの利用上限に達しました。しばらく時間をおいてから、もう一度お試しください。";
+    case "session_expired": return "Claudeのログインが切れています。ログインし直してから、もう一度お試しください。";
+    case "image_rejected": return "この画像は送信できませんでした。JPEG・PNG・WebP形式で、サイズの小さい画像にしてください。";
     case "images_unavailable": return IMPORT_MSG.imagesUnavailable;
     case "refused": return "この画像は処理できませんでした。答案部分だけが写った画像にしてください。";
     case "prompt_too_large": return "入力が大きすぎます。画像の枚数を減らしてください。";
@@ -1129,7 +1129,7 @@ function createImporter(opt){
     const all = Array.from(fileList || []);
     const files = all.filter(importIsSupported);
     st.photos = []; releasePdf(); clearThumbs(); clearNotes(); reloadBtn.hidden = true; updateOcrBtn();
-    fileName.textContent = files.map(f => f.name || "貼り付けた画像").join("，");
+    fileName.textContent = files.map(f => f.name || "貼り付けた画像").join("、");
     if(!all.length) return;
     if(!files.length){ note(ocrError, "対応していない形式のファイルです。写真（JPEG・PNG・WebP）またはPDFを選んでください。"); return; }
 
@@ -1146,7 +1146,7 @@ function createImporter(opt){
         if((text.match(/[A-Za-z]/g) || []).length >= 40){
           setText(text);
           const canImage = importCaps.imagesOK && !!sampleFn;
-          note(fileNote, extra + "このPDFには文字データが含まれていたため，画像として読み取らずに，そのまま下の欄に取り込みました。答案と見比べて，単語のつながり・改行・答案以外の文字などを確認してから添削してください。" + (canImage ? " スキャナーが自動で付けた文字データなどで内容が正しく取り込めていない場合は，「画像として読み取り直す」を押してください。" : ""));
+          note(fileNote, extra + "このPDFには文字データが含まれていたため、画像として読み取らずに、そのまま下の欄に取り込みました。答案と見比べて、単語のつながり・改行・答案以外の文字などを確認してから添削してください。" + (canImage ? " スキャナーが自動で付けた文字データなどで内容が正しく取り込めていない場合は、「画像として読み取り直す」を押してください。" : ""));
           reloadBtn.hidden = !canImage;
         } else {
           await loadPdfAsImages(pdf, token);
@@ -1157,7 +1157,7 @@ function createImporter(opt){
       return;
     }
 
-    if(!importCaps.ready){ note(ocrError, "写真の読み取り機能を準備しています。数秒待ってから，もう一度選んでください。"); return; }
+    if(!importCaps.ready){ note(ocrError, "写真の読み取り機能を準備しています。数秒待ってから、もう一度選んでください。"); return; }
     if(!importCaps.imagesOK || !sampleFn){ note(ocrError, IMPORT_MSG.imagesUnavailable); return; }
     const usable = files.filter(f => importCaps.imageTypes.includes(f.type));
     if(!usable.length){ note(ocrError, "この形式の画像は送信できません。JPEG・PNG・WebPのいずれかにしてください。"); return; }
@@ -1174,7 +1174,7 @@ function createImporter(opt){
       if(usable.length > importCaps.maxImages) msgs.push("一度に読み取れる画像は" + importCaps.maxImages + "枚までです。最初の" + importCaps.maxImages + "枚を使います。");
       msgs.push("「英文を読み取る」を押してください。");
       note(fileNote, msgs.join(" "));
-    }catch(e){ if(token === st.token) note(ocrError, "この画像を読み込めませんでした。別の写真を選ぶか，テキストで入力してください。"); }
+    }catch(e){ if(token === st.token) note(ocrError, "この画像を読み込めませんでした。別の写真を選ぶか、テキストで入力してください。"); }
     finally{ if(token === st.token) loading(prepLoading, false); setBusy(false); }
   }
 
@@ -1219,7 +1219,7 @@ function createImporter(opt){
   function applyCaps(){
     if(importCaps.imagesOK && sampleFn){
       fileInput.accept = importCaps.imageTypes.concat(["application/pdf", ".pdf"]).join(",");
-      dropHint.textContent = "画面にコピーした画像やPDFは，Ctrl+V（Macは⌘+V）で貼り付けられる場合があります。";
+      dropHint.textContent = "画面にコピーした画像やPDFは、Ctrl+V（Macは⌘+V）で貼り付けられる場合があります。";
     } else {
       fileInput.accept = "application/pdf,.pdf";
       dropHint.textContent = IMPORT_MSG.imagesUnavailable;
