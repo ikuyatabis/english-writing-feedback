@@ -155,7 +155,7 @@ a{color:var(--violet-dark)}
       <summary class="tool-howto-title"><strong>事前にChatGPTへログインしてから使ってください（使い方はこちら）</strong></summary>
       <ol>
         <li>① 分かる範囲で出題情報を入力します（すべて任意です）。</li>
-        <li>② 日本語の原文・設問指示と、あなたの英訳を入力します。原文の前後の日本語も可能な限り含め、英訳する箇所を明示してください。</li>
+        <li>② 日本語の原文・設問指示と、あなたの英訳を入力します。原文の前後の日本語も可能な限り含め、英訳しない前後の文を（　）で囲み、英訳する箇所を明示してください。</li>
         <li>③ <strong>「ChatGPTを開く」</strong>を押します。添削基準と入力内容をまとめたデータが自動でコピーされます。</li>
         <li>④ ChatGPTの入力欄に貼り付けて送信します。</li>
       </ol>
@@ -184,9 +184,9 @@ a{color:var(--violet-dark)}
   <h2>日本語の原文・設問指示を入力する</h2>
   <div class="field">
     <label class="lbl" for="problem">日本語の原文・設問指示（テキスト）</label>
-    <p class="note">文脈によって適切な英訳が変わることがあります。英訳対象だけでなく、その<strong>前後の日本語も可能な限り入力</strong>してください。英訳しない前後の文を（　）で囲むなど、<strong>英訳する箇所を明示</strong>してください。</p>
+    <p class="note">文脈によって適切な英訳が変わることがあります。英訳対象だけでなく、その<strong>前後の日本語も可能な限り入力</strong>してください。英訳しない前後の文を（　）で囲み、<strong>英訳する箇所を明示</strong>してください。</p>
     <p class="note">入力例：<br>（昨日、友人と話していた。）<br><strong>彼はその知らせを聞いて驚いた。</strong><br>（その後、すぐに家に帰った。）</p>
-    <textarea id="problem" placeholder="英訳する文と、その前後の日本語・設問指示を入力します。英訳しない文は（　）で囲むなど、対象を明示してください。写真・PDFの場合は空欄でも構いません。" spellcheck="false" autocorrect="off" autocomplete="off" autocapitalize="none" writingsuggestions="false" data-gramm="false" data-gramm_editor="false" data-enable-grammarly="false" data-lt-active="false"></textarea>
+    <textarea id="problem" placeholder="英訳する文と、その前後の日本語・設問指示を入力します。英訳しない前後の文を（　）で囲み、英訳する箇所を明示してください。写真・PDFの場合は空欄でも構いません。" spellcheck="false" autocorrect="off" autocomplete="off" autocapitalize="none" writingsuggestions="false" data-gramm="false" data-gramm_editor="false" data-enable-grammarly="false" data-lt-active="false"></textarea>
     <label class="check"><input id="problemFile" type="checkbox">問題文・資料の写真／PDFをChatGPTに添付する</label>
   </div>
 </section>
