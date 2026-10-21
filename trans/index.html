@@ -168,14 +168,14 @@ a{color:var(--violet-dark)}
 <main class="sheet-wrap">
 <section class="panel">
   <h2>出題情報（任意）</h2>
-  <p class="meta-description">分かる項目だけ入力してください。大学名・年度などは公開解答例を探す際の手がかりになります。配点を０に設定した場合は、得点を付けずに添削します。</p>
+  <p class="meta-description">分かる項目だけ入力してください。大学名・年度などは公開解答例を探す際の手がかりになります。<br>配点は20点で採点しますが、適宜変更が可能です。０に設定した場合は、得点を付けずに添削します。</p>
   <div class="meta-grid">
     <div class="meta-field"><label class="lbl" for="examUniversity">大学名</label><input type="text" id="examUniversity" placeholder="例：京都大学" maxlength="120" autocomplete="off"></div>
     <div class="meta-field"><label class="lbl" for="examYear">年度</label><input type="text" id="examYear" placeholder="例：2026" maxlength="40" autocomplete="off"></div>
     <div class="meta-field"><label class="lbl" for="examSession">日程・入試方式</label><input type="text" id="examSession" placeholder="例：前期日程" maxlength="120" autocomplete="off"></div>
     <div class="meta-field"><label class="lbl" for="examFaculty">学部・学科</label><input type="text" id="examFaculty" placeholder="例：文学部" maxlength="120" autocomplete="off"></div>
     <div class="meta-field"><label class="lbl" for="examQuestion">問題番号など</label><input type="text" id="examQuestion" placeholder="例：第２問" maxlength="120" autocomplete="off"></div>
-    <div class="meta-field"><label class="lbl" for="examPoints">配点</label><input type="number" id="examPoints" placeholder="例：30" min="0" max="1000" step="5" value="30" inputmode="decimal"></div>
+    <div class="meta-field"><label class="lbl" for="examPoints">配点</label><input type="number" id="examPoints" placeholder="例：20" min="0" max="1000" step="5" value="20" inputmode="decimal"></div>
   </div>
   <label class="check"><input id="includePublicExamples" type="checkbox">公開解答例も調べる（希望する場合のみ）</label>
 <p class="note">大学公式のほか、塾・予備校・出版社などの公開解答例も、見つかった場合に限って出典付きで紹介します。</p>
