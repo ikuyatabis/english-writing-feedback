@@ -3,12 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light">
 <title>伊都への恋文｜自由英作文</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;600;700;800&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
   :root {
+    color-scheme: only light;
     /* 九州大学シンボルカラー（ワインカラー）: DIC230 / RGB R133 G2 B62 (#85023e) ― 九州大学「シンボルロゴについて」より */
     --wine: #85023e;
     --wine-deep: #5c012b;
@@ -29,20 +31,8 @@
     padding-top: env(safe-area-inset-top, 0px);
     padding-bottom: env(safe-area-inset-bottom, 0px);
   }
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) {
-      --paper: #1b1712; --paper-line: #4a4032; --card: #241d19; --ink: #eee6d6; --ink-soft: #b3a68f;
-      --wine: #e391b4; --wine-deep: #f2bcd3; --wine-soft: #c9809f; --wine-tint: #3a2230;
-      --ok: #8fc79c; --ok-bg: #1e2b21; --warn: #e0ac5c; --warn-bg: #332618;
-      --bad: #e391b4; --bad-bg: #3a2230; --focus: #7db3e8;
-    }
-  }
-  :root[data-theme="dark"] {
-      --paper: #1b1712; --paper-line: #4a4032; --card: #241d19; --ink: #eee6d6; --ink-soft: #b3a68f;
-      --wine: #e391b4; --wine-deep: #f2bcd3; --wine-soft: #c9809f; --wine-tint: #3a2230;
-      --ok: #8fc79c; --ok-bg: #1e2b21; --warn: #e0ac5c; --warn-bg: #332618;
-      --bad: #e391b4; --bad-bg: #3a2230; --focus: #7db3e8;
-  }
+  
+  
   *, *::before, *::after { box-sizing: inherit; }
   html { scroll-padding-top: env(safe-area-inset-top, 0px); }
   html, body { height: 100%; }
@@ -169,10 +159,10 @@
   .btn:disabled { opacity: 0.5; cursor: not-allowed; }
   .btn.ghost { background: var(--card); color: var(--wine-deep); border: 1px solid var(--wine); letter-spacing: 0.04em; }
   .btn.ghost:hover:not(:disabled) { background: var(--paper); }
-  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .btn:not(.ghost) { color: #241d19; } }
-  :root[data-theme="dark"] .btn:not(.ghost) { color: #241d19; }
-  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .seal { color: #241d19; } }
-  :root[data-theme="dark"] .seal { color: #241d19; }
+  
+  
+  
+  
 
   .loading { color: var(--ink-soft); font-size: 0.92rem; margin-top: 10px; display: none; align-items: center; gap: 8px; }
   .loading.show { display: flex; }
