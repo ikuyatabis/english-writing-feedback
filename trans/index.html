@@ -177,7 +177,7 @@ a{color:var(--violet-dark)}
     <label class="lbl" for="problem">日本語の原文・設問指示（テキスト）</label>
     <p class="note">前後の日本語も可能な限り入力してください。英訳しない前後の文は（　）で囲み、英訳する箇所を明示してください。</p>
     <p class="note">入力例：<br>（昨日、友人と話していた。）<strong>彼はその知らせを聞いて驚いた。</strong>（その後、すぐに家に帰った。）</p>
-    <textarea id="problem" placeholder="英訳しない箇所を（　）で囲んでください。写真・PDFの場合は空欄でも構いません。" spellcheck="false" autocorrect="off" autocomplete="off" autocapitalize="none" writingsuggestions="false" data-gramm="false" data-gramm_editor="false" data-enable-grammarly="false" data-lt-active="false"></textarea>
+    <textarea id="problem" placeholder="英訳しない箇所を（　）で囲んでください。&#10;写真・PDFを使う場合は、空欄のままにして次で☑を入れてください。" spellcheck="false" autocorrect="off" autocomplete="off" autocapitalize="none" writingsuggestions="false" data-gramm="false" data-gramm_editor="false" data-enable-grammarly="false" data-lt-active="false"></textarea>
     <label class="check"><input id="problemFile" type="checkbox">問題文・資料の写真／PDFをChatGPTに添付する</label>
   </div>
 </section>
@@ -185,7 +185,7 @@ a{color:var(--violet-dark)}
   <h2>答案を入力する</h2>
   <div class="field">
     <label class="lbl" for="answer">あなたの英訳（テキスト）</label>
-    <textarea id="answer" placeholder="英訳した答案を入力します。手書きの写真・PDFを使う場合は空欄でも構いません。" spellcheck="false" autocorrect="off" autocomplete="off" autocapitalize="none" writingsuggestions="false" data-gramm="false" data-gramm_editor="false" data-enable-grammarly="false" data-lt-active="false"></textarea>
+    <textarea id="answer" placeholder="答案を入力します。&#10;手書きの写真・PDFを使う場合は、空欄のままにして次で☑を入れてください。" spellcheck="false" autocorrect="off" autocomplete="off" autocapitalize="none" writingsuggestions="false" data-gramm="false" data-gramm_editor="false" data-enable-grammarly="false" data-lt-active="false"></textarea>
     <label class="check"><input id="answerFile" type="checkbox">答案の写真／PDFをChatGPTに添付する</label>
   </div>
   <p class="note">写真・PDFはこのサイトから自動送信されません。ChatGPT側で添付してください。問題と答案のファイルは、それぞれ役割が分かるよう区別してください。</p>
