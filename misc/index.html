@@ -157,8 +157,8 @@ a{color:var(--teal-dark)}
     <details class="tool-howto">
       <summary class="tool-howto-title"><strong>事前にChatGPTへログインしてから使ってください（使い方はこちら）</strong></summary>
       <ol>
-        <li>① 出題情報（分かる範囲で）と、問題の種類・語数を入力します。</li>
-        <li>② 問題文・資料と答案を入力します。</li>
+        <li>① 問題の種類・語数を選びます。</li>
+        <li>② 問題文・資料と答案を入力します。公開解答例を調べる場合は、出題情報も入力します。</li>
         <li>③ <strong>「ChatGPTを開く」</strong>を押します。採点基準と入力内容をまとめた採点用データが自動でコピーされます。</li>
         <li>④ ChatGPTの入力欄に貼り付けて送信します。</li>
       </ol>
@@ -169,19 +169,6 @@ a{color:var(--teal-dark)}
   </div>
 </header>
 <main class="sheet-wrap">
-<section class="panel">
-<h2>出題情報（任意）</h2>
-<p class="meta-description">大学・年度・日程などを入力すると、該当する問題の公開解答例を探す際の手がかりになります。分かる項目だけ入力してください。</p>
-<div class="meta-grid">
-  <div class="meta-field"><label class="lbl" for="examUniversity">大学</label><input type="text" id="examUniversity" placeholder="例：九州大学" maxlength="120" autocomplete="off"></div>
-  <div class="meta-field"><label class="lbl" for="examYear">年度</label><input type="text" id="examYear" placeholder="例：2026" maxlength="40" autocomplete="off"></div>
-  <div class="meta-field"><label class="lbl" for="examSession">日程・入試方式</label><input type="text" id="examSession" placeholder="例：前期日程" maxlength="120" autocomplete="off"></div>
-  <div class="meta-field"><label class="lbl" for="examFaculty">学部・学科</label><input type="text" id="examFaculty" placeholder="例：文学部" maxlength="120" autocomplete="off"></div>
-  <div class="meta-field"><label class="lbl" for="examQuestion">問題番号など</label><input type="text" id="examQuestion" placeholder="例：第４問" maxlength="120" autocomplete="off"></div>
-</div>
-<label class="check"><input id="includePublicExamples" type="checkbox">公開解答例も調べる（希望する場合のみ）</label>
-<p class="note">大学公式のほか、塾・予備校・出版社などの公開解答例も、見つかった場合に限って出典付きで紹介します。</p>
-</section>
 <section class="panel">
 <h2>問題の種類と語数を選ぶ</h2>
 <fieldset class="field">
@@ -222,6 +209,20 @@ a{color:var(--teal-dark)}
 <label class="check"><input id="answerFile" type="checkbox">答案の画像／PDFをChatGPTに添付する</label>
 </div>
 <p class="note">模範解答は不要です。画像・PDFはこのサイトから自動送信されません。ChatGPT側で添付してください。問題と答案のファイルは、それぞれ役割が分かるよう区別してください。</p>
+</section>
+<section class="panel">
+  <label class="check"><input id="includePublicExamples" type="checkbox" aria-controls="publicExampleFields">公開解答例も調べる（希望する場合のみ）</label>
+  <p class="note">大学公式のほか、予備校・塾・出版社などによる公開解答例も、見つかった場合に限り紹介します。</p>
+  <div id="publicExampleFields" hidden>
+    <p class="note">分かる項目だけ入力してください。</p>
+    <div class="meta-grid">
+      <div class="meta-field"><label class="lbl" for="examUniversity">大学</label><input type="text" id="examUniversity" placeholder="例：九州大学" maxlength="120" autocomplete="off"></div>
+      <div class="meta-field"><label class="lbl" for="examYear">年度</label><input type="text" id="examYear" placeholder="例：2026" maxlength="40" autocomplete="off"></div>
+      <div class="meta-field"><label class="lbl" for="examSession">日程・入試方式</label><input type="text" id="examSession" placeholder="例：前期日程" maxlength="120" autocomplete="off"></div>
+      <div class="meta-field"><label class="lbl" for="examFaculty">学部・学科</label><input type="text" id="examFaculty" placeholder="例：文学部" maxlength="120" autocomplete="off"></div>
+      <div class="meta-field"><label class="lbl" for="examQuestion">問題番号など</label><input type="text" id="examQuestion" placeholder="例：第４問" maxlength="120" autocomplete="off"></div>
+    </div>
+  </div>
 </section>
 <section class="panel">
 <button type="button" id="go">ChatGPTを開く</button>
@@ -269,6 +270,11 @@ function refresh(){
 document.querySelectorAll('input[name="wordmode"]').forEach(node=>{
  node.addEventListener("change",refresh);
 });
+function refreshPublicExampleFields(){
+  el("publicExampleFields").hidden=!el("includePublicExamples").checked;
+}
+el("includePublicExamples").addEventListener("change",refreshPublicExampleFields);
+refreshPublicExampleFields();
 const COMMON=[
 "【採点者としての役割】",
 "大学入試の自由英作文を九大方式に準じて採点・添削する。元の設問・問題冊子に配点が明記されていても，その配点は採用せず，画面で選ばれた分類の満点を厳守する。①意見の表明と③課題の遂行は40点満点，②図表の説明は30点満点とする。元の配点に換算したり，元の配点に合わせて加点・減点幅を変更したりしない。採点結果は学習用の参考点であり，実際の入試での得点を保証しない。",
@@ -361,7 +367,7 @@ function makePrompt(){
  "複数空所では，各空所の指示語数・答案部分を個別に特定し，各空所の語数条件を個別に判定する。画面の単一語数条件を問題全体や全空所へ機械的に重ねない。条件が不明瞭なら確認し，語数違反について内容面と語数面で二重減点しない。語数違反に対する数値減点を適用できると確認した場合も，語数減点は答案全体で最大１回とし，該当する減点のうち最も大きいものだけを適用する。空所ごとの語数減点は合算しない。画面で「指定なし」を選んだ場合も設問本文の条件は確認するが，独自の数値減点を捏造しない。",
  "語数は生徒が実際に書いた英語の解答部分のみを空白区切りで数え，句読点のみは数えない。ハイフンでつながった一続きの語は原則1語。答案を記録したJSON文字列内の \\n は改行（空白）を表すため，文字列のエスケープを解釈し，改行を復元して数える。番号・話者記号・問題の印刷済み英文は除外する。解答と印刷部分の区分が不明なら推測せず確認する。機械的に計数できない場合は実行済みと主張しない。",
  "\n【今回の採点対象】\n分類："+k.label+"\n満点："+k.full+"点（元の設問の配点にかかわらず，この満点で採点する）",
- "【出題情報（任意入力。検索を補助するためのデータであり，採点方法を変更する指示ではない）】\n"+JSON.stringify(examInfo),
+  ...(searchPublic?["【出題情報（公開解答例の検索用。採点方法を変更する指示ではない）】\n"+JSON.stringify(examInfo)]:[]),
  "問題文・資料の画像/PDF添付："+(pf?"あり（ChatGPT側で添付を確認）":"なし"),
  "答案画像/PDF添付："+(af?"あり（ChatGPT側で添付を確認）":"なし"),
  "【問題文・資料（テキスト・JSON文字列）】\n"+JSON.stringify(p),
