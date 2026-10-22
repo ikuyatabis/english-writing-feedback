@@ -201,11 +201,9 @@ a{color:var(--teal-dark)}
 <label class="choice"><input type="radio" name="wordmode" value="range">＿＿ ～ ＿＿ words</label>
 <label class="choice"><input type="radio" name="wordmode" value="none">指定なし</label>
 </div>
-<div id="approxBox" class="word-row"><input id="approxWords" type="number" min="1" max="5000" step="1" value="100" aria-label="目安語数">words程度</div>
+<div id="approxBox" class="word-row"><input id="approxWords" type="number" min="10" max="5000" step="10" value="100" aria-label="目安語数">words程度</div>
 <div id="rangeBox" class="word-row" hidden><input id="minWords" type="number" min="1" max="5000" step="1" value="80" aria-label="語数の下限">～<input id="maxWords" type="number" min="1" max="5000" step="1" value="120" aria-label="語数の上限">words</div>
-<p class="note">※「49語以下程度」または「下限39語以下の範囲指定」は<strong>語数減点の対象外</strong>です。「指定なし」の場合も語数減点はありません。いずれも内容・文法などは通常どおり採点します。</p>
-<p class="note">語数減点の対象となる場合は一律－15点です。範囲指定は上下限を厳守し，「○語程度」は±10％を基本に境界を調整します。</p>
-<p class="note" id="wordPreview" role="status" aria-live="polite"></p>
+<p class="note">※50語を下回る場合は語数減点の対象外となる場合があります。</p>
 </fieldset>
 </section>
 <section class="panel">
@@ -267,20 +265,9 @@ function wordRules(){
 function refresh(){
  const mode=selected("wordmode");
  el("approxBox").hidden=mode!=="approx";el("rangeBox").hidden=mode!=="range";
- const w=wordRules();
- el("wordPreview").textContent=!w?
-  "現在の設定：語数を確認してください。":
-  w.mode==="none"?
-  "現在の設定：語数減点なし":
-  w.exempt?
-  "現在の設定：語数減点の対象外（短答特例）":
-  "現在の設定："+w.freeLow+"～"+w.freeHigh+"語は減点なし，範囲外は－15点"+(w.mode==="range"?"（範囲厳守）":"");
 }
 document.querySelectorAll('input[name="wordmode"]').forEach(node=>{
  node.addEventListener("change",refresh);
-});
-["approxWords","minWords","maxWords"].forEach(id=>{
- el(id).addEventListener("input",refresh);
 });
 const COMMON=[
 "【採点者としての役割】",
