@@ -3,12 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light">
 <title>三田キャンへの道｜自由英作文</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700;800&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
   :root{
+    color-scheme: only light;
     --paper:#f7f1e4;
     --panel:#fffdf7;
     --ink:#241f18;
@@ -32,22 +34,8 @@
     --font-sans:"Zen Kaku Gothic New","Noto Sans JP",-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif;
     font-family:var(--font-sans);
   }
-  @media (prefers-color-scheme: dark){
-    :root:not([data-theme="light"]){
-      --paper:#1b1712; --panel:#241f18; --ink:#eee6d6; --sub:#b3a68f; --line:#4a4032;
-      --navy:#9aa9d6; --navy-deep:#c7d0ec; --navy-soft:#232838;
-      --red:#e08a94; --red-soft:#3a2224;
-      --ok:#8fbf9d; --ok-soft:#20301f; --warn:#e0b866; --warn-soft:#372c15;
-      --bad:#e08a94; --bad-soft:#3a2224; --unknown:#b3a68f; --unknown-soft:#2c2820;
-    }
-  }
-  :root[data-theme="dark"]{
-    --paper:#1b1712; --panel:#241f18; --ink:#eee6d6; --sub:#b3a68f; --line:#4a4032;
-    --navy:#9aa9d6; --navy-deep:#c7d0ec; --navy-soft:#232838;
-    --red:#e08a94; --red-soft:#3a2224;
-    --ok:#8fbf9d; --ok-soft:#20301f; --warn:#e0b866; --warn-soft:#372c15;
-    --bad:#e08a94; --bad-soft:#3a2224; --unknown:#b3a68f; --unknown-soft:#2c2820;
-  }
+  
+  
   *{box-sizing:border-box;}
   html{ scroll-padding-top: env(safe-area-inset-top, 0px); }
   body{
