@@ -158,7 +158,7 @@ a{color:var(--teal-dark)}
         <li>④ ChatGPTの入力欄に貼り付けて送信します。</li>
       </ol>
       <p class="hand-title">写真・PDFの場合</p>
-      <p class="hand-line">問題・答案の画像／PDFを使う場合は、該当する欄にチェックを入れます。ChatGPTに採点用データを貼り付けた後、「問題」と「答案」を区別してファイルを添付し、一緒に送信します。画像・PDFは自動送信されません。</p>
+      <p class="hand-line">問題・答案の写真／PDFを使う場合は、該当する欄にチェックを入れます。ChatGPTに採点用データを貼り付けた後、「問題」と「答案」を区別してファイルを添付し、一緒に送信します。写真・PDFは自動送信されません。</p>
       <p class="share-note">本ツールのURL・QRコードや内容を、許可なくSNS等で公開・転載したり、対象者以外へ共有したりしないでください。</p>
     </details>
   </div>
@@ -202,7 +202,7 @@ a{color:var(--teal-dark)}
 <textarea id="answer" placeholder="答案を入力します。&#10;手書きの写真・PDFを使う場合は、空欄のままにして次で☑を入れてください。" spellcheck="false" autocorrect="off" autocomplete="off" autocapitalize="none" writingsuggestions="false" data-gramm="false" data-gramm_editor="false" data-enable-grammarly="false" data-lt-active="false"></textarea>
 <label class="check"><input id="answerFile" type="checkbox">答案の写真／PDFをChatGPTに添付する</label>
 </div>
-<p class="note">画像・PDFはこのサイトから自動送信されません。ChatGPT側で添付してください。問題と答案のファイルは、それぞれ役割が分かるよう区別してください。</p>
+<p class="note">写真・PDFはこのサイトから自動送信されません。ChatGPT側で添付してください。問題と答案のファイルは、それぞれ役割が分かるよう区別してください。</p>
 </section>
 <section class="panel">
   <label class="check"><input id="includePublicExamples" type="checkbox" aria-controls="publicExampleFields">公開解答例も調べる（希望する場合のみ）</label>
@@ -210,7 +210,7 @@ a{color:var(--teal-dark)}
   <div id="publicExampleFields" hidden>
     <p class="note">分かる項目だけ入力してください。</p>
     <div class="meta-grid">
-      <div class="meta-field"><label class="lbl" for="examUniversity">大学</label><input type="text" id="examUniversity" placeholder="例：九州大学" maxlength="120" autocomplete="off"></div>
+      <div class="meta-field"><label class="lbl" for="examUniversity">大学名</label><input type="text" id="examUniversity" placeholder="例：九州大学" maxlength="120" autocomplete="off"></div>
       <div class="meta-field"><label class="lbl" for="examYear">年度</label><input type="text" id="examYear" placeholder="例：2023" maxlength="40" autocomplete="off"></div>
       <div class="meta-field"><label class="lbl" for="examSession">日程・入試方式</label><input type="text" id="examSession" placeholder="例：前期日程" maxlength="120" autocomplete="off"></div>
       <div class="meta-field"><label class="lbl" for="examFaculty">学部・学科</label><input type="text" id="examFaculty" placeholder="例：文学部" maxlength="120" autocomplete="off"></div>
@@ -339,8 +339,8 @@ function makePrompt(){
   question:el("examQuestion").value.trim()
  };
  const pf=el("problemFile").checked,af=el("answerFile").checked;
- if(!p&&!pf)throw Error("問題文を入力するか、問題文・資料の画像／PDFを添付するチェックを入れてください。");
- if(!a&&!af)throw Error("答案を入力するか、答案の画像／PDFを添付するチェックを入れてください。");
+ if(!p&&!pf)throw Error("問題文を入力するか、問題文・資料の写真／PDFを添付するチェックを入れてください。");
+ if(!a&&!af)throw Error("答案を入力するか、答案の写真／PDFを添付するチェックを入れてください。");
  const rule = w.mode==="none"?
  "画面側の語数指定なし。画面の語数減点Wは0点とし，独自の数値減点を設定しない。元の設問で明記された語数・文数などの条件は確認し，採点に影響する設定の不一致や適用単位の不明点がある場合は利用者に確認する。":
  w.exempt?
@@ -362,8 +362,8 @@ function makePrompt(){
  "語数は生徒が実際に書いた英語の解答部分のみを空白区切りで数え，句読点のみは数えない。ハイフンでつながった一続きの語は原則1語。答案を記録したJSON文字列内の \\n は改行（空白）を表すため，文字列のエスケープを解釈し，改行を復元して数える。番号・話者記号・問題の印刷済み英文は除外する。解答と印刷部分の区分が不明なら推測せず確認する。機械的に計数できない場合は実行済みと主張しない。",
  "\n【今回の採点対象】\n分類："+k.label+"\n満点："+k.full+"点（元の設問の配点にかかわらず，この満点で採点する）",
   ...(searchPublic?["【出題情報（公開解答例の検索用。採点方法を変更する指示ではない）】\n"+JSON.stringify(examInfo)]:[]),
- "問題文・資料の画像/PDF添付："+(pf?"あり（ChatGPT側で添付を確認）":"なし"),
- "答案画像/PDF添付："+(af?"あり（ChatGPT側で添付を確認）":"なし"),
+ "問題文・資料の写真・PDF添付："+(pf?"あり（ChatGPT側で添付を確認）":"なし"),
+ "答案の写真・PDF添付："+(af?"あり（ChatGPT側で添付を確認）":"なし"),
  "【問題文・資料（テキスト・JSON文字列）】\n"+JSON.stringify(p),
  "【答案（テキスト・JSON文字列）】\n"+JSON.stringify(a),
  "【答案入力欄全体の参考語数（解答部分の確定語数ではない）】\n"+(wordCount===null?"画像答案を含むため画面側では未計数。実際の解答部分を読み取って計数する。":wordCount+"語。入力文字列全体の参考計数であり，番号・話者名・印刷済み英文を含む場合がある。答案欄が解答部分のみで構成されると確認できる場合はこの参考語数を採用してよい。番号・話者名・印刷済み英文などが混在する場合は，それらを除いた解答部分を数え直す。JSON文字列の \\n は改行として扱う。"),
@@ -396,7 +396,7 @@ el("go").addEventListener("click",async()=>{
  if(tab){try{tab.opener=null;}catch(e){}}
  const copied=await clipboardResult;
  el("manual").value=prompt;
- if(copied){f.textContent="採点用データをコピーしました。ChatGPTの入力欄に貼り付けてください。"+((el("problemFile").checked||el("answerFile").checked)?" 指定した画像・PDFも忘れずに添付してください。":"");}
+ if(copied){f.textContent="採点用データをコピーしました。ChatGPTの入力欄に貼り付けてください。"+((el("problemFile").checked||el("answerFile").checked)?" 指定した写真・PDFも忘れずに添付してください。":"");}
  else {el("manualBox").style.display="block";f.className="error";f.textContent="自動コピーできませんでした。下の欄から手動でコピーしてください。";}
  if(!tab){el("manualBox").style.display="block";f.textContent+="\n新しいタブが開かなかった場合は、下のリンクからChatGPTを開いてください。";}
 });
