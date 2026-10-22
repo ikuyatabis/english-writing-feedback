@@ -333,6 +333,11 @@
   .import-actions{ display:flex; flex-wrap:wrap; gap:10px; align-items:center; }
   .notice-box.warn{ background:var(--warn-soft); color:var(--warn); }
   textarea[readonly]{ opacity:.7; cursor:not-allowed; }
+
+/* Keep full form area accessible on phones and short viewports. */
+@media (max-width: 560px), (max-height: 700px) {
+  .masthead { position: static; }
+}
 </style>
 </head>
 <body>
