@@ -13,7 +13,7 @@
 :root {
   color-scheme: only light;
   --paper:#f7f1e4; --card:#fffdf7; --ink:#241f18; --sub:#736a5a; --line:#dfd3ba;
-  --violet:#704691; --violet-dark:#52356e; --violet-soft:#b69acc; --tint:#f1e8f8; --seal:#704691;
+  --gold:#927645; --gold-dark:#70582E; --gold-soft:#CBB789; --tint:#F5EFE0; --seal:#927645;
   --alert:#a34526; --focus:#197fbc;
   --font-serif:"Shippori Mincho","Hiragino Mincho ProN","Yu Mincho",serif;
   --font-sans:"Zen Kaku Gothic New","Hiragino Sans","Yu Gothic",sans-serif;
@@ -25,7 +25,7 @@ body{
   margin:0;background:var(--paper);color:var(--ink);font-family:var(--font-sans);
   line-height:1.75;-webkit-font-smoothing:antialiased;
 }
-::selection{background:var(--violet-soft);color:#281b32}
+::selection{background:var(--gold-soft);color:#332815}
 :focus-visible{outline:2px solid var(--focus);outline-offset:2px}
 .page{max-width:760px;margin:0 auto;padding:0 20px 64px}
 .masthead{
@@ -36,30 +36,30 @@ body{
 .masthead-inner{max-width:760px;margin:0 auto;padding:0 20px 20px;text-align:center}
 .seal{
   width:56px;height:56px;margin:0 auto 14px;border-radius:50%;
-  border:1px solid var(--violet-soft);
+  border:1px solid var(--gold-soft);
   box-shadow:0 0 0 3px var(--paper),0 0 0 4px var(--tint);
   background:var(--seal);color:#f7f2df;
   display:flex;align-items:center;justify-content:center;
   font-family:var(--font-serif);font-size:1.5rem;font-weight:700;
 }
-.kicker{margin:0 0 6px;font-size:.82rem;letter-spacing:.04em;color:var(--violet);font-weight:500}
+.kicker{margin:0 0 6px;font-size:.82rem;letter-spacing:.04em;color:var(--gold-dark);font-weight:500}
 h1{
   margin:0 0 4px;font-family:var(--font-serif);font-weight:800;
   font-size:clamp(1.5rem,5vw,2rem);letter-spacing:.03em;color:var(--ink)
 }
 .tricolor{display:flex;height:4px;width:120px;margin:4px auto 16px;border-radius:2px;overflow:hidden}
 .tricolor span{flex:1}
-.tricolor span:nth-child(1),.tricolor span:nth-child(3){background:var(--violet)}
-.tricolor span:nth-child(2){background:var(--violet-soft)}
+.tricolor span:nth-child(1),.tricolor span:nth-child(3){background:var(--gold)}
+.tricolor span:nth-child(2){background:var(--gold-soft)}
 .lede{margin:0 auto;color:var(--sub);font-size:.9rem;max-width:42em}
 .tool-howto{
   max-width:680px;margin:10px auto 0;padding:7px 12px;text-align:left;
   background:var(--card);border:1px solid var(--line);
-  border-left:4px solid var(--violet);border-radius:4px
+  border-left:4px solid var(--gold);border-radius:4px
 }
 .tool-howto-title{
   margin:0;font-family:var(--font-serif);font-size:.88rem;
-  font-weight:700;color:var(--violet-dark);cursor:pointer;line-height:1.45
+  font-weight:700;color:var(--gold-dark);cursor:pointer;line-height:1.45
 }
 .tool-howto > summary.tool-howto-title{list-style:none}
 .tool-howto > summary.tool-howto-title::-webkit-details-marker{display:none}
@@ -74,7 +74,7 @@ h1{
 .tool-howto li{margin:1px 0}
 .tool-howto .hand-title{
   margin:7px 0 0;font-family:var(--font-serif);
-  font-size:.84rem;font-weight:700;color:var(--violet-dark)
+  font-size:.84rem;font-weight:700;color:var(--gold-dark)
 }
 .tool-howto .hand-line{margin:0;font-size:.81rem;line-height:1.55}
 .tool-howto .share-note{margin:9px 0 0;font-size:.74rem;line-height:1.55;opacity:.72}
@@ -82,10 +82,10 @@ h1{
 .panel{
   padding:22px 24px;margin-bottom:20px;
   background:var(--card);border:1px solid var(--line);
-  border-top:3px solid var(--violet);border-radius:4px;
+  border-top:3px solid var(--gold);border-radius:4px;
   box-shadow:0 1px 2px rgba(36,31,24,.05)
 }
-.panel h2{margin:0 0 13px;font-family:var(--font-serif);font-size:1.16rem;font-weight:700;color:var(--violet-dark)}
+.panel h2{margin:0 0 13px;font-family:var(--font-serif);font-size:1.16rem;font-weight:700;color:var(--gold-dark)}
 .field{margin:0 0 19px}
 .field:last-child{margin-bottom:0}
 legend,.lbl{font-family:var(--font-serif);font-weight:700;display:block;margin:0 0 8px;font-size:.94rem}
@@ -96,8 +96,8 @@ fieldset{padding:0;margin:0;border:0}
   border:1px solid var(--line);border-radius:4px;padding:8px 12px;cursor:pointer;
   font-size:.94rem
 }
-.choice:has(input:checked){background:var(--tint);border-color:var(--violet)}
-input[type=radio],input[type=checkbox]{accent-color:var(--violet)}
+.choice:has(input:checked){background:var(--tint);border-color:var(--gold)}
+input[type=radio],input[type=checkbox]{accent-color:var(--gold)}
 textarea,input[type=number],input[type=text]{
   font:inherit;color:var(--ink);background:var(--card);
   border:1px solid var(--line);border-radius:3px;padding:10px 12px;max-width:100%
@@ -108,14 +108,14 @@ textarea,input[type=number],input[type=text]{
 .meta-field input{display:block;width:100%;min-height:42px;font-size:.95rem}
 .meta-description{font-size:.84rem;color:var(--sub);margin:0 0 12px}
 textarea{width:100%;min-height:150px;resize:vertical}
-textarea:focus,input[type=number]:focus,input[type=text]:focus{outline:2px solid var(--violet);outline-offset:1px}
+textarea:focus,input[type=number]:focus,input[type=text]:focus{outline:2px solid var(--gold);outline-offset:1px}
 input[type=number]{width:100px}
 .word-row{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-top:12px}
 .note{font-size:.84rem;color:var(--sub);margin:8px 0}
 .check{display:flex;gap:8px;align-items:flex-start;margin:10px 0;cursor:pointer;font-size:.92rem}
 .check input{margin-top:6px}
 button{
-  border:0;background:var(--seal);color:#fff9e9;font:inherit;
+  border:0;background:var(--gold-dark);color:#fff9e9;font:inherit;
   font-family:var(--font-serif);font-weight:700;
   border-radius:3px;padding:14px 20px;width:100%;cursor:pointer
 }
@@ -126,7 +126,7 @@ button:hover{filter:brightness(1.08)}
 #manual{min-height:110px;font-size:.81rem}
 .disclaimer{font-size:.83rem;line-height:1.7;text-align:center;color:var(--sub);margin:20px 0 0}
 footer{font-size:.78rem;color:var(--sub);text-align:center;margin-top:15px}
-a{color:var(--violet-dark)}
+a{color:var(--gold-dark)}
 [hidden]{display:none!important}
 @media(max-width:560px), (max-height:700px){
   .masthead{position:static}
