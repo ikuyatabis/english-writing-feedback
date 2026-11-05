@@ -252,6 +252,14 @@
       </details>
 
       <p class="section-label">あなたの答案</p>
+<div class="output-format-picker" style="margin:12px 0 16px;padding:12px 14px;border:1px solid #c9c9c9;border-radius:8px">
+  <div style="font-weight:700;margin-bottom:8px">添削結果の出力形式</div>
+  <label style="display:block;padding:3px 0"><input type="radio" name="outputFormat" value="screen" checked> 画面表示のみ（標準）</label>
+  <label style="display:block;padding:3px 0"><input type="radio" name="outputFormat" value="word"> Word（B5）</label>
+  <label style="display:block;padding:3px 0"><input type="radio" name="outputFormat" value="pdf"> PDF（B5）</label>
+  <label style="display:block;padding:3px 0"><input type="radio" name="outputFormat" value="both"> Word＋PDF（B5）</label>
+  <p style="font-size:.86em;line-height:1.55;margin:8px 0 0">Word・PDFはJIS B5（182×257 mm）・縦向き。ファイルはChatGPT側で作成します。利用環境によっては作成できない場合があります。</p>
+</div>
       <div class="tabs" role="tablist">
         <button class="tab" role="tab" id="tabText" aria-selected="true">テキストで入力</button>
         <button class="tab" role="tab" id="tabPhoto" aria-selected="false">手書き答案（写真・PDF）</button>
@@ -761,8 +769,25 @@ function showHandoffBox(promptText){
   }
   wrap.querySelector("#chatgptHandoffText").value=promptText; wrap.style.display="flex";
 }
+function getExportInstruction(){
+  const selected=document.querySelector('input[name="outputFormat"]:checked');
+  const mode=selected?selected.value:"screen";
+  if(mode==="screen")return "";
+  const formats={word:"Word（.docx）",pdf:"PDF（.pdf）",both:"Word（.docx）とPDF（.pdf）"};
+  const requested=formats[mode];
+  if(!requested)return "";
+  return [
+    "【添削結果の出力形式】",
+    "指定形式："+requested+"。通常の添削結果はChatGPTの画面にも全文表示してください。対応するファイル生成機能が利用できる場合は，同じ添削結果をJIS B5（182×257 mm）・縦向きで作成し，ダウンロード可能なファイルとして提示してください。Wordは編集可能な.docx形式，PDFは.pdf形式にしてください。",
+    "画面表示とファイルには同じ内容を収録してください。既定の採点基準・減点規則・出力順・語数条件・問題固有の例外を変更せず，見出し・表・改行や余白はB5で読みやすく整えてください。WordとPDFの両方を選んだ場合は同一内容の2ファイルを作成してください。",
+    "公開解答例の検索・紹介が明示的に希望されている場合に限り，独立採点・添削の完了後に検索し，出典が確認できたものだけを末尾に追加してから画面表示とファイル作成を行ってください。公開解答例を採点結果の調整に使わないでください。見つからない場合はその旨を記載してください。希望されていない場合は検索しないでください。",
+    "答案・資料の不足，判読不能，本文未収録など，既存の規則で採点・添削を停止・保留すべき場合は，その既定の案内だけを返し，ファイルは作成しないでください。",
+    "対応するファイルを生成できない場合は，架空のファイル・ダウンロードリンクを示さず，画面上の添削結果を維持したうえで作成できなかった旨を簡潔に伝えてください。"
+  ].join("\n");
+}
 async function handoffToChatGPT(basePrompt){
-  const promptText=basePrompt+"\n\n"+CHATGPT_OUTPUT_OVERRIDE;
+  const formatInstruction=getExportInstruction();
+  const promptText=basePrompt+"\n\n"+CHATGPT_OUTPUT_OVERRIDE+(formatInstruction?"\n\n"+formatInstruction:"");
   try{window.open("https://chatgpt.com/","_blank","noopener")}catch(_){}
   let copied=false; try{if(navigator.clipboard&&window.isSecureContext){await navigator.clipboard.writeText(promptText);copied=true}}catch(_){}
   if(copied){
