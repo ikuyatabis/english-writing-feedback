@@ -208,7 +208,15 @@ a{color:var(--teal-dark)}
 <p class="note">写真・PDFはこのサイトから自動送信されません。ChatGPT側で添付してください。問題と答案のファイルは、それぞれ役割が分かるよう区別してください。</p>
 </section>
 <section class="panel">
-  <label class="check"><input id="includePublicExamples" type="checkbox" aria-controls="publicExampleFields">公開解答例も調べる（希望する場合のみ）</label>
+<div class="output-format-picker" style="margin:12px 0 16px;padding:12px 14px;border:1px solid #c9c9c9;border-radius:8px">
+  <div style="font-weight:700;margin-bottom:8px">添削結果の出力形式</div>
+  <label style="display:block;padding:3px 0"><input type="radio" name="outputFormat" value="screen" checked> 画面表示のみ（標準）</label>
+  <label style="display:block;padding:3px 0"><input type="radio" name="outputFormat" value="word"> Word（B5）</label>
+  <label style="display:block;padding:3px 0"><input type="radio" name="outputFormat" value="pdf"> PDF（B5）</label>
+  <label style="display:block;padding:3px 0"><input type="radio" name="outputFormat" value="both"> Word＋PDF（B5）</label>
+  <p style="font-size:.86em;line-height:1.55;margin:8px 0 0">Word・PDFはJIS B5（182×257 mm）・縦向き。ファイルはChatGPT側で作成します。利用環境によっては作成できない場合があります。</p>
+</div>
+  <label class="check"><input id="includePublicExamples" type="checkbox" aria-controls="publicExampleFields">公開解答例も調べる（処理に時間がかかります）</label>
   <p class="note">大学公式のほか、予備校・塾・出版社などによる公開解答例も、見つかった場合に限り紹介します。<br>添削結果をすぐに知りたい場合は、オフのままにすることをおすすめします。</p>
   <div id="publicExampleFields" hidden>
     <p class="note">分かる項目だけ入力してください。</p>
@@ -335,6 +343,22 @@ function countWords(s){
  const m=s.match(/\S+/g)||[];
  return m.filter(w=>/[A-Za-z0-9]/.test(w)).length;
 }
+function getExportInstruction(){
+  const selected=document.querySelector('input[name="outputFormat"]:checked');
+  const mode=selected?selected.value:"screen";
+  if(mode==="screen")return "";
+  const formats={word:"Word（.docx）",pdf:"PDF（.pdf）",both:"Word（.docx）とPDF（.pdf）"};
+  const requested=formats[mode];
+  if(!requested)return "";
+  return [
+    "【添削結果の出力形式】",
+    "指定形式："+requested+"。通常の添削結果はChatGPTの画面にも全文表示してください。対応するファイル生成機能が利用できる場合は，同じ添削結果をJIS B5（182×257 mm）・縦向きで作成し，ダウンロード可能なファイルとして提示してください。Wordは編集可能な.docx形式，PDFは.pdf形式にしてください。",
+    "画面表示とファイルには同じ内容を収録してください。既定の採点基準・減点規則・出力順・語数条件・問題固有の例外を変更せず，見出し・表・改行や余白はB5で読みやすく整えてください。WordとPDFの両方を選んだ場合は同一内容の2ファイルを作成してください。",
+    "公開解答例の検索・紹介が明示的に希望されている場合に限り，独立採点・添削の完了後に検索し，出典が確認できたものだけを末尾に追加してから画面表示とファイル作成を行ってください。公開解答例を採点結果の調整に使わないでください。見つからない場合はその旨を記載してください。希望されていない場合は検索しないでください。",
+    "答案・資料の不足，判読不能，本文未収録など，既存の規則で採点・添削を停止・保留すべき場合は，その既定の案内だけを返し，ファイルは作成しないでください。",
+    "対応するファイルを生成できない場合は，架空のファイル・ダウンロードリンクを示さず，画面上の添削結果を維持したうえで作成できなかった旨を簡潔に伝えてください。"
+  ].join("\n");
+}
 function makePrompt(){
  const kind=selected("kind"),k=kinds[kind],w=wordRules();
  if(!w)throw Error("語数の入力を確認してください。");
@@ -387,7 +411,7 @@ function makePrompt(){
  "公開解答例の検索・紹介は希望されていません。公開解答例の検索・紹介は行わないでください。"
  ]),
  searchPublic?"以上の問題文と答案を，指定された分類と基準で採点・添削し，その後に公開解答例を出典付きで紹介せよ。":"以上の問題文と答案を，指定された分類と基準で採点・添削せよ。"
- ].join("\n\n");
+ ].concat(getExportInstruction()?[getExportInstruction()]:[]).join("\n\n");
 }
 async function copyText(t){
  if(navigator.clipboard&&window.isSecureContext){try{await navigator.clipboard.writeText(t);return true;}catch(e){}}
