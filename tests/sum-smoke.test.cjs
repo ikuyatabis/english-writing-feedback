@@ -85,7 +85,8 @@ test("word limit modes and their boundary calculations", () => {
   const h = createHarness();
   h.selections.wordmode = "approx";
   const cases = [
-    ["30", true, 30, 30],
+    ["30", true, 30, 33],
+    ["40", true, 40, 44],
     ["50", false, 45, 55],
     ["80", false, 70, 90],
     ["100", false, 90, 110],
@@ -210,18 +211,46 @@ test("Audit: English counting recognizes Unicode letters and numbers", () => {
   assert.equal(vmCount(h, "countWords", "apples\tbananas\noranges"), 3);
 });
 
-test("Audit: Japanese length legend is language-neutral and the short-length rule remains unchanged", () => {
+test("Audit: short summary limits waive only lower-bound deductions, never excess length", () => {
   assert.match(html, /<legend>字数・語数の指定<\/legend>/);
+  const h = createHarness();
+  for (const kind of ["ja", "en"]) {
+    h.selections.kind = kind;
+    h.call("refresh");
+    const unit = kind === "ja" ? "字" : "words";
+    const desc = kind === "ja" ? "字数" : "語数";
+    h.selections.wordmode = "range";
+    h.elements.minWords.value = "30";
+    h.elements.maxWords.value = "40";
+    const w = h.call("wordRules");
+    assert.equal(w.exempt, true, "Short-range low-bound exemption remains");
+    assert.equal(w.freeHigh, 40);
+    let prompt = h.call("makePrompt");
+    assert(prompt.includes("下限不足による" + desc + "減点Wは0点"));
+    assert(prompt.includes("上限40" + unit + "を１字または１語でも超えた場合は，超過量によらず一律－15点"));
+    assert(!prompt.includes("指定された" + desc + "が少ないため" + desc + "減点Wは0点"));
+    h.selections.wordmode = "approx";
+    h.elements.approxWords.value = "40";
+    assert.equal(h.call("wordRules").freeHigh, 44);
+    prompt = h.call("makePrompt");
+    assert(prompt.includes("上限44" + unit + "を１字または１語でも超えた場合は，超過量によらず一律－15点"));
+    h.selections.wordmode = "within";
+    h.elements.withinWords.value = "40";
+    prompt = h.call("makePrompt");
+    assert(prompt.includes("一律－15点"));
+  }
+});
+
+test("Audit: upper-bound deduction remains fixed at 15 even when full mark is 10", () => {
   const h = createHarness();
   h.selections.wordmode = "range";
   h.elements.minWords.value = "30";
   h.elements.maxWords.value = "40";
-  const w = h.call("wordRules");
-  assert.equal(w.exempt, true, "Pre-existing short-range grading exemption must not change without approval");
-  assert(h.call("makePrompt").includes("減点Wは0点"));
-  h.selections.wordmode = "within";
-  h.elements.withinWords.value = "40";
-  assert(h.call("makePrompt").includes("一律－15点"));
+  h.elements.examPoints.value = "10";
+  const prompt = h.call("makePrompt");
+  assert(prompt.includes("10点満点"));
+  assert(prompt.includes("一律－15点"));
+  assert(prompt.includes("max(0, M－C－E－W－Q)"));
 });
 
 test("Audit: changing a word in one clause does not exempt a separate verbatim clause", () => {
