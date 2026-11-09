@@ -24,7 +24,7 @@ async function checkPage(browser, name, width, height) {
     });
   });
   await page.goto(target, { waitUntil: "domcontentloaded" });
-  assert.match(await page.title(), /選り抜きの庵｜日本文＆英文│要約対策/);
+  assert.match(await page.title(), /選り抜きの庵│要約問題/);
   assert.equal(await page.locator('input[name="kind"][value="ja"]').isChecked(), true);
   assert.equal(await page.locator("#paraphraseBox").isVisible(), false);
   assert.equal(await page.locator("#approxBox").isVisible(), true);
@@ -70,7 +70,7 @@ async function checkHome(browser, name, width, height) {
   await page.goto(homeTarget, { waitUntil: "domcontentloaded" });
   const titles = await page.locator(".grid .card h2").allInnerTexts();
   assert.deepEqual(titles, [
-    "持ち込み診療所", "ことのは研究室", "選り抜きの庵",
+    "持ち込み診療所", "ことのは研究室", "選り抜きの庵│要約問題",
     "伊都への恋文", "待ってろ文キャン", "三田キャンへの道"
   ]);
   assert.match(await page.locator(".lead").innerText(), /入試英語の添削ツール でつ/);
