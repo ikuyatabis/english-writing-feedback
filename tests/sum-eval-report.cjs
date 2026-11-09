@@ -47,28 +47,34 @@ function loadInput(csvText,key){
   if(seen.has(key))throw Error("Duplicate CSV row: "+key);
   seen.add(key);
   const fields=["model","session_id","L","P","D","C","W","score","reason"];
+  const required=["model","session_id","C","W","score","reason"];
   const filled=fields.filter(x=>o[x].trim()!=="").length;
   if(filled===0){records.push({...o,completed:false});continue;}
-  if(filled!==fields.length){
-   const absent=fields.filter(x=>o[x].trim()==="");
-   records.push({...o,completed:false,incompleteReason:"Missing: "+absent.join(", ")});
+  const absent=required.filter(x=>o[x].trim()==="");
+  if(absent.length){
+   records.push({...o,completed:false,incompleteReason:"Missing required observations: "+absent.join(", ")});
    continue;
   }
   if(o.model.length>120||o.session_id.length>120)throw Error("CSV row "+rowNum+": excessively long model/session identifier");
   const numeric={};
   for(const name of ["L","P","D","C","W","score"]){
+   if(["L","P","D"].includes(name)&&o[name].trim()===""){numeric[name]=null;continue;}
    if(!/^\d+(?:\.\d{1,2})?$/.test(o[name].trim()))throw Error("CSV row "+rowNum+": "+name+" must be a nonnegative number with at most 2 decimals");
    numeric[name]=Number(o[name]);
    if(numeric[name]>40)throw Error("CSV row "+rowNum+": "+name+" cannot exceed M=40");
   }
   Object.assign(o,numeric);
-  if(![0,10,20].includes(o.P))throw Error("CSV row "+rowNum+": P must be 0, 10 or 20 for M=40");
+  if(o.P!==null&&![0,10,20].includes(o.P))throw Error("CSV row "+rowNum+": P must be 0, 10 or 20 for M=40");
   if(o.W!==0)throw Error("CSV row "+rowNum+": these 10 controlled summaries all satisfy 120 characters, so W must be 0");
-  const contentLoss=Math.min(40,Math.max(o.L,o.P)+o.D);
-  const score=Math.max(0,40-contentLoss-o.W);
-  if(Math.abs(o.C-contentLoss)>0.005)throw Error("CSV row "+rowNum+": C="+o.C+" disagrees with max(L,P)+D="+fmt(contentLoss));
+  const arithmeticVerified=[o.L,o.P,o.D].every(x=>x!==null);
+  if(arithmeticVerified){
+   const contentLoss=Math.min(40,Math.max(o.L,o.P)+o.D);
+   if(Math.abs(o.C-contentLoss)>0.005)throw Error("CSV row "+rowNum+": C="+o.C+" disagrees with max(L,P)+D="+fmt(contentLoss));
+  }
+  const score=Math.max(0,40-o.C-o.W);
   if(Math.abs(o.score-score)>0.005)throw Error("CSV row "+rowNum+": score="+o.score+" disagrees with 40-C-W="+fmt(score));
-  records.push({...o,completed:true,original_case:known.get(o.filename).original_case});
+  records.push({...o,completed:true,arithmetic_verified:arithmeticVerified,
+   original_case:known.get(o.filename).original_case});
  }
  if(seen.size!==expected.size)throw Error("CSV must contain exactly 3 rows for each of 10 files; found "+seen.size+" of "+expected.size);
  const sessionIds=new Set();
@@ -85,13 +91,15 @@ function summarize(csv,key){
  const byFile=new Map(key.cases.map(x=>[x.filename,x]));
  const cases=key.cases.map(info=>{
   const v=complete.filter(x=>x.filename===info.filename);
-  const scores=v.map(x=>x.score), penalties=v.map(x=>x.P);
+  const scores=v.map(x=>x.score),penalties=v.map(x=>x.P);
+  const knownP=penalties.filter(x=>x!==null);
   return {
-   case_id:info.original_case,file:info.filename,completed:v.length,
+   case_id:info.original_case,file:info.filename,completed:v.length,penalty_observations:knownP.length,
+   arithmetic_verified_trials:v.filter(x=>x.arithmetic_verified).length,
    average_score:mean(scores),range_score:scores.length?[Math.min(...scores),Math.max(...scores)]:null,
    observed_scores:scores,observed_P:penalties,
    exact_score_agreement:v.length===3?new Set(scores).size===1:null,
-   content_penalty_agreement:v.length===3?new Set(penalties).size===1:null
+   content_penalty_agreement:v.length===3&&knownP.length===3?new Set(knownP).size===1:null
   };
  });
  const entries=new Map(cases.map(x=>[x.case_id,x]));
@@ -106,9 +114,9 @@ function summarize(csv,key){
   completed_trials:complete.length,expected_trials:30,models,
   incomplete_rows:rows.filter(x=>!x.completed&&x.incompleteReason).map(x=>({file:x.filename,attempt:x.attempt,issue:x.incompleteReason})),
   cases,comparisons,
-  all_penalty_agreement:complete.length===30?cases.every(x=>x.content_penalty_agreement):null,
+  all_penalty_agreement:complete.length===30&&cases.every(x=>x.penalty_observations===3)?cases.every(x=>x.content_penalty_agreement):null,
   all_score_agreement:complete.length===30?cases.every(x=>x.exact_score_agreement):null,
-  warning:"Independent model sessions cannot be verified from a CSV; recorded model/session IDs are self-reported. Three repeats per case do not establish future reliability. No model calls were made by this analyzer."
+  warning:"A completed scoring trial may still lack L/P/D; a blank P is UNKNOWN, not zero. Score and C/W arithmetic are checked even when L/P/D are unknown. The content-loss formula cannot be verified without all three components. Independent model sessions cannot be verified from a CSV; model/session IDs are self-reported. No model calls were made by this analyzer."
  };
 }
 
@@ -121,13 +129,13 @@ function renderMarkdown(result){
  "",
  "この報告はCSVに記録された試行だけを集計します。空欄は０点と見なさず，独立セッションを実行したとも主張しません。",
  "",
- "| 条件 | 記録済み | 平均点 | 点数範囲 | 25％・50％減点P | 点数一致 | P一致 |",
- "|---|---:|---:|---|---|---|---|"
+ "| 条件 | 採点記録 | Pの記録 | 平均点 | 点数範囲 | 減点P（不明は？） | 点数一致 | P一致 |",
+ "|---|---:|---:|---:|---|---|---|---|"
  ];
  for(const c of result.cases){
   const range=c.range_score?c.range_score.map(f).join("～"):"—";
-  lines.push("| "+c.case_id+" ("+c.file+") | "+c.completed+"/3 | "+f(c.average_score)+" | "+range+" | "+
-   (c.observed_P.length?c.observed_P.map(f).join("，"):"—")+" | "+
+  lines.push("| "+c.case_id+" ("+c.file+") | "+c.completed+"/3 | "+c.penalty_observations+"/3 | "+f(c.average_score)+" | "+range+" | "+
+   (c.observed_P.length?c.observed_P.map(x=>x===null?"？":f(x)).join("，"):"—")+" | "+
    (c.exact_score_agreement===null?"未判定":c.exact_score_agreement?"一致":"不一致")+" | "+
    (c.content_penalty_agreement===null?"未判定":c.content_penalty_agreement?"一致":"不一致")+" |");
  }
@@ -136,6 +144,7 @@ function renderMarkdown(result){
  if(result.incomplete_rows.length)lines.push("","**入力が途中の行：** "+result.incomplete_rows.map(x=>x.file+" #"+x.attempt+" ("+x.issue+")").join("，"));
  if(result.models.length>1)lines.push("","**注意：複数のモデル名が混在しています。モデル内の反復とモデル間比較を混同しないでください。**");
  lines.push("","**注意：**"+result.warning,"",
+ "Pが不明の試行があれば，その答案のP一致は未判定です。記録不足を減点不適用（P=0）と混同しないでください。","",
  "この集計は実測データがない場合に採点の一貫性を証明しません。３回とも同じ結果でも，未知の答案で再現する保証はありません。");
  return lines.join("\n")+"\n";
 }
