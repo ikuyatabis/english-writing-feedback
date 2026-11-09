@@ -74,6 +74,14 @@ async function checkHome(browser, name, width, height) {
     "伊都への恋文", "持ち込み診療所", "ことのは研究室"
   ]);
   assert.match(await page.locator(".lead").innerText(), /入試英語の添削ツール でつ/);
+  for (const selector of [".lead", ".howto-heading h2"]) {
+    const lineCount = await page.locator(selector).evaluate(element => {
+      const range = document.createRange();
+      range.selectNodeContents(element);
+      return new Set(Array.from(range.getClientRects()).map(rect => Math.round(rect.top))).size;
+    });
+    assert.equal(lineCount, 1, name + " unwanted wrapping in " + selector);
+  }
   const bounds = await page.locator(".grid .card").evaluateAll(nodes => nodes.map(n => {
     const b = n.getBoundingClientRect();
     return { x: Math.round(b.x), y: Math.round(b.y), width: Math.round(b.width) };
