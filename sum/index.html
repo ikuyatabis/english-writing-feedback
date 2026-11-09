@@ -275,12 +275,18 @@ function wordRules(){
  if(mode==="within"&&!validInt(within))return null;
  const low=mode==="approx"?Number(a):mode==="range"?Number(lo):0;
  const high=mode==="approx"?Number(a):mode==="range"?Number(hi):Number(within);
+ // For short prompts, waive only the lower-bound penalty, never the upper bound.
  const exempt=mode==="approx"?low<50:mode==="range"?low<40:false;
  let freeLow=low,freeHigh=high;
- if(mode==="approx"&&!exempt){
-   const exactTolerance=low%50===0;
-   freeLow=exactTolerance?low*9/10:near10(low*.9);
-   freeHigh=exactTolerance?low*11/10:near10(low*1.1);
+ if(mode==="approx"){
+   if(exempt){
+     // Retain the actual +10% allowance for short "approximately" limits.
+     freeHigh=Math.floor(low*1.1+1e-9);
+   }else{
+     const exactTolerance=low%50===0;
+     freeLow=exactTolerance?low*9/10:near10(low*.9);
+     freeHigh=exactTolerance?low*11/10:near10(low*1.1);
+   }
  }
  return {mode,low,high,freeLow,freeHigh,exempt};
 }
@@ -345,7 +351,7 @@ function makePrompt(){
  }else if(w.mode==="within"){
    countRule="画面での指定："+formatSpec()+"。上限を超えたら超過量によらず一律－15点。上限以内なら字数・語数による減点なし。下限は設けず，短いという理由だけで減点しない。必要な要点の欠落は内容面で評価する。";
  }else if(w.exempt){
-   countRule="画面での指定："+formatSpec()+"。指定された"+unitName+"が少ないため"+unitName+"減点Wは0点。生徒には「"+unitName+"が少ないため、"+unitName+"については採点の対象外としています」とだけ説明する。免除の閾値は示さない。内容上の不足は別途評価するが，指定数から外れた事実を内容面へ付け替えない。";
+   countRule="画面での指定："+formatSpec()+"。指定された"+unitName+"が少ないため，下限不足による"+unitName+"減点Wは0点。ただし上限"+w.freeHigh+unit+"を１字または１語でも超えた場合は，超過量によらず一律－15点とする。上限以内で短い答案には"+unitName+"減点を課さず，必要な要点の欠落は内容面で評価する。生徒に下限不足の理由を説明する場合は「"+unitName+"が少ないため，下限不足については採点の対象外としています」と伝える。免除の閾値は示さない。指定数から外れた事実を内容面へ付け替えない。";
  }else{
    countRule="画面での指定："+formatSpec()+"。減点なしの範囲："+w.freeLow+"～"+w.freeHigh+unit+"。"+
    (w.mode==="range"?"範囲指定は上下限厳守。±10％の猶予を追加しない。":"「程度」の許容は基本±10％。境界が５単位になる場合は正確な値を使用し，そうでなければ上下の境界を10単位で四捨五入する。")+
