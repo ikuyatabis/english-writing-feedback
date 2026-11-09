@@ -29,6 +29,7 @@ async function checkPage(browser, name, width, height) {
   assert.equal(await page.locator("#paraphraseBox").isVisible(), false);
   assert.equal(await page.locator("#approxBox").isVisible(), true);
   assert.equal(await page.locator("#withinBox").isVisible(), false);
+  assert.equal(await page.getByText("字数・語数の指定", { exact: true }).count(), 1);
   const layout = await page.evaluate(() => ({
     innerWidth: innerWidth,
     scrollWidth: document.documentElement.scrollWidth,
@@ -107,12 +108,34 @@ async function checkHome(browser, name, width, height) {
   await context.close();
 }
 
+async function checkAuditHowto(browser, width, height) {
+  const context = await browser.newContext({ viewport: { width, height }, deviceScaleFactor: 1 });
+  await context.route(/fonts\.googleapis\.com|fonts\.gstatic\.com/, route => route.abort());
+  const page = await context.newPage();
+  try {
+    await page.goto(target, { waitUntil: "domcontentloaded" });
+    assert.equal(await page.locator(".masthead").evaluate(e => getComputedStyle(e).position), "sticky");
+    await page.locator(".tool-howto summary").click();
+    assert.equal(await page.locator(".tool-howto").evaluate(e => e.open), true);
+    assert.equal(await page.locator(".masthead").evaluate(e => getComputedStyle(e).position), "static");
+    await page.locator("#problem").click({ timeout: 4500, trial: true });
+    await page.locator("#answer").click({ timeout: 4500, trial: true });
+    await page.locator(".tool-howto summary").click();
+    assert.equal(await page.locator(".masthead").evaluate(e => getComputedStyle(e).position), "sticky");
+    console.log("Howto " + width + "x" + height + ": PASS; inputs clickable");
+  } finally {
+    await context.close();
+  }
+}
+
 (async () => {
   const browser = await chromium.launch({ headless: true, args: ["--no-sandbox"] });
   try {
     await checkPage(browser, "desktop", 1365, 900);
     await checkPage(browser, "mobile", 390, 844);
     await checkPage(browser, "small-mobile", 320, 700);
+    await checkAuditHowto(browser, 561, 701);
+    await checkAuditHowto(browser, 600, 800);
     await checkHome(browser, "desktop", 1365, 900);
     await checkHome(browser, "mobile", 390, 844);
     await checkHome(browser, "small-mobile", 320, 700);
