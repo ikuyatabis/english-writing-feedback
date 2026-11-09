@@ -24,7 +24,8 @@ async function checkPage(browser, name, width, height) {
     });
   });
   await page.goto(target, { waitUntil: "domcontentloaded" });
-  assert.match(await page.title(), /選り抜きの庵│要約問題/);
+  assert.match(await page.title(), /より抜き図書館│要約問題/);
+  assert.equal(await page.locator(".seal").innerText(), "図");
   assert.equal(await page.locator('input[name="kind"][value="ja"]').isChecked(), true);
   assert.equal(await page.locator("#paraphraseBox").isVisible(), false);
   assert.equal(await page.locator("#approxBox").isVisible(), true);
@@ -73,7 +74,7 @@ async function checkHome(browser, name, width, height) {
   assert.equal(await page.locator(".card.sum .new-mark").innerText(), "new!");
   assert.equal(await page.locator(".card.sum .new-mark").isVisible(), true);
   assert.deepEqual(titles, [
-    "持ち込み診療所", "ことのは研究室", "選り抜きの庵",
+    "持ち込み診療所", "ことのは研究室", "より抜き図書館",
     "伊都への恋文", "待ってろ文キャン", "三田キャンへの道"
   ]);
   assert.equal(await page.locator('.card.sum p').innerText(), "日本文＆英文│要約問題");
