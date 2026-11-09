@@ -6,6 +6,7 @@ const { pathToFileURL } = require("node:url");
 const { chromium } = require("playwright");
 
 const target = pathToFileURL(path.resolve(__dirname, "..", "sum", "index.html")).href;
+const homeTarget = pathToFileURL(path.resolve(__dirname, "..", "index.html")).href;
 const artifacts = path.resolve(__dirname, "..", "test-artifacts");
 fs.mkdirSync(artifacts, { recursive: true });
 
@@ -60,12 +61,50 @@ async function checkPage(browser, name, width, height) {
   await context.close();
 }
 
+async function checkHome(browser, name, width, height) {
+  const context = await browser.newContext({ viewport: { width, height }, deviceScaleFactor: 1 });
+  await context.route(/fonts\.googleapis\.com|fonts\.gstatic\.com/, route => route.abort());
+  const page = await context.newPage();
+  const errors = [];
+  page.on("pageerror", err => errors.push(err.message));
+  await page.goto(homeTarget, { waitUntil: "domcontentloaded" });
+  const titles = await page.locator(".grid .card h2").allInnerTexts();
+  assert.deepEqual(titles, [
+    "待ってろ文キャン", "三田キャンへの道", "選り抜きの庵",
+    "伊都への恋文", "持ち込み診療所", "ことのは研究室"
+  ]);
+  assert.match(await page.locator(".lead").innerText(), /入試英語の添削ツール でつ/);
+  const bounds = await page.locator(".grid .card").evaluateAll(nodes => nodes.map(n => {
+    const b = n.getBoundingClientRect();
+    return { x: Math.round(b.x), y: Math.round(b.y), width: Math.round(b.width) };
+  }));
+  if (width > 650) {
+    assert.equal(bounds[0].y, bounds[1].y);
+    assert.equal(bounds[1].y, bounds[2].y);
+    assert.equal(bounds[3].y, bounds[4].y);
+    assert.equal(bounds[4].y, bounds[5].y);
+    assert(bounds[0].x < bounds[1].x && bounds[1].x < bounds[2].x);
+    assert(bounds[3].y > bounds[0].y);
+  } else {
+    assert(bounds.every((item, i) => i === 0 || item.y > bounds[i-1].y));
+  }
+  const maxWidth = await page.evaluate(() => document.documentElement.scrollWidth);
+  assert(maxWidth <= width + 1, "Homepage overflow: " + maxWidth + " > " + width);
+  assert.equal(errors.length, 0, errors.join("; "));
+  await page.screenshot({ path: path.join(artifacts, "home-" + name + ".png"), fullPage: true });
+  console.log("Homepage " + name + ": PASS; six cards in correct order");
+  await context.close();
+}
+
 (async () => {
   const browser = await chromium.launch({ headless: true, args: ["--no-sandbox"] });
   try {
     await checkPage(browser, "desktop", 1365, 900);
     await checkPage(browser, "mobile", 390, 844);
     await checkPage(browser, "small-mobile", 320, 700);
+    await checkHome(browser, "desktop", 1365, 900);
+    await checkHome(browser, "mobile", 390, 844);
+    await checkHome(browser, "small-mobile", 320, 700);
   } finally {
     await browser.close();
   }
