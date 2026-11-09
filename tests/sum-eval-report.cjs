@@ -66,6 +66,11 @@ function loadInput(csvText,key){
   Object.assign(o,numeric);
   if(o.P!==null&&![0,10,20].includes(o.P))throw Error("CSV row "+rowNum+": P must be 0, 10 or 20 for M=40");
   if(o.W!==0)throw Error("CSV row "+rowNum+": these 10 controlled summaries all satisfy 120 characters, so W must be 0");
+  for(const component of ["L","P","D"]){
+   if(o[component]!==null&&o.C+0.005<o[component]){
+    throw Error("CSV row "+rowNum+": C cannot be less than reported "+component+"="+o[component]);
+   }
+  }
   const arithmeticVerified=[o.L,o.P,o.D].every(x=>x!==null);
   if(arithmeticVerified){
    const contentLoss=Math.min(40,Math.max(o.L,o.P)+o.D);
