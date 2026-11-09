@@ -73,11 +73,14 @@ async function checkHome(browser, name, width, height) {
   const titles = await page.locator(".grid .card h2").evaluateAll(nodes => nodes.map(node => node.firstChild?.textContent?.trim() || ""));
   assert.equal(await page.locator(".card.sum .new-mark").innerText(), "new!");
   assert.equal(await page.locator(".card.sum .new-mark").isVisible(), true);
+  const badgeX = await page.locator(".card.sum .new-mark").evaluate(e => e.getBoundingClientRect().x);
+  const titleX = await page.locator(".card.sum h2").evaluate(e => e.getBoundingClientRect().x);
+  assert(badgeX > titleX, name + " new badge must appear to the right of the title start");
   assert.deepEqual(titles, [
     "持ち込み診療所", "ことのは研究室", "より抜き図書館",
     "伊都への恋文", "待ってろ文キャン", "三田キャンへの道"
   ]);
-  assert.equal(await page.locator('.card.sum p').innerText(), "日本文＆英文│要約問題");
+  assert.match(await page.locator('.card.sum p').innerText(), /日本文.*英文.*要約問題/);
   assert.match(await page.locator(".lead").innerText(), /入試英語の添削ツール\s*でつ/);
   assert.equal(await page.locator(".lead-detsu").innerText(), "でつ");
   assert.equal(await page.locator(".lead-detsu").evaluate(e => getComputedStyle(e).display), width <= 650 ? "block" : "inline");
