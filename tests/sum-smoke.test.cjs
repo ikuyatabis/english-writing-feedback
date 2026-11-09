@@ -270,6 +270,7 @@ test("Audit: independent content-deduction groups follow max(L,P)+D without doub
   const prompt = h.call("makePrompt");
   assert(prompt.includes("内容減点合計Cは min(M, max(L,P)+D)"));
   assert(prompt.includes("追加分 max(0,P-L)"));
+  assert(prompt.includes("min(M, L＋max(0,P-L)＋D) がCと一致するよう検算する"));
   assert(prompt.includes("LとPを両方足してはならない"));
   assert(prompt.includes("M=40，L=18，P=20，D=11ならC=31，最終得点は9"));
 
@@ -297,4 +298,19 @@ test("Audit: original 25/50 percent thresholds remain and do not affect fixed 15
   assert(prompt.includes("要約の適切さを明らかに損なう場合はMの25％"));
   assert(prompt.includes("原文と明らかに矛盾する重大な内容を加えた場合はMの50％"));
   assert(prompt.includes("超過量によらず一律－15点"));
+});
+
+
+test("Audit: manually reviewed 2025 content-boundary fixtures retain exact character counts", () => {
+  const markdown = fs.readFileSync(path.join(__dirname, "yorinuki-content-boundary-cases.md"), "utf8");
+  const base = markdown.match(/共通部分（全６ケース）：\s*\n> ([^\n]+)/)?.[1];
+  assert(base, "Missing shared answer text");
+  const cases = [...markdown.matchAll(/^\| B([1-6]) \| ([^|]+) \| (\d+) \|/gm)];
+  assert.equal(cases.length, 6);
+  const h = createHarness();
+  for (const [, id, suffix, expectedLength] of cases) {
+    const measured = vmCount(h, "countJapaneseChars", base + suffix.trim());
+    assert.equal(measured, Number(expectedLength), "Case B" + id + " has stale length");
+    assert(measured <= 120, "Case B" + id + " must stay below the 120-character cap");
+  }
 });
