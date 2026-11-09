@@ -78,8 +78,10 @@ async function checkHome(browser, name, width, height) {
     "伊都への恋文", "待ってろ文キャン", "三田キャンへの道"
   ]);
   assert.equal(await page.locator('.card.sum p').innerText(), "日本文＆英文│要約問題");
-  assert.match(await page.locator(".lead").innerText(), /入試英語の添削ツール でつ/);
-  for (const selector of [".lead", ".howto-heading h2"]) {
+  assert.match(await page.locator(".lead").innerText(), /入試英語の添削ツール\s*でつ/);
+  assert.equal(await page.locator(".lead-detsu").innerText(), "でつ");
+  assert.equal(await page.locator(".lead-detsu").evaluate(e => getComputedStyle(e).display), width <= 650 ? "block" : "inline");
+  for (const selector of [".howto-heading h2"]) {
     const lineCount = await page.locator(selector).evaluate(element => {
       const range = document.createRange();
       range.selectNodeContents(element);
