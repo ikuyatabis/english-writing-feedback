@@ -114,3 +114,48 @@ test("Reject wrong content arithmetic, forbidden penalties and duplicate session
   assert.throws(()=>summarize(missing,key),/exactly 3 rows/);
  });
 });
+
+test("Optional L/P/D remain UNKNOWN without erasing actual grading results",()=>{
+ withBundle((tmp,key)=>{
+  const rows=filledRows(key,()=>({L:0,P:0,D:0})).trimEnd().split("\n");
+  for(let i=1;i<rows.length;i++){
+   const fields=parseCsv(rows[i]+"\n")[0];
+   fields[4]="";fields[5]="";fields[6]="";
+   rows[i]=fields.slice(0,10).join(",")+',"An actual answer might not spell out every content component"';
+  }
+  const data=rows.join("\n")+"\n";
+  const result=summarize(data,key);
+  assert.equal(result.completed_trials,30);
+  assert.equal(result.all_score_agreement,true);
+  assert.equal(result.all_penalty_agreement,null);
+  assert(result.cases.every(x=>x.penalty_observations===0));
+  assert(result.cases.every(x=>x.arithmetic_verified_trials===0));
+  assert(result.cases.every(x=>x.content_penalty_agreement===null));
+  const md=renderMarkdown(result);
+  assert(md.includes("Pが不明の試行"));
+  assert(md.includes("？"));
+  assert(!md.includes("P一致 | 不一致"));
+ });
+});
+
+test("Explicit P can be analyzed while L/D are unknown, without inventing missing values",()=>{
+ withBundle((tmp,key)=>{
+  const rows=filledRows(key,()=>({P:10})).trimEnd().split("\n");
+  for(let i=1;i<rows.length;i++){
+   const fields=parseCsv(rows[i]+"\n")[0];
+   fields[4]="";fields[6]="";
+   rows[i]=fields.slice(0,10).join(",")+',"Case scored, but original points were not itemized"';
+  }
+  const report=summarize(rows.join("\n")+"\n",key);
+  assert.equal(report.completed_trials,30);
+  assert.equal(report.all_penalty_agreement,true);
+  assert.equal(report.all_score_agreement,true);
+  assert(report.cases.every(x=>x.penalty_observations===3));
+  assert(report.cases.every(x=>x.arithmetic_verified_trials===0));
+  // P and C contradict each other, even if L and D are missing.
+  const bad=[...rows],cells=parseCsv(bad[1]+"\n")[0];
+  cells[7]="5";cells[9]="35";
+  bad[1]=cells.slice(0,10).join(",")+',"Inconsistent partial subtotal"';
+  assert.throws(()=>summarize(bad.join("\n")+"\n",key),/C cannot be less than reported P/);
+ });
+});
