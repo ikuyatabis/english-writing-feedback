@@ -51,7 +51,7 @@ test("HTML includes the official label and all six menus in the required order",
   assert.match(html, /<p class="kicker">日本文＆英文<\/p>/);
   assert.match(html, /<h1>選り抜きの庵│要約問題<\/h1>/);
   assert.match(html, /大学・年度を問わず、独自の基準に基づき添削します。/);
-  assert.match(homepage, /<h2>選り抜きの庵<\/h2><p>日本文＆英文│要約問題<\/p>/);
+  assert.match(homepage, /<h2>選り抜きの庵 <span class="new-mark">new!<\/span><\/h2><p>日本文＆英文│要約問題<\/p>/);
   const order = [...homepage.matchAll(/class="card [^"]+" href="\.\/([^/]+)\//g)].map(m => m[1]);
   assert.deepEqual(order, ["misc", "trans", "sum", "ito", "buncan", "mita"]);
   assert.match(homepage, /入試英語の添削ツール でつ/);
