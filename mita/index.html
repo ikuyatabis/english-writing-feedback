@@ -1147,6 +1147,9 @@ function createImporter(opt){
     tabText.setAttribute("aria-selected", String(m === "text"));
     tabPhoto.setAttribute("aria-selected", String(m === "photo"));
     pane.hidden = m !== "photo";
+    ta.hidden = m === "photo";
+    wc.hidden = m === "photo";
+    submitBtn.hidden = m === "photo";
   }
   function setText(text){
     ta.value = text;
