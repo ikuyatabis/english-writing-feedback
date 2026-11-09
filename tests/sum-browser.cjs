@@ -80,7 +80,7 @@ async function checkHome(browser, name, width, height) {
     "持ち込み診療所", "ことのは研究室", "より抜き図書館",
     "伊都への恋文", "待ってろ文キャン", "三田キャンへの道"
   ]);
-  assert.match(await page.locator('.card.sum p').innerText(), /日本文.*英文.*要約問題/);
+  assert.equal(await page.locator('.card.sum p').innerText(), '(英→日) (英→英)│要約問題');
   assert.match(await page.locator(".lead").innerText(), /入試英語の添削ツール\s*でつ/);
   assert.equal(await page.locator(".lead-detsu").innerText(), "でつ");
   assert.equal(await page.locator(".lead-detsu").evaluate(e => getComputedStyle(e).display), width <= 650 ? "block" : "inline");
