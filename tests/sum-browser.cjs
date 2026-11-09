@@ -70,8 +70,8 @@ async function checkHome(browser, name, width, height) {
   await page.goto(homeTarget, { waitUntil: "domcontentloaded" });
   const titles = await page.locator(".grid .card h2").allInnerTexts();
   assert.deepEqual(titles, [
-    "待ってろ文キャン", "三田キャンへの道", "選り抜きの庵",
-    "伊都への恋文", "持ち込み診療所", "ことのは研究室"
+    "持ち込み診療所", "ことのは研究室", "選り抜きの庵",
+    "伊都への恋文", "待ってろ文キャン", "三田キャンへの道"
   ]);
   assert.match(await page.locator(".lead").innerText(), /入試英語の添削ツール でつ/);
   for (const selector of [".lead", ".howto-heading h2"]) {
