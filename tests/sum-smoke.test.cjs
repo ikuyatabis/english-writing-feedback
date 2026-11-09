@@ -49,13 +49,13 @@ function createHarness() {
 test("HTML includes the official label and all six menus in the required order", () => {
   assert.match(html, /より抜き図書館/);
   assert.match(html, /<div class="seal" aria-hidden="true">図<\/div>/);
-  assert.match(html, /<p class="kicker">日本文[^<]*英文[^<]*<\/p>/);
+  assert.match(html, /<p class="kicker">\(英文→日本文\) \(英文→英文\)<\/p>/);
   assert.match(html, /<h1>より抜き図書館│要約問題<\/h1>/);
   assert.match(html, /大学・年度を問わず、独自の基準に基づき添削します。/);
   assert.match(homepage, /<a class="card sum" href="\.\/sum\/">/);
   assert.match(homepage, /<span class="new-mark">new!<\/span>/);
   assert.match(homepage, /<h2>より抜き図書館<\/h2>/);
-  assert.match(homepage, /<p>日本文[^<]*英文[^<]*要約問題<\/p>/);
+  assert.match(homepage, /<p>\(英→日\) \(英→英\)│要約問題<\/p>/);
   const order = [...homepage.matchAll(/class="card [^"]+" href="\.\/([^/]+)\//g)].map(m => m[1]);
   assert.deepEqual(order, ["misc", "trans", "sum", "ito", "buncan", "mita"]);
   assert.match(homepage, /入試英語の添削ツール <span class="lead-detsu">でつ<\/span>/);
