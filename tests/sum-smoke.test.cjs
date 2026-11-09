@@ -263,3 +263,38 @@ test("Audit: changing a word in one clause does not exempt a separate verbatim c
   assert(prompt.includes("変更されていない各節は別々に判定する"));
   assert(prompt.includes("節の完全引用は８語以上の場合に原則Mの25％減点"));
 });
+
+
+test("Audit: independent content-deduction groups follow max(L,P)+D without double counting", () => {
+  const h = createHarness();
+  const prompt = h.call("makePrompt");
+  assert(prompt.includes("内容減点合計Cは min(M, max(L,P)+D)"));
+  assert(prompt.includes("追加分 max(0,P-L)"));
+  assert(prompt.includes("LとPを両方足してはならない"));
+  assert(prompt.includes("M=40，L=18，P=20，D=11ならC=31，最終得点は9"));
+
+  // Specification arithmetic only. This does not score an essay or detect semantic error groups.
+  const cases = [
+    { M: 40, L: 18, P: 20, D: 11, contentLoss: 31, score: 9 }, // Claude J5-like
+    { M: 40, L: 20, P: 20, D: 0, contentLoss: 20, score: 20 }, // Claude J6-like
+    { M: 40, L: 25, P: 10, D: 3, contentLoss: 28, score: 12 },
+    { M: 40, L: 0, P: 0, D: 5, contentLoss: 5, score: 35 },
+    { M: 40, L: 30, P: 20, D: 15, contentLoss: 40, score: 0 },
+    { M: 10, L: 2, P: 5, D: 4, contentLoss: 9, score: 1 }
+  ];
+  for (const c of cases) {
+    const extraPenalty = Math.max(0, c.P - c.L);
+    const calculatedLoss = Math.min(c.M, c.L + extraPenalty + c.D);
+    assert.equal(calculatedLoss, c.contentLoss);
+    assert.equal(Math.max(0, c.M - calculatedLoss), c.score);
+  }
+});
+
+test("Audit: original 25/50 percent thresholds remain and do not affect fixed 15-point length rule", () => {
+  const h = createHarness();
+  const prompt = h.call("makePrompt");
+  assert(prompt.includes("原文にない軽微な補足でも原文の趣旨を損なわなければ，それ自体では減点しない"));
+  assert(prompt.includes("要約の適切さを明らかに損なう場合はMの25％"));
+  assert(prompt.includes("原文と明らかに矛盾する重大な内容を加えた場合はMの50％"));
+  assert(prompt.includes("超過量によらず一律－15点"));
+});
