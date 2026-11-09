@@ -68,7 +68,9 @@ async function checkHome(browser, name, width, height) {
   const errors = [];
   page.on("pageerror", err => errors.push(err.message));
   await page.goto(homeTarget, { waitUntil: "domcontentloaded" });
-  const titles = await page.locator(".grid .card h2").allInnerTexts();
+  const titles = await page.locator(".grid .card h2").evaluateAll(nodes => nodes.map(node => node.firstChild?.textContent?.trim() || ""));
+  assert.equal(await page.locator(".card.sum .new-mark").innerText(), "new!");
+  assert.equal(await page.locator(".card.sum .new-mark").isVisible(), true);
   assert.deepEqual(titles, [
     "持ち込み診療所", "ことのは研究室", "選り抜きの庵",
     "伊都への恋文", "待ってろ文キャン", "三田キャンへの道"
