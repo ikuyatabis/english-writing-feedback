@@ -99,6 +99,9 @@ function buildBundle(outDir){
   "5. All prompts use Japanese summary, 40 points, 120-character maximum, no quotation checkbox and screen output.",
   "6. Prompts are constructed from the real sum/index.html makePrompt() function and the 2025 literature passage from buncan/index.html.",
   "7. This script never calls AI models and therefore does not measure scoring reproducibility by itself.",
+  "8. After filling in results-template.csv with ALL 30 independent-session scoring results, run: node tests/sum-eval-report.cjs PATH_TO_COORDINATOR_DIR",
+  "9. The analyzer writes analysis.md and analysis.json. Blank rows are NOT treated as zeros or completed evaluations. Invalid score arithmetic is rejected.",
+  "10. Model names and session IDs are self-reported and cannot independently prove that a conversation was new. The coordinator alone should retain the private key and results.",
   "",
   "Generate: node tests/sum-eval-bundle.cjs OUTPUT_DIR"
  ].join("\n")+"\n");
