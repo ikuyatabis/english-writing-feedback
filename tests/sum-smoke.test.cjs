@@ -50,7 +50,7 @@ test("HTML includes the official label and all six menus in the required order",
   assert.match(html, /選り抜きの庵/);
   assert.match(html, /日本文＆英文│要約対策/);
   const order = [...homepage.matchAll(/class="card [^"]+" href="\.\/([^/]+)\//g)].map(m => m[1]);
-  assert.deepEqual(order, ["buncan", "mita", "sum", "ito", "misc", "trans"]);
+  assert.deepEqual(order, ["misc", "trans", "sum", "ito", "buncan", "mita"]);
   assert.match(homepage, /入試英語の添削ツール でつ/);
 });
 
