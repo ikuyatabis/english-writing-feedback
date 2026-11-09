@@ -188,3 +188,49 @@ test("photo/PDF input accepted only when explicitly marked", () => {
   h.elements.answerFile.checked = true;
   assert(h.call("makePrompt").includes("画像答案を含むため画面側では未計数"));
 });
+
+
+test("Audit: Japanese counting normalizes decomposed kana without rewriting answer", () => {
+  const h = createHarness();
+  const composed = "あ".repeat(99) + "が";
+  const decomposed = "あ".repeat(99) + "か\u3099";
+  assert.equal(vmCount(h, "countJapaneseChars", composed), 100);
+  assert.equal(vmCount(h, "countJapaneseChars", decomposed), 100);
+  assert.equal(vmCount(h, "countJapaneseChars", "は\u309a"), 1);
+  assert.equal(vmCount(h, "countJapaneseChars", "あ　い\nう"), 3);
+  assert.equal(h.elements.answer.value, "あ　い\nう", "Answer input must remain unchanged");
+});
+
+test("Audit: English counting recognizes Unicode letters and numbers", () => {
+  const h = createHarness();
+  assert.equal(vmCount(h, "countWords", "We need ２０ volunteers."), 4);
+  assert.equal(vmCount(h, "countWords", "We need 20 volunteers."), 4);
+  assert.equal(vmCount(h, "countWords", "Mind-wandering can help."), 3);
+  assert.equal(vmCount(h, "countWords", "We need ! volunteers."), 3);
+  assert.equal(vmCount(h, "countWords", "apples\tbananas\noranges"), 3);
+});
+
+test("Audit: Japanese length legend is language-neutral and the short-length rule remains unchanged", () => {
+  assert.match(html, /<legend>字数・語数の指定<\/legend>/);
+  const h = createHarness();
+  h.selections.wordmode = "range";
+  h.elements.minWords.value = "30";
+  h.elements.maxWords.value = "40";
+  const w = h.call("wordRules");
+  assert.equal(w.exempt, true, "Pre-existing short-range grading exemption must not change without approval");
+  assert(h.call("makePrompt").includes("減点Wは0点"));
+  h.selections.wordmode = "within";
+  h.elements.withinWords.value = "40";
+  assert(h.call("makePrompt").includes("一律－15点"));
+});
+
+test("Audit: changing a word in one clause does not exempt a separate verbatim clause", () => {
+  const h = createHarness();
+  h.selections.kind = "en";
+  h.call("refresh");
+  h.elements.paraphrase.checked = true;
+  const prompt = h.call("makePrompt");
+  assert(prompt.includes("変更されていない各節は独立に照合し"));
+  assert(prompt.includes("変更されていない各節は別々に判定する"));
+  assert(prompt.includes("節の完全引用は８語以上の場合に原則Mの25％減点"));
+});
