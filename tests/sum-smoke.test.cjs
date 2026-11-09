@@ -314,4 +314,13 @@ test("Audit: manually reviewed 2025 content-boundary fixtures retain exact chara
     assert.equal(measured, Number(expectedLength), "Case B" + id + " has stale length");
     assert(measured <= 120, "Case B" + id + " must stay below the 120-character cap");
   }
+  const extraCases = [...markdown.matchAll(/^\| C([1-4]) \| ([^|]+) \| (\d+) \|/gm)];
+  assert.equal(extraCases.length, 4);
+  for (const [, id, suffix, expectedLength] of extraCases) {
+    const measured = vmCount(h, "countJapaneseChars", base + suffix.trim());
+    assert.equal(measured, Number(expectedLength), "Case C" + id + " has stale length");
+    assert(measured <= 120, "Case C" + id + " must stay below the 120-character cap");
+  }
+  assert(base.includes("有害になりうる"), "Fixture must preserve the original may/can nuance");
+  assert(base.includes("偶然の結びつき"), "Fixture must include the creativity mechanism");
 });
