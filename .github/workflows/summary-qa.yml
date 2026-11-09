@@ -1,6 +1,13 @@
 name: Summary workshop QA
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - "sum/**"
+      - "index.html"
+      - "tests/sum-*.cjs"
+      - ".github/workflows/summary-qa.yml"
   pull_request:
     paths:
       - "sum/**"
