@@ -55,7 +55,7 @@ test("HTML includes the official label and all six menus in the required order",
   assert.match(homepage, /<h2>より抜き図書館 <span class="new-mark">new!<\/span><\/h2><p>日本文＆英文│要約問題<\/p>/);
   const order = [...homepage.matchAll(/class="card [^"]+" href="\.\/([^/]+)\//g)].map(m => m[1]);
   assert.deepEqual(order, ["misc", "trans", "sum", "ito", "buncan", "mita"]);
-  assert.match(homepage, /入試英語の添削ツール でつ/);
+  assert.match(homepage, /入試英語の添削ツール <span class="lead-detsu">でつ<\/span>/);
 });
 
 test("input IDs are unique and script references exist", () => {
