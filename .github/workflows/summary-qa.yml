@@ -7,12 +7,16 @@ on:
       - "sum/**"
       - "index.html"
       - "tests/sum-*.cjs"
+      - "tests/yorinuki-content-boundary-cases.md"
+      - "buncan/index.html"
       - ".github/workflows/summary-qa.yml"
   pull_request:
     paths:
       - "sum/**"
       - "index.html"
       - "tests/sum-*.cjs"
+      - "tests/yorinuki-content-boundary-cases.md"
+      - "buncan/index.html"
       - ".github/workflows/summary-qa.yml"
   workflow_dispatch:
 
@@ -28,7 +32,26 @@ jobs:
         with:
           node-version: "22"
       - name: Run native Node regression tests
-        run: node --test tests/sum-smoke.test.cjs
+        run: node --test tests/sum-*.test.cjs
+      - name: Generate blinded summary evaluation inputs
+        run: node tests/sum-eval-bundle.cjs test-artifacts/yorinuki-eval
+      - name: Upload blinded prompts only
+        uses: actions/upload-artifact@v4
+        with:
+          name: yorinuki-blind-evaluation-prompts
+          path: test-artifacts/yorinuki-eval/prompts/
+          if-no-files-found: error
+          retention-days: 14
+      - name: Upload coordinator-only evaluation files
+        uses: actions/upload-artifact@v4
+        with:
+          name: yorinuki-evaluation-coordinator
+          path: |
+            test-artifacts/yorinuki-eval/private-key.json
+            test-artifacts/yorinuki-eval/results-template.csv
+            test-artifacts/yorinuki-eval/README.md
+          if-no-files-found: error
+          retention-days: 14
 
   chromium-views:
     runs-on: ubuntu-latest
