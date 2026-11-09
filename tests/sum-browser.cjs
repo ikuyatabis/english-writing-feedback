@@ -30,6 +30,7 @@ async function checkPage(browser, name, width, height) {
   assert.equal(await page.locator("#paraphraseBox").isVisible(), false);
   assert.equal(await page.locator("#approxBox").isVisible(), true);
   assert.equal(await page.locator("#withinBox").isVisible(), false);
+  assert.equal(await page.getByText("字数・語数の指定", { exact: true }).count(), 1);
   const layout = await page.evaluate(() => ({
     innerWidth: innerWidth,
     scrollWidth: document.documentElement.scrollWidth,
@@ -77,8 +78,10 @@ async function checkHome(browser, name, width, height) {
     "伊都への恋文", "待ってろ文キャン", "三田キャンへの道"
   ]);
   assert.equal(await page.locator('.card.sum p').innerText(), "日本文＆英文│要約問題");
-  assert.match(await page.locator(".lead").innerText(), /入試英語の添削ツール でつ/);
-  for (const selector of [".lead", ".howto-heading h2"]) {
+  assert.match(await page.locator(".lead").innerText(), /入試英語の添削ツール\s*でつ/);
+  assert.equal(await page.locator(".lead-detsu").innerText(), "でつ");
+  assert.equal(await page.locator(".lead-detsu").evaluate(e => getComputedStyle(e).display), width <= 650 ? "block" : "inline");
+  for (const selector of [".howto-heading h2"]) {
     const lineCount = await page.locator(selector).evaluate(element => {
       const range = document.createRange();
       range.selectNodeContents(element);
@@ -108,12 +111,34 @@ async function checkHome(browser, name, width, height) {
   await context.close();
 }
 
+async function checkAuditHowto(browser, width, height) {
+  const context = await browser.newContext({ viewport: { width, height }, deviceScaleFactor: 1 });
+  await context.route(/fonts\.googleapis\.com|fonts\.gstatic\.com/, route => route.abort());
+  const page = await context.newPage();
+  try {
+    await page.goto(target, { waitUntil: "domcontentloaded" });
+    assert.equal(await page.locator(".masthead").evaluate(e => getComputedStyle(e).position), "sticky");
+    await page.locator(".tool-howto summary").click();
+    assert.equal(await page.locator(".tool-howto").evaluate(e => e.open), true);
+    assert.equal(await page.locator(".masthead").evaluate(e => getComputedStyle(e).position), "static");
+    await page.locator("#problem").click({ timeout: 4500, trial: true });
+    await page.locator("#answer").click({ timeout: 4500, trial: true });
+    await page.locator(".tool-howto summary").click();
+    assert.equal(await page.locator(".masthead").evaluate(e => getComputedStyle(e).position), "sticky");
+    console.log("Howto " + width + "x" + height + ": PASS; inputs clickable");
+  } finally {
+    await context.close();
+  }
+}
+
 (async () => {
   const browser = await chromium.launch({ headless: true, args: ["--no-sandbox"] });
   try {
     await checkPage(browser, "desktop", 1365, 900);
     await checkPage(browser, "mobile", 390, 844);
     await checkPage(browser, "small-mobile", 320, 700);
+    await checkAuditHowto(browser, 561, 701);
+    await checkAuditHowto(browser, 600, 800);
     await checkHome(browser, "desktop", 1365, 900);
     await checkHome(browser, "mobile", 390, 844);
     await checkHome(browser, "small-mobile", 320, 700);
