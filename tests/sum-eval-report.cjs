@@ -136,6 +136,9 @@ function summarize(csv,key){
    observed_trials:cases.reduce((n,c)=>n+(c.approved_observed_P??0),0),
    matching_trials:cases.reduce((n,c)=>n+(c.approved_matching_P??0),0),
    mismatching_trials:cases.reduce((n,c)=>n+(c.approved_observed_P??0)-(c.approved_matching_P??0),0),
+   score_observed_trials:cases.reduce((n,c)=>n+(c.approved_expected_score===null?0:c.completed),0),
+   score_matching_trials:cases.reduce((n,c)=>n+(c.approved_matching_score??0),0),
+   score_mismatching_trials:cases.reduce((n,c)=>n+(c.approved_expected_score===null?0:c.completed-(c.approved_matching_score??0)),0),
    status:cases.some(c=>c.approved_status==="MISMATCH")?"MISMATCH":
     cases.filter(c=>c.approved_expected_P!==null).every(c=>c.approved_status==="MATCH")?"MATCH":"UNVERIFIED"
   },
@@ -171,7 +174,7 @@ function renderMarkdown(result){
  }
  lines.push("","**"+result.approved_reference.cases.join("・")+"の確定判定との照合：** "+result.approved_reference.status+
  "（P記録"+result.approved_reference.observed_trials+"/"+result.approved_reference.expected_trials+
- "件，適合"+result.approved_reference.matching_trials+"件，不適合"+result.approved_reference.mismatching_trials+"件）",
+ "件，P適合"+result.approved_reference.matching_trials+"件，P不適合"+result.approved_reference.mismatching_trials+"件；確定得点の記録"+result.approved_reference.score_observed_trials+"件，得点適合"+result.approved_reference.score_matching_trials+"件，得点不適合"+result.approved_reference.score_mismatching_trials+"件）",
  "","この照合はユーザーが確定したB3・C4のP=10，C2のP=0および得点40だけに適用します。他の７答案の正解を断定しません。３回とも同じ誤判定の場合も「不適合」とします。","",
  "## 対比する組み合わせ","","| 比較 | 状況 | ３回ずつの平均点差（前者－後者） |","|---|---|---:|");
  for(const c of result.comparisons)lines.push("| "+c.pair+" | "+(c.complete?"比較可能":"未完了")+" | "+f(c.mean_score_difference)+" |");
