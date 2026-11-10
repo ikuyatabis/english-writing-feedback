@@ -175,18 +175,20 @@ function editRecordedTrial(csv,file,attempt,updates){
  return rows.join("\n")+"\n";
 }
 
-test("Approved references are limited to B3 and C4, never to the other eight",()=>{
+test("Approved references include B3/C2/C4 and do not invent outcomes for seven other cases",()=>{
  withBundle((tmp,key)=>{
   const r=summarize(fs.readFileSync(path.join(tmp,"results-template.csv"),"utf8"),key);
-  assert.deepEqual(r.approved_reference.cases,["B3","C4"]);
+  assert.deepEqual(r.approved_reference.cases,["B3","C2","C4"]);
   assert.equal(r.approved_reference.status,"UNVERIFIED");
-  assert.equal(r.approved_reference.expected_trials,6);
+  assert.equal(r.approved_reference.expected_trials,9);
   assert.equal(r.approved_reference.observed_trials,0);
   assert.equal(r.approved_reference.matching_trials,0);
   assert.equal(r.approved_reference.mismatching_trials,0);
-  assert(r.cases.filter(c=>c.approved_expected_P!==null).every(c=>c.approved_expected_P===10));
+  assert.equal(r.cases.find(c=>c.case_id==="C2").approved_expected_P,0);
+  assert.equal(r.cases.find(c=>c.case_id==="C2").approved_expected_score,40);
+  assert(r.cases.filter(c=>["B3","C4"].includes(c.case_id)).every(c=>c.approved_expected_P===10));
   assert(r.cases.filter(c=>c.approved_expected_P===null).every(c=>c.approved_status===null));
-  assert(renderMarkdown(r).includes("P記録0/6件"));
+  assert(renderMarkdown(r).includes("P記録0/9件"));
  });
 });
 
@@ -199,7 +201,8 @@ test("Three identical erroneous P=0 deductions fail the approved-reference check
   assert.equal(r.all_penalty_agreement,true);
   assert.equal(r.approved_reference.status,"MISMATCH");
   assert.equal(r.approved_reference.mismatching_trials,6);
-  assert.equal(r.approved_reference.matching_trials,0);
+  assert.equal(r.approved_reference.matching_trials,3);
+  assert.equal(r.cases.find(c=>c.case_id==="C2").approved_status,"MATCH");
   for(const id of ["B3","C4"]){
    const c=r.cases.find(x=>x.case_id===id);
    assert.equal(c.content_penalty_agreement,true);
@@ -207,7 +210,7 @@ test("Three identical erroneous P=0 deductions fail the approved-reference check
    assert.equal(c.approved_matching_P,0);
    assert.equal(c.approved_observed_P,3);
   }
-  assert(renderMarkdown(r).includes("不適合(0/3件一致)"));
+  assert(renderMarkdown(r).includes("不適合(P 0/3"));
  });
 });
 
@@ -218,8 +221,8 @@ test("Only B3 and C4 with P=10 satisfy approved 25-percent deductions",()=>{
   }));
   const r=summarize(csv,key);
   assert.equal(r.approved_reference.status,"MATCH");
-  assert.equal(r.approved_reference.observed_trials,6);
-  assert.equal(r.approved_reference.matching_trials,6);
+  assert.equal(r.approved_reference.observed_trials,9);
+  assert.equal(r.approved_reference.matching_trials,9);
   assert.equal(r.approved_reference.mismatching_trials,0);
   assert.equal(r.all_penalty_agreement,true);
   assert.equal(r.all_score_agreement,true);
@@ -228,6 +231,8 @@ test("Only B3 and C4 with P=10 satisfy approved 25-percent deductions",()=>{
    assert.equal(c.approved_status,"MATCH");
    assert.deepEqual(c.observed_scores,[30,30,30]);
   }
+  assert.equal(r.cases.find(x=>x.case_id==="C2").approved_status,"MATCH");
+  assert.deepEqual(r.cases.find(x=>x.case_id==="C2").observed_scores,[40,40,40]);
   assert(renderMarkdown(r).includes("適合(3/3)"));
  });
 });
@@ -243,8 +248,8 @@ test("A missing P for an approved case remains unverified, not a hidden zero",()
   const r=summarize(partial,key);
   assert.equal(r.completed_trials,30);
   assert.equal(r.approved_reference.status,"UNVERIFIED");
-  assert.equal(r.approved_reference.observed_trials,5);
-  assert.equal(r.approved_reference.matching_trials,5);
+  assert.equal(r.approved_reference.observed_trials,8);
+  assert.equal(r.approved_reference.matching_trials,8);
   assert.equal(r.approved_reference.mismatching_trials,0);
   const c=r.cases.find(x=>x.case_id==="B3");
   assert.equal(c.approved_status,"UNVERIFIED");
@@ -263,8 +268,51 @@ test("One bad C4 penalty fails against approved rule despite five correct observ
   const r=summarize(bad,key);
   assert.equal(r.completed_trials,30);
   assert.equal(r.approved_reference.status,"MISMATCH");
-  assert.equal(r.approved_reference.matching_trials,5);
+  assert.equal(r.approved_reference.matching_trials,8);
   assert.equal(r.approved_reference.mismatching_trials,1);
   assert.equal(r.cases.find(x=>x.case_id==="C4").approved_status,"MISMATCH");
+ });
+});
+
+test("C2: 3 repeated deductions of 25% disagree with user-approved no-deduction decision",()=>{
+ withBundle((tmp,key)=>{
+  const csv=filledRows(key,i=>({P:
+   key.cases[i].original_case==="C2"?10:
+   ["B3","C4"].includes(key.cases[i].original_case)?10:0
+  }));
+  const r=summarize(csv,key);
+  assert.equal(r.completed_trials,30);
+  assert.equal(r.all_penalty_agreement,true);
+  assert.equal(r.all_score_agreement,true);
+  assert.equal(r.approved_reference.mismatching_trials,3);
+  assert.equal(r.approved_reference.matching_trials,6);
+  assert.equal(r.approved_reference.status,"MISMATCH");
+  const c=r.cases.find(x=>x.case_id==="C2");
+  assert.equal(c.approved_expected_P,0);
+  assert.equal(c.approved_expected_score,40);
+  assert.equal(c.approved_observed_P,3);
+  assert.equal(c.approved_matching_P,0);
+  assert.equal(c.approved_matching_score,0);
+  assert.equal(c.approved_status,"MISMATCH");
+  assert.deepEqual(c.observed_scores,[30,30,30]);
+ });
+});
+
+test("C2: P=0 still fails if 40-point score is not awarded",()=>{
+ withBundle((tmp,key)=>{
+  const csv=filledRows(key,i=>({P:["B3","C4"].includes(key.cases[i].original_case)?10:0}));
+  const file=approvedCaseFile(key,"C2");
+  // A hypothetical separate 10-point deduction, not a real observed grading result.
+  const bad=editRecordedTrial(csv,file,2,{4:"0",5:"0",6:"10",7:"10",9:"30"});
+  const r=summarize(bad,key);
+  assert.equal(r.completed_trials,30);
+  assert.equal(r.approved_reference.mismatching_trials,0);
+  assert.equal(r.approved_reference.matching_trials,9);
+  assert.equal(r.approved_reference.status,"MISMATCH");
+  const c=r.cases.find(x=>x.case_id==="C2");
+  assert.equal(c.approved_matching_P,3);
+  assert.equal(c.approved_matching_score,2);
+  assert.equal(c.approved_status,"MISMATCH");
+  assert(renderMarkdown(r).includes("得点 2/3"));
  });
 });
