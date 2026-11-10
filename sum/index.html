@@ -152,7 +152,7 @@ a{color:var(--teal-dark)}
 <header class="masthead">
   <div class="masthead-inner">
     <div class="seal" aria-hidden="true">図</div>
-    <p class="kicker">日本文も英文も</p>
+    <p class="kicker">(英文→日本文) (英文→英文)</p>
     <h1>より抜き図書館│要約問題</h1>
     <div class="tricolor" aria-hidden="true"><span></span><span></span><span></span></div>
     <p class="lede">大学・年度を問わず、独自の基準に基づき添削します。</p>
@@ -218,7 +218,7 @@ a{color:var(--teal-dark)}
 <section class="panel">
 <h2>答案を入力する</h2>
 <div class="field">
-<label class="lbl" for="answer" id="answerLabel">英文を日本文で要約した答案（テキスト）</label>
+<label class="lbl" for="answer" id="answerLabel">日本文要約の答案（テキスト）</label>
 <textarea id="answer" placeholder="答案を入力します。&#10;手書きの写真・PDFを使う場合は、次で☑を入れてください。" spellcheck="false" autocorrect="off" autocomplete="off" autocapitalize="none" writingsuggestions="false" data-gramm="false" data-gramm_editor="false" data-enable-grammarly="false" data-lt-active="false"></textarea>
 <label class="check"><input id="answerFile" type="checkbox">答案の写真／PDFをChatGPTに添付する</label>
 </div>
@@ -297,7 +297,7 @@ function refresh(){
  el("paraphraseBox").hidden=!en;
  if(!en)el("paraphrase").checked=false;
  document.querySelectorAll(".word-unit").forEach(node=>node.textContent=en?"words":"字");
- el("answerLabel").textContent=en?"英文を英文で要約した答案（テキスト）":"英文を日本文で要約した答案（テキスト）";
+ el("answerLabel").textContent=en?"英文要約の答案（テキスト）":"日本文要約の答案（テキスト）";
 }
 document.querySelectorAll('input[name="wordmode"], input[name="kind"]').forEach(node=>node.addEventListener("change",refresh));
 function refreshPublicExampleFields(){
