@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "confirmed_on": "2026-11-10",
+  "scope": "yorinuki Japanese 40-point summaries, 120-character maximum",
+  "notes": "Only B3 and C4 were explicitly adjudicated by the user. All other cases remain provisional tests, not certified expected outputs. Confirmed P is distinct from overall score, and 30 independent model trials remain unperformed.",
+  "expected_P": {
+    "B3": {
+      "value": 10,
+      "percent": 25,
+      "reason": "Unsupported new school policy treated as the passage's conclusion"
+    },
+    "C4": {
+      "value": 10,
+      "percent": 25,
+      "reason": "The passage's tentative criticism of teacher invective is changed into an unconditional claim that it is always wrong"
+    }
+  }
+}
