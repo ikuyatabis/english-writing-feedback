@@ -19,6 +19,7 @@ const content50="原文と明らかに矛盾する重大な内容を加えた場
 const b3="原文が述べていない教育方針などの主張を結論として加え，原文の趣旨を不当に拡張した場合は25％減点の対象とする。";
 const c4="原文の可能性・限定・留保を取り除き，根拠なく無条件の断定へ変えて意味をゆがめた場合も同様とする。";
 const guard="原文にないというだけで自動的に減点せず，趣旨を損なわない軽微な補足は減点しない。";
+const c2="原文にある問題提起から自然に導ける控えめな示唆（指導を再考する手掛かりになる等）は，筆者自身の結論と偽らず，特定の方針の実施を求めず，原文の趣旨を変えない場合，原文に明記されていなくても25％減点しない。";
 const severe="重大で明白な原文矛盾には50％減点を優先する。";
 const formula="内容減点合計Cは min(M, max(L,P)+D) とし，LとPを両方足してはならない。";
 
@@ -65,6 +66,7 @@ for(const [name,needle] of [
  ["includes the B3 unsupported conclusion guidance",b3],
  ["includes the C4 excessive-certainty guidance",c4],
  ["explicitly forbids automatic penalty for minor additions",guard],
+ ["protects C2 mild implication without exempting unsupported policies",c2],
  ["retains severe-contradiction priority",severe],
  ["retains content-overlap formula without additive L+P",formula]
 ]){
@@ -74,7 +76,7 @@ for(const [name,needle] of [
 // 09–10: no leakage of audit labels or previously expected answers.
 test("Prompt contains no B3/C4 fixture label, expected score or audit classification",()=>{
  const p=harness().prompt;
- for(const s of ["B3型","C4型","B3の得点","C4の得点","事前の検討用仮説","30回の観点別検証"]){
+ for(const s of ["B3型","C4型","C2の正解","B3の得点","C4の得点","事前の検討用仮説","30回の観点別検証"]){
   assert(!p.includes(s),"Auditor note leaked to model: "+s);
  }
 });
@@ -82,8 +84,11 @@ test("New content rubric is included exactly once and inside the scoring COMMON 
  const p=harness().prompt;
  assert.equal(p.split(b3).length,2);
  assert.equal(p.split(c4).length,2);
+ assert.equal(p.split(c2).length,2);
  assert(p.indexOf("【原文にない内容・事実との矛盾】")<p.indexOf(b3));
  assert(p.indexOf(c4)<p.indexOf("【日本文要約：日本語表現】"));
+ assert(p.indexOf(c2)>p.indexOf(c4));
+ assert(p.indexOf(c2)<p.indexOf("【日本文要約：日本語表現】"));
 });
 
 // 11–20: ten distinct real summary fixtures, not invented answer bodies.
@@ -112,7 +117,7 @@ for(const [id,tail] of Object.entries(contents)){
    answer:c.answer
   }}).prompt;
   assert(p.includes(JSON.stringify(c.answer)),"fixture not passed unmodified");
-  assert(p.includes(b3)&&p.includes(c4),"fixture evaluated using old rubric");
+  assert(p.includes(b3)&&p.includes(c4)&&p.includes(c2),"fixture evaluated using old rubric");
   assert(p.includes("配点：40点満点")&&p.includes("字数指定：120字以内"));
  });
 }
@@ -122,7 +127,7 @@ for(const kind of ["ja","en"]){
  for(const points of ["","0","10","20","40"]){
   test("Score setting "+kind+" / "+(points||"blank")+" preserves content rubric and points setting",()=>{
    const p=harness({select:{kind},values:{examPoints:points,answer:kind==="en"?"Mind wandering can help creativity.":"要約の内容。"}}).prompt;
-   assert(p.includes(b3)&&p.includes(c4)&&p.includes(severe));
+   assert(p.includes(b3)&&p.includes(c4)&&p.includes(c2)&&p.includes(severe));
    assert(p.includes(formula));
    if(points===""||points==="0"){
     assert(p.includes("【得点なし添削：最優先指示】"));
@@ -140,7 +145,7 @@ for(const kind of ["ja","en"]){
  for(const wordmode of ["none","within","approx","range"]){
   test("Length rule "+kind+" / "+wordmode+" preserves meaning criteria and length rule",()=>{
    const p=harness({select:{kind,wordmode},values:{answer:kind==="en"?"Concentration can help.":"要約の内容。"}}).prompt;
-   assert(p.includes(b3)&&p.includes(c4)&&p.includes(content25)&&p.includes(content50));
+   assert(p.includes(b3)&&p.includes(c4)&&p.includes(c2)&&p.includes(content25)&&p.includes(content50));
    if(wordmode==="none")assert(p.includes("数値減点Wは0点"));
    else assert(p.includes("一律－15点"));
    if(wordmode==="within")assert(p.includes("下限は設けず"));
@@ -155,7 +160,7 @@ for(const kind of ["ja","en"]){
  for(const outputFormat of ["screen","word","pdf","both"]){
   test("Output "+kind+" / "+outputFormat+" changes delivery but not content rubric",()=>{
    const p=harness({select:{kind,outputFormat},values:{answer:kind==="en"?"Creativity benefits.":"要約の内容。"}}).prompt;
-   assert(p.includes(b3)&&p.includes(c4)&&p.includes(formula));
+   assert(p.includes(b3)&&p.includes(c4)&&p.includes(c2)&&p.includes(formula));
    if(outputFormat==="screen")assert(!p.includes("【添削結果の出力形式：最優先指示】"));
    else{
     assert(p.includes("【添削結果の出力形式：最優先指示】"));
@@ -169,7 +174,7 @@ for(const kind of ["ja","en"]){
 for(const enabled of [false,true]){
  test("Quotation checkbox "+(enabled?"enabled":"disabled")+" retains independent rubric",()=>{
   const p=harness({select:{kind:"en"},checked:{paraphrase:enabled},values:{answer:"Mind wandering helps with creativity."}}).prompt;
-  assert(p.includes(b3)&&p.includes(c4));
+  assert(p.includes(b3)&&p.includes(c4)&&p.includes(c2));
   if(enabled)assert(p.includes("言い換え指示チェックあり"));
   else assert(p.includes("言い換え指示チェックなし"));
  });
@@ -180,7 +185,7 @@ for(const problemFile of [false,true]){
  for(const answerFile of [false,true]){
   test("Attachment flags "+problemFile+"/"+answerFile+" retain content policy",()=>{
    const p=harness({checked:{problemFile,answerFile}}).prompt;
-   assert(p.includes(b3)&&p.includes(c4)&&p.includes(formula));
+   assert(p.includes(b3)&&p.includes(c4)&&p.includes(c2)&&p.includes(formula));
    assert(p.includes("【問題文・資料の写真・PDF添付】\n"+(problemFile?"あり":"なし")));
    assert(p.includes("【答案の写真・PDF添付】\n"+(answerFile?"あり":"なし")));
   });
@@ -217,4 +222,17 @@ test("No new HTML grading knobs or mandatory inputs were added",()=>{
 });
 test("Current app continues to instruct no public-solution searches by default",()=>{
  assert(harness().prompt.includes("公開解答例の検索・紹介は希望されていないため実施しない"));
+});
+
+test("C2 prompt uses original summary and protects mild implication while B3/C4 remain penalizable",()=>{
+ const c=cases.find(x=>x.id==="C2");
+ assert(c&&c.chars===111);
+ const p=harness({values:{
+  problem:"次の英文を日本語120字以内で要約してください。\n\n"+passage,
+  answer:c.answer
+ }}).prompt;
+ assert(p.includes(JSON.stringify(c.answer)));
+ assert(p.includes(c2));
+ assert(p.includes(b3)&&p.includes(c4)&&p.includes(severe));
+ assert(!p.includes("C2は40点"),"Expected score must not leak into grading request");
 });
