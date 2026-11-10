@@ -26,11 +26,12 @@ test("blinded input construction: actual app prompt and no revealed evaluation k
   assert(prompt.includes("公開解答例の検索・紹介は希望されていないため実施しない"));
   assert(prompt.includes("上限を超えたら超過量によらず一律－15点"));
   assert(prompt.includes("原文にない内容を加えて要約の適切さを明らかに損なう場合はMの25％"));
+  assert(prompt.includes("原文にある問題提起から自然に導ける控えめな示唆"));
   assert(prompt.includes("原文と明らかに矛盾する重大な内容を加えた場合はMの50％"));
   assert(!prompt.includes("事前の検討用仮説"));
   assert(!prompt.includes("単回の暫定採点"));
   assert(!prompt.includes("original_case"));
-  for(const hidden of ["approved_expected_P","yorinuki-approved-decisions","B3の正解","C4の正解","original_case","expected_P"]){
+  for(const hidden of ["approved_expected_P","yorinuki-approved-decisions","B3の正解","C4の正解","C2の正解","C2は40点","original_case","expected_P"]){
    assert(!prompt.includes(hidden),"Private expected-value hint leaked: "+hidden);
   }
  }
