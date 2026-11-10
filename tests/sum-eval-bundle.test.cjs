@@ -30,6 +30,9 @@ test("blinded input construction: actual app prompt and no revealed evaluation k
   assert(!prompt.includes("事前の検討用仮説"));
   assert(!prompt.includes("単回の暫定採点"));
   assert(!prompt.includes("original_case"));
+  for(const hidden of ["approved_expected_P","yorinuki-approved-decisions","B3の正解","C4の正解","original_case","expected_P"]){
+   assert(!prompt.includes(hidden),"Private expected-value hint leaked: "+hidden);
+  }
  }
 });
 
