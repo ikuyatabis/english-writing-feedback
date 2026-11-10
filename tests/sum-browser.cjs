@@ -71,16 +71,16 @@ async function checkHome(browser, name, width, height) {
   page.on("pageerror", err => errors.push(err.message));
   await page.goto(homeTarget, { waitUntil: "domcontentloaded" });
   const titles = await page.locator(".grid .card h2").evaluateAll(nodes => nodes.map(node => node.firstChild?.textContent?.trim() || ""));
-  assert.equal(await page.locator(".card.sum .new-mark").innerText(), "new!");
+  assert.equal(await page.locator(".card.sum .new-mark").innerText(), "試験運用中");
   assert.equal(await page.locator(".card.sum .new-mark").isVisible(), true);
   const badgeX = await page.locator(".card.sum .new-mark").evaluate(e => e.getBoundingClientRect().x);
   const titleX = await page.locator(".card.sum h2").evaluate(e => e.getBoundingClientRect().x);
-  assert(badgeX > titleX, name + " new badge must appear to the right of the title start");
+  assert(badgeX > titleX, name + " trial badge must appear to the right of the title start");
   assert.deepEqual(titles, [
     "持ち込み診療所", "ことのは研究室", "より抜き図書館",
-    "伊都への恋文", "待ってろ文キャン", "三田キャンへの道"
+    "英検の庵", "伊都への恋文", "待ってろ文キャン", "三田キャンへの道"
   ]);
-  assert.equal(await page.locator('.card.sum p').innerText(), '(英→日) (英→英)│要約問題');
+  assert.equal(await page.locator('.card.sum p').innerText(), '(英☞日) (英☞英)│要約問題');
   assert.match(await page.locator(".lead").innerText(), /入試英語の添削ツール\s*でつ/);
   assert.equal(await page.locator(".lead-detsu").innerText(), "でつ");
   assert.equal(await page.locator(".lead-detsu").evaluate(e => getComputedStyle(e).display), width <= 650 ? "block" : "inline");
@@ -96,13 +96,20 @@ async function checkHome(browser, name, width, height) {
     const b = n.getBoundingClientRect();
     return { x: Math.round(b.x), y: Math.round(b.y), width: Math.round(b.width) };
   }));
-  if (width > 650) {
+  assert.equal(bounds.length, 7, "Homepage must show seven content cards");
+  if (width > 830 || (width > 650 && width >= height)) {
+    // Three cards on the first row, then two two-card rows.
     assert.equal(bounds[0].y, bounds[1].y);
     assert.equal(bounds[1].y, bounds[2].y);
     assert.equal(bounds[3].y, bounds[4].y);
-    assert.equal(bounds[4].y, bounds[5].y);
+    assert.equal(bounds[5].y, bounds[6].y);
     assert(bounds[0].x < bounds[1].x && bounds[1].x < bounds[2].x);
-    assert(bounds[3].y > bounds[0].y);
+    assert(bounds[3].y > bounds[2].y);
+    assert(bounds[5].y > bounds[4].y);
+  } else if (width > 650) {
+    // Two columns in portrait tablet mode.
+    for(const i of [0,2,4]) assert.equal(bounds[i].y,bounds[i+1].y);
+    for(const i of [2,4,6]) assert(bounds[i].y>bounds[i-2].y);
   } else {
     assert(bounds.every((item, i) => i === 0 || item.y > bounds[i-1].y));
   }
@@ -110,7 +117,7 @@ async function checkHome(browser, name, width, height) {
   assert(maxWidth <= width + 1, "Homepage overflow: " + maxWidth + " > " + width);
   assert.equal(errors.length, 0, errors.join("; "));
   await page.screenshot({ path: path.join(artifacts, "home-" + name + ".png"), fullPage: true });
-  console.log("Homepage " + name + ": PASS; six cards in correct order");
+  console.log("Homepage " + name + ": PASS; seven cards in correct order");
   await context.close();
 }
 
