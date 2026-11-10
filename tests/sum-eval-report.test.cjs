@@ -159,3 +159,112 @@ test("Explicit P can be analyzed while L/D are unknown, without inventing missin
   assert.throws(()=>summarize(bad.join("\n")+"\n",key),/C cannot be less than reported P/);
  });
 });
+
+function approvedCaseFile(key,id){
+ const info=key.cases.find(c=>c.original_case===id);
+ assert(info,"Approved case absent: "+id);
+ return info.filename;
+}
+function editRecordedTrial(csv,file,attempt,updates){
+ const rows=csv.trimEnd().split("\n");
+ const pos=rows.findIndex(row=>row.startsWith(file+","+attempt+","));
+ assert(pos>0,"Trial not found: "+file+" / "+attempt);
+ const cells=parseCsv(rows[pos]+"\n")[0];
+ for(const [index,value] of Object.entries(updates))cells[Number(index)]=String(value);
+ rows[pos]=cells.slice(0,10).join(",")+',"Synthetic test data, not a real ChatGPT evaluation"';
+ return rows.join("\n")+"\n";
+}
+
+test("Approved references are limited to B3 and C4, never to the other eight",()=>{
+ withBundle((tmp,key)=>{
+  const r=summarize(fs.readFileSync(path.join(tmp,"results-template.csv"),"utf8"),key);
+  assert.deepEqual(r.approved_reference.cases,["B3","C4"]);
+  assert.equal(r.approved_reference.status,"UNVERIFIED");
+  assert.equal(r.approved_reference.expected_trials,6);
+  assert.equal(r.approved_reference.observed_trials,0);
+  assert.equal(r.approved_reference.matching_trials,0);
+  assert.equal(r.approved_reference.mismatching_trials,0);
+  assert(r.cases.filter(c=>c.approved_expected_P!==null).every(c=>c.approved_expected_P===10));
+  assert(r.cases.filter(c=>c.approved_expected_P===null).every(c=>c.approved_status===null));
+  assert(renderMarkdown(r).includes("P記録0/6件"));
+ });
+});
+
+test("Three identical erroneous P=0 deductions fail the approved-reference check",()=>{
+ withBundle((tmp,key)=>{
+  const csv=filledRows(key,()=>({P:0}));
+  const r=summarize(csv,key);
+  assert.equal(r.completed_trials,30);
+  assert.equal(r.all_score_agreement,true);
+  assert.equal(r.all_penalty_agreement,true);
+  assert.equal(r.approved_reference.status,"MISMATCH");
+  assert.equal(r.approved_reference.mismatching_trials,6);
+  assert.equal(r.approved_reference.matching_trials,0);
+  for(const id of ["B3","C4"]){
+   const c=r.cases.find(x=>x.case_id===id);
+   assert.equal(c.content_penalty_agreement,true);
+   assert.equal(c.approved_status,"MISMATCH");
+   assert.equal(c.approved_matching_P,0);
+   assert.equal(c.approved_observed_P,3);
+  }
+  assert(renderMarkdown(r).includes("不適合(0/3件一致)"));
+ });
+});
+
+test("Only B3 and C4 with P=10 satisfy approved 25-percent deductions",()=>{
+ withBundle((tmp,key)=>{
+  const csv=filledRows(key,i=>({
+    P:["B3","C4"].includes(key.cases[i].original_case)?10:0
+  }));
+  const r=summarize(csv,key);
+  assert.equal(r.approved_reference.status,"MATCH");
+  assert.equal(r.approved_reference.observed_trials,6);
+  assert.equal(r.approved_reference.matching_trials,6);
+  assert.equal(r.approved_reference.mismatching_trials,0);
+  assert.equal(r.all_penalty_agreement,true);
+  assert.equal(r.all_score_agreement,true);
+  for(const id of ["B3","C4"]){
+   const c=r.cases.find(x=>x.case_id===id);
+   assert.equal(c.approved_status,"MATCH");
+   assert.deepEqual(c.observed_scores,[30,30,30]);
+  }
+  assert(renderMarkdown(r).includes("適合(3/3)"));
+ });
+});
+
+test("A missing P for an approved case remains unverified, not a hidden zero",()=>{
+ withBundle((tmp,key)=>{
+  const csv=filledRows(key,i=>({
+    P:["B3","C4"].includes(key.cases[i].original_case)?10:0
+  }));
+  const file=approvedCaseFile(key,"B3");
+  // Absence of P is not a positive or negative approved-reference observation.
+  const partial=editRecordedTrial(csv,file,1,{4:"",5:"",6:""});
+  const r=summarize(partial,key);
+  assert.equal(r.completed_trials,30);
+  assert.equal(r.approved_reference.status,"UNVERIFIED");
+  assert.equal(r.approved_reference.observed_trials,5);
+  assert.equal(r.approved_reference.matching_trials,5);
+  assert.equal(r.approved_reference.mismatching_trials,0);
+  const c=r.cases.find(x=>x.case_id==="B3");
+  assert.equal(c.approved_status,"UNVERIFIED");
+  assert.equal(c.approved_observed_P,2);
+  assert.equal(c.content_penalty_agreement,null);
+ });
+});
+
+test("One bad C4 penalty fails against approved rule despite five correct observations",()=>{
+ withBundle((tmp,key)=>{
+  const csv=filledRows(key,i=>({
+    P:["B3","C4"].includes(key.cases[i].original_case)?10:0
+  }));
+  const file=approvedCaseFile(key,"C4");
+  const bad=editRecordedTrial(csv,file,3,{5:"0",7:"0",9:"40"});
+  const r=summarize(bad,key);
+  assert.equal(r.completed_trials,30);
+  assert.equal(r.approved_reference.status,"MISMATCH");
+  assert.equal(r.approved_reference.matching_trials,5);
+  assert.equal(r.approved_reference.mismatching_trials,1);
+  assert.equal(r.cases.find(x=>x.case_id==="C4").approved_status,"MISMATCH");
+ });
+});
