@@ -107,10 +107,14 @@ function summarize(csv,key){
    exact_score_agreement:v.length===3?new Set(scores).size===1:null,
    content_penalty_agreement:v.length===3&&knownP.length===3?new Set(knownP).size===1:null,
    approved_expected_P:APPROVED[info.original_case]?.value??null,
+   approved_expected_score:APPROVED[info.original_case]?.expected_score??null,
    approved_observed_P:APPROVED[info.original_case]?knownP.length:null,
    approved_matching_P:APPROVED[info.original_case]?knownP.filter(p=>p===APPROVED[info.original_case].value).length:null,
+   approved_matching_score:APPROVED[info.original_case]?.expected_score===undefined?null:
+    v.filter(r=>r.score===APPROVED[info.original_case].expected_score).length,
    approved_status:!APPROVED[info.original_case]?null:
-    knownP.some(p=>p!==APPROVED[info.original_case].value)?"MISMATCH":
+    knownP.some(p=>p!==APPROVED[info.original_case].value)||
+    (APPROVED[info.original_case].expected_score!==undefined&&v.some(r=>r.score!==APPROVED[info.original_case].expected_score))?"MISMATCH":
     knownP.length===3?"MATCH":"UNVERIFIED"
   };
  });
@@ -132,12 +136,15 @@ function summarize(csv,key){
    observed_trials:cases.reduce((n,c)=>n+(c.approved_observed_P??0),0),
    matching_trials:cases.reduce((n,c)=>n+(c.approved_matching_P??0),0),
    mismatching_trials:cases.reduce((n,c)=>n+(c.approved_observed_P??0)-(c.approved_matching_P??0),0),
+   score_observed_trials:cases.reduce((n,c)=>n+(c.approved_expected_score===null?0:c.completed),0),
+   score_matching_trials:cases.reduce((n,c)=>n+(c.approved_matching_score??0),0),
+   score_mismatching_trials:cases.reduce((n,c)=>n+(c.approved_expected_score===null?0:c.completed-(c.approved_matching_score??0)),0),
    status:cases.some(c=>c.approved_status==="MISMATCH")?"MISMATCH":
     cases.filter(c=>c.approved_expected_P!==null).every(c=>c.approved_status==="MATCH")?"MATCH":"UNVERIFIED"
   },
   all_penalty_agreement:complete.length===30&&cases.every(x=>x.penalty_observations===3)?cases.every(x=>x.content_penalty_agreement):null,
   all_score_agreement:complete.length===30?cases.every(x=>x.exact_score_agreement):null,
-  warning:"Consistency is NOT correctness: three identical P=0 judgments for B3/C4 contradict the approved P=10 even though they agree with one another. An omitted P is UNKNOWN, not zero. C/W arithmetic is checked even when L/P/D are unknown. Independent model sessions cannot be verified from CSV; model/session IDs are self-reported. No model calls were made by this analyzer."
+  warning:"Consistency is NOT correctness: repeated wrong penalties can agree. The approved P values for B3=10, C2=0 and C4=10, plus C2 score=40, are checked separately from score consistency. An omitted P is UNKNOWN, not zero. C/W arithmetic is checked even when L/P/D are unknown. Independent model sessions cannot be verified from CSV; model/session IDs are self-reported. No model calls were made by this analyzer."
  };
 }
 
@@ -159,12 +166,16 @@ function renderMarkdown(result){
    (c.observed_P.length?c.observed_P.map(x=>x===null?"？":f(x)).join("，"):"—")+" | "+
    (c.exact_score_agreement===null?"未判定":c.exact_score_agreement?"一致":"不一致")+" | "+
    (c.content_penalty_agreement===null?"未判定":c.content_penalty_agreement?"一致":"不一致")+" | "+
-   (c.approved_status===null?"対象外":c.approved_status==="UNVERIFIED"?"未検証("+c.approved_matching_P+"/"+c.approved_observed_P+"件が既知Pに一致)":c.approved_status==="MISMATCH"?"不適合("+c.approved_matching_P+"/"+c.approved_observed_P+"件一致)":"適合(3/3)")+" |");
+   (c.approved_status===null?"対象外":
+    c.approved_status==="UNVERIFIED"?"未検証("+c.approved_matching_P+"/"+c.approved_observed_P+"件がPに一致)":
+    c.approved_status==="MISMATCH"?"不適合(P "+c.approved_matching_P+"/"+c.approved_observed_P+
+     (c.approved_expected_score===null?"":", 得点 "+c.approved_matching_score+"/"+c.completed)+")":
+    "適合(3/3)")+" |");
  }
- lines.push("","**B3・C4の確定判定との照合：** "+result.approved_reference.status+
+ lines.push("","**"+result.approved_reference.cases.join("・")+"の確定判定との照合：** "+result.approved_reference.status+
  "（P記録"+result.approved_reference.observed_trials+"/"+result.approved_reference.expected_trials+
- "件，適合"+result.approved_reference.matching_trials+"件，不適合"+result.approved_reference.mismatching_trials+"件）",
- "","この照合はユーザーが確定したB3・C4のP=10だけに適用し，他の８答案の正解を断定しません。３回とも同じ誤判定の場合も「不適合」とします。","",
+ "件，P適合"+result.approved_reference.matching_trials+"件，P不適合"+result.approved_reference.mismatching_trials+"件；確定得点の記録"+result.approved_reference.score_observed_trials+"件，得点適合"+result.approved_reference.score_matching_trials+"件，得点不適合"+result.approved_reference.score_mismatching_trials+"件）",
+ "","この照合はユーザーが確定したB3・C4のP=10，C2のP=0および得点40だけに適用します。他の７答案の正解を断定しません。３回とも同じ誤判定の場合も「不適合」とします。","",
  "## 対比する組み合わせ","","| 比較 | 状況 | ３回ずつの平均点差（前者－後者） |","|---|---|---:|");
  for(const c of result.comparisons)lines.push("| "+c.pair+" | "+(c.complete?"比較可能":"未完了")+" | "+f(c.mean_score_difference)+" |");
  if(result.incomplete_rows.length)lines.push("","**入力が途中の行：** "+result.incomplete_rows.map(x=>x.file+" #"+x.attempt+" ("+x.issue+")").join("，"));
