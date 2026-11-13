@@ -7,6 +7,7 @@ const { test } = require("node:test");
 
 const html = fs.readFileSync(path.join(__dirname, "..", "sum", "index.html"), "utf8");
 const homepage = fs.readFileSync(path.join(__dirname, "..", "index.html"), "utf8");
+const historyPage = fs.readFileSync(path.join(__dirname, "..", "history", "index.html"), "utf8");
 const scriptMatch = html.match(/<script>([\s\S]*?)<\/script>/);
 assert(scriptMatch, "sum/index.html must contain an inline script");
 const script = scriptMatch[1];
@@ -59,6 +60,18 @@ test("HTML includes the official label and all seven menus in the required order
   const order = [...homepage.matchAll(/class="card [^"]+" href="\.\/([^/]+)\//g)].map(m => m[1]);
   assert.deepEqual(order, ["misc", "trans", "sum", "eiken", "ito", "buncan", "mita"]);
   assert.match(homepage, /入試英語の添削ツール <span class="lead-detsu">でつ<\/span>/);
+});
+
+test("History page has noindex, ordered dates, and consistent date labels", () => {
+  assert.match(historyPage, /<meta name="robots" content="noindex">/);
+  assert.match(historyPage, /<h1>更新履歴<\/h1>/);
+  const dates = [...historyPage.matchAll(/<time datetime="(\d{4}-\d{2}-\d{2})">(\d{4}\.\d{2}\.\d{2})<\/time>/g)];
+  assert(dates.length > 0, "History entries must include valid date labels");
+  for (let i = 0; i < dates.length; i++) {
+    assert.equal(dates[i][2], dates[i][1].replace(/-/g, "."));
+    if (i > 0) assert(dates[i - 1][1] >= dates[i][1], "History dates must be newest first");
+  }
+  assert.match(historyPage, /<footer><a class="footer-home-link" href="\.\.\/">Shibata Writing Lab│柴田答案ラボ<\/a><\/footer>/);
 });
 
 test("input IDs are unique and script references exist", () => {
