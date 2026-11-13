@@ -7,6 +7,7 @@ const { chromium } = require("playwright");
 
 const target = pathToFileURL(path.resolve(__dirname, "..", "sum", "index.html")).href;
 const homeTarget = pathToFileURL(path.resolve(__dirname, "..", "index.html")).href;
+const historyTarget = pathToFileURL(path.resolve(__dirname, "..", "history", "index.html")).href;
 const artifacts = path.resolve(__dirname, "..", "test-artifacts");
 fs.mkdirSync(artifacts, { recursive: true });
 
@@ -121,6 +122,54 @@ async function checkHome(browser, name, width, height) {
   await context.close();
 }
 
+async function checkHistory(browser, name, width, height) {
+  const context = await browser.newContext({ viewport: { width, height }, deviceScaleFactor: 1 });
+  await context.route(/fonts\.googleapis\.com|fonts\.gstatic\.com/, route => route.abort());
+  try {
+    const page = await context.newPage();
+    const errors = [];
+    page.on("pageerror", error => errors.push(error.message));
+    await page.goto(historyTarget, { waitUntil: "domcontentloaded" });
+    assert.equal(await page.title(), "更新履歴｜柴田答案ラボ");
+    assert.equal(await page.locator("h1").innerText(), "更新履歴");
+    assert.equal(await page.locator('meta[name="robots"]').getAttribute("content"), "noindex");
+    assert.equal(await page.locator("footer .footer-home-link").getAttribute("href"), "../");
+    const entries = await page.locator(".updates li").evaluateAll(nodes => nodes.map(li => {
+      const time = li.querySelector("time");
+      const description = li.querySelector("p");
+      const timeBox = time?.getBoundingClientRect();
+      const descriptionBox = description?.getBoundingClientRect();
+      return {
+        date: time?.getAttribute("datetime") || "",
+        label: time?.textContent.trim() || "",
+        description: description?.textContent.trim() || "",
+        links: Array.from(li.querySelectorAll("a[href]"), a => a.getAttribute("href")),
+        overlaps: Boolean(timeBox && descriptionBox && descriptionBox.left < timeBox.right - 1)
+      };
+    }));
+    assert(entries.length > 0, "History must have dated entries");
+    for (let i = 0; i < entries.length; i++) {
+      const entry = entries[i];
+      assert.match(entry.date, /^\d{4}-\d{2}-\d{2}$/, "History machine date");
+      assert.equal(entry.label, entry.date.replace(/-/g, "."));
+      assert(entry.description.length > 0, "History entry description missing");
+      assert.equal(entry.overlaps, false, name + ": date and description overlap");
+      if (i > 0) assert(entries[i - 1].date >= entry.date, "History is not newest first");
+      for (const href of entry.links) {
+        assert(href.startsWith("../"), "Unexpected history link: " + href);
+        assert(fs.existsSync(path.resolve(__dirname, "..", "history", href, "index.html")), "Missing history link target: " + href);
+      }
+    }
+    const scrollWidth = await page.evaluate(() => document.documentElement.scrollWidth);
+    assert(scrollWidth <= width + 1, name + ": history horizontal overflow: " + scrollWidth);
+    assert.equal(errors.length, 0, name + ": history JS errors: " + errors.join("; "));
+    await page.screenshot({ path: path.join(artifacts, "history-" + name + ".png"), fullPage: true });
+    console.log("History " + name + ": PASS; entries=" + entries.length);
+  } finally {
+    await context.close();
+  }
+}
+
 async function checkAuditHowto(browser, width, height) {
   const context = await browser.newContext({ viewport: { width, height }, deviceScaleFactor: 1 });
   await context.route(/fonts\.googleapis\.com|fonts\.gstatic\.com/, route => route.abort());
@@ -152,6 +201,9 @@ async function checkAuditHowto(browser, width, height) {
     await checkHome(browser, "desktop", 1365, 900);
     await checkHome(browser, "mobile", 390, 844);
     await checkHome(browser, "small-mobile", 320, 700);
+    await checkHistory(browser, "desktop", 1365, 900);
+    await checkHistory(browser, "mobile", 390, 844);
+    await checkHistory(browser, "small-mobile", 320, 700);
   } finally {
     await browser.close();
   }
