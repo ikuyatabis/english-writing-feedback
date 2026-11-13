@@ -9,6 +9,7 @@ on:
       - "tests/sum-*.cjs"
       - "tests/yorinuki-content-boundary-cases.md"
       - "buncan/index.html"
+      - "history/index.html"
       - ".github/workflows/summary-qa.yml"
   pull_request:
     paths:
@@ -17,6 +18,7 @@ on:
       - "tests/sum-*.cjs"
       - "tests/yorinuki-content-boundary-cases.md"
       - "buncan/index.html"
+      - "history/index.html"
       - ".github/workflows/summary-qa.yml"
   workflow_dispatch:
 
