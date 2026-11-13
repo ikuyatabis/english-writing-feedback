@@ -756,7 +756,7 @@ function showHandoffToast(message){
   if(!el){ el=document.createElement("div"); el.id="chatgptHandoffToast"; el.style.cssText="position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:9999;max-width:min(92vw,680px);padding:12px 16px;border-radius:6px;background:#24201a;color:#fff;font:14px/1.6 sans-serif;box-shadow:0 5px 22px rgba(0,0,0,.25)"; document.body.appendChild(el); }
   el.textContent=message; el.hidden=false; clearTimeout(el._timer); el._timer=setTimeout(()=>{el.hidden=true},7000);
 }
-function showHandoffBox(promptText){
+function showHandoffBox(promptText, needsAttachment=false){
   let wrap=document.getElementById("chatgptHandoffBox");
   if(!wrap){
     wrap=document.createElement("div"); wrap.id="chatgptHandoffBox"; wrap.style.cssText="position:fixed;inset:0;z-index:9998;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;padding:20px";
@@ -769,9 +769,12 @@ function showHandoffBox(promptText){
       let copied=false;
       try{if(navigator.clipboard && typeof navigator.clipboard.writeText==="function"){await navigator.clipboard.writeText(t.value);copied=true}}catch(_){}
       if(!copied){try{copied=document.execCommand("copy")===true}catch(_){}}
-      showHandoffToast(copied?"全文をコピーしました。ChatGPTに貼り付けて送信してください。":"コピーできませんでした。欄内の全文を選択して、手動でコピーしてください。");
+      const sendingHint=wrap.dataset.needsAttachment==="true"?"ChatGPTに貼り付け，答案の写真・PDFを添付してから送信してください。":"ChatGPTに貼り付けて送信してください。";
+      showHandoffToast(copied?"全文をコピーしました。"+sendingHint:"コピーできませんでした。欄内の全文を選択して、手動でコピーしてください。");
     };
   }
+  wrap.dataset.needsAttachment=String(needsAttachment);
+  wrap.querySelector("p").textContent=needsAttachment?"下の全文をコピーし，ChatGPTに貼り付け，答案の写真・PDFを添付してから送信してください。":"下の全文をコピーし、ChatGPTの新しいチャットに貼り付けて送信してください。";
   wrap.querySelector("#chatgptHandoffText").value=promptText; wrap.style.display="flex";
 }
 function getExportInstruction(){
@@ -791,16 +794,17 @@ function getExportInstruction(){
     "対応するファイル生成機能が利用できない場合や生成に失敗した場合は，その理由を簡潔に説明し，作成できたファイルがあればそのリンクを示したうえで，添削結果の全文を画面に表示してください。生成していないファイルや実在しないダウンロードリンクを示してはいけません。"
   ].join("\n");
 }
-async function handoffToChatGPT(basePrompt){
+async function handoffToChatGPT(basePrompt, needsAttachment=false){
   const formatInstruction=getExportInstruction();
   const promptText=basePrompt+"\n\n"+CHATGPT_OUTPUT_OVERRIDE+(formatInstruction?"\n\n"+formatInstruction:"");
+  const sendingHint=needsAttachment?"ChatGPTに貼り付け，答案の写真・PDFを添付してから送信してください。":"ChatGPTに貼り付けて送信してください。";
   try{window.open("https://chatgpt.com/","_blank","noopener")}catch(_){}
   let copied=false; try{if(navigator.clipboard&&window.isSecureContext){await navigator.clipboard.writeText(promptText);copied=true}}catch(_){}
   if(copied){
-    showHandoffToast("採点用データをコピーしました。ChatGPTに貼り付けて送信してください。ChatGPTが開かなかった場合は、手動で開いてください。");
+    showHandoffToast("採点用データをコピーしました。"+sendingHint+"ChatGPTが開かなかった場合は、手動で開いてください。");
   }else{
-    showHandoffBox(promptText);
-    showHandoffToast("自動コピーできませんでした。ChatGPTが開かなかった場合は、下のボタンから開いてください。");
+    showHandoffBox(promptText, needsAttachment);
+    showHandoffToast(needsAttachment?"自動コピーできませんでした。下のボタンから全文をコピーし，ChatGPTに貼り付け，答案の写真・PDFを添付してから送信してください。":"自動コピーできませんでした。ChatGPTが開かなかった場合は、下のボタンから開いてください。");
   }
   return copied;
 }
@@ -875,7 +879,7 @@ function buildPhotoPrompt(k){
 $("photoChatGPTBtn").onclick = async () => {
   const k = key();
   if(!k){ note("errorBox", "年度と問題を選択してください。"); return; }
-  try{ await handoffToChatGPT(buildPhotoPrompt(k)); }
+  try{ await handoffToChatGPT(buildPhotoPrompt(k), true); }
   catch(_){ note("errorBox", "ChatGPTを開く準備ができませんでした。もう一度お試しください。"); }
 };
 
