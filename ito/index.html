@@ -246,7 +246,7 @@ footer .footer-home-link:focus-visible{outline:2px solid #197fbc;outline-offset:
       <div class="field"><label for="year">年度</label>
         <select id="year"><option value="">選択してください</option><optgroup label="九州大学 前期試験"><option value="2026">2026年度 前期</option><option value="2025">2025年度 前期</option><option value="2024">2024年度 前期</option></optgroup><optgroup label="河合塾 九大入試オープン"><option value="open2027">2027年度（26年秋実施）</option><option value="open2026">2026年度（25年秋実施）</option><option value="open2025">2025年度（24年秋実施）</option><option value="open2024">2024年度（23年秋実施）</option><option value="open2023">2023年度（22年秋実施）</option></optgroup></select></div>
       <div class="field"><label for="qno">問題</label>
-        <select id="qno"><option value="">選択してください</option><option value="4">第４問</option><option value="5">第５問</option></select></div>
+        <select id="qno"><option value="">選択してください</option><option value="4">〔４〕</option><option value="5">〔５〕</option></select></div>
     </section>
     <div class="confirm" id="changeConfirm" role="alertdialog" aria-labelledby="changeText" hidden>
       <p id="changeText"></p>
@@ -414,7 +414,7 @@ const SOURCE_LABEL = {
 };
 
 const DATA = JSON.parse(new TextDecoder().decode(Uint8Array.from(atob(DATA_B64), c => c.charCodeAt(0))));
-for(const [id,text] of Object.entries(ORIGINAL_PROMPT_TEXT)){if(DATA.problem[id])DATA.problem[id]=text;}
+for(const [id,text] of Object.entries(ORIGINAL_PROMPT_TEXT)){if(DATA.problem[id])DATA.problem[id]=normalizeQuestionNumber(text);}
 const OPEN_DATA = typeof OPEN_CASES === "object" ? OPEN_CASES : {};
 const OPEN_EXAMPLES = typeof OPEN_MODELS === "object" ? OPEN_MODELS : {};
 for(const [id,c] of Object.entries(OPEN_DATA)){
@@ -422,11 +422,11 @@ for(const [id,c] of Object.entries(OPEN_DATA)){
   const variants=OPEN_EXAMPLES[id];
   if(!Array.isArray(variants)||!variants.length)continue;
   RANGE[id]={min:c.min,max:c.max,full:c.full};
-  DATA.problem[id]=OPEN_QUESTIONS[id] ? openQuestionPlainText(id) : c.conditions;
+  DATA.problem[id]=OPEN_QUESTIONS[id] ? normalizeQuestionNumber(openQuestionPlainText(id)) : c.conditions;
   DATA.rubric[id]=c.rubric;
   DATA.instr[id]=[
     "【河合塾・九大入試オープン：模試専用の補足】",
-    c.year+"年度入試対策（"+c.held+"年11月実施）第"+c.q+"問。九大前期本番とは別の問題。",
+    c.year+"年度入試対策（"+c.held+"年11月実施）"+questionMark(c.q)+"。九大前期本番とは別の問題。",
     "満点"+c.full+"点。分類："+c.kind+"。英語面の減点上限"+c.englishCap+"点。",
     "原題の英文と図表の確認済みデータを用いて採点する。採点条件を推測して追加せず，問題別の採点基準を優先する。",
     "【自由英作文問題の採点上の原則】は最新の統一版を適用し，問題固有の注意は個別ルールを適用する。",
@@ -445,8 +445,10 @@ let current = { year: "", qno: "" }, pending = null, fileToken = 0;
 
 function key(){ return (current.year && current.qno) ? `${current.year}-${current.qno}` : null; }
 function fullwidthSingleDigit(n){ const str=String(n);return /^[0-9]$/.test(str)?String.fromCharCode(str.charCodeAt(0)+0xFEE0):str; }
-function label(k){ const m=/^open(20\d{2})-([45])$/.exec(k);if(m){const y=Number(m[1]);return y+"年度入試対策 九大入試オープン 第"+fullwidthSingleDigit(m[2])+"問（"+(y-1)+"年11月実施）";}const [y,q]=k.split("-");return `${y}年度 第${fullwidthSingleDigit(q)}問`; }
-function displayLabel(k){ const m=/^open(20\d{2})-([45])$/.exec(k);if(m){const y=Number(m[1]);return y+"年度（"+((y-1)%100)+"年秋実施） 第"+fullwidthSingleDigit(m[2])+"問";}return label(k); }
+function questionMark(q){ return "〔"+fullwidthSingleDigit(q)+"〕"; }
+function normalizeQuestionNumber(text){ return String(text).replace(/^〔([45])〕/,(_,q)=>questionMark(q)); }
+function label(k){ const m=/^open(20\d{2})-([45])$/.exec(k);if(m){const y=Number(m[1]);return y+"年度入試対策 九大入試オープン "+questionMark(m[2])+"（"+(y-1)+"年11月実施）";}const [y,q]=k.split("-");return `${y}年度 ${questionMark(q)}`; }
+function displayLabel(k){ const m=/^open(20\d{2})-([45])$/.exec(k);if(m){const y=Number(m[1]);return y+"年度（"+((y-1)%100)+"年秋実施） "+questionMark(m[2]);}return label(k); }
 function countWords(t){ return t.split(/\s+/).filter(w => /[A-Za-z0-9\uFF10-\uFF19\uFF21-\uFF3A\uFF41-\uFF5A]/.test(w)).length; }
 function showLoading(id, on){ $(id).classList.toggle("show", on); }
 // 処理中（採点・読み取り・PDF処理）は，処理対象や画面状態を変えてしまう操作をすべて止める。「中止」ボタンは止めない。
@@ -492,7 +494,7 @@ function applyProblem(){
     $("problem").innerHTML = renderOpenQuestion(k);
   }else{
     $("problem").innerHTML = (ORIGINAL_PROBLEM_HTML[k] || "<p>問題文のデータがありません。</p>") +
-      '<p class="problem-attribution">出典：九州大学 前期日程・英語（'+esc(k.split("-")[0])+'年度）第'+esc(fullwidthSingleDigit(k.split("-")[1]))+'問。表示用にレイアウト・図表を再構成した箇所があります。掲載の解答例と採点は当ラボ独自のものであり，大学の公式解答・採点ではありません。</p>';
+      '<p class="problem-attribution">出典：九州大学 前期日程・英語（'+esc(k.split("-")[0])+'年度）'+questionMark(k.split("-")[1])+'。表示用にレイアウト・図表を再構成した箇所があります。掲載の解答例と採点は当ラボ独自のものであり，大学の公式解答・採点ではありません。</p>';
   }
   refreshCount();
 }
