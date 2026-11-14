@@ -120,7 +120,12 @@ test("Ito: 2022/2023 original exams use shared rubric and source-specific scorin
   assert.match(early["2023-5"].rubric,/２〜３英文/);
   assert.match(html,/<option value="2023">2023年度 前期<\/option>/);
   assert.match(html,/<option value="2022">2022年度 前期<\/option>/);
-  assert.match(html,/DATA\.rubric\["2026-5"\] \+=/);
+  assert.match(html,/const VISUAL_LABEL_CAPITALIZATION_RULE =/);
+  assert.match(html,/DATA\.common_rubric \+=/);
+  assert.match(html,/図表に由来しない不適切な大文字化/);
+  assert.match(html,/１箇所につき−１点/);
+  assert.doesNotMatch(html,/DATA\.rubric\["2026-5"\] \+=/);
+  assert.doesNotMatch(cases["open2027-5"].rubric,/【2027年〔５〕固有の補足】/);
   const c2022q5=vm.runInNewContext(earlySource+"\nearlyQuestionHtml('2022-5')",{});
   const c2023q5=vm.runInNewContext(earlySource+"\nearlyQuestionHtml('2023-5')",{});
   assert.match(c2022q5,/<svg/);
