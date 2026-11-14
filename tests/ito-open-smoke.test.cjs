@@ -9,9 +9,11 @@ const html = fs.readFileSync(path.join(root,"ito/index.html"),"utf8");
 const casesSource = fs.readFileSync(path.join(root,"ito/open-cases.js"),"utf8");
 const modelsSource = fs.readFileSync(path.join(root,"ito/open-models.js"),"utf8");
 const questionsSource = fs.readFileSync(path.join(root,"ito/open-questions.js"),"utf8");
+const earlySource = fs.readFileSync(path.join(root,"ito/early-cases.js"),"utf8");
 const cases=JSON.parse(JSON.stringify(vm.runInNewContext(casesSource+"\nOPEN_CASES", {})));
 const models=JSON.parse(JSON.stringify(vm.runInNewContext(modelsSource+"\nOPEN_MODELS", {})));
 const questions=JSON.parse(JSON.stringify(vm.runInNewContext(questionsSource+"\nOPEN_QUESTIONS", {})));
+const early=JSON.parse(JSON.stringify(vm.runInNewContext(earlySource+"\nEARLY_CASES", {})));
 const encoded=html.match(/const DATA_B64 = "([^"]+)"/)?.[1];
 assert(encoded,"Existing exam grading data must be present");
 const data=JSON.parse(Buffer.from(encoded,"base64").toString("utf8"));
@@ -24,6 +26,7 @@ test("Ito: browser scripts are valid JavaScript",()=>{
   new vm.Script(casesSource);
   new vm.Script(modelsSource);
   new vm.Script(questionsSource);
+  new vm.Script(earlySource);
 });
 
 test("Ito: every open question has grading conditions and model answers",()=>{
@@ -66,6 +69,7 @@ test("Ito: original entrance-exam grading records remain available",()=>{
   assert.match(html,/const ORIGINAL_PROBLEM_HTML =/);
   assert.match(html,/const ORIGINAL_PROMPT_TEXT =/);
   assert.match(html,/<script src="\.\/open-questions\.js"><\/script>/);
+  assert.match(html,/<script src="\.\/early-cases\.js"><\/script>/);
   assert.match(html,/open-cases\.js/);
   assert.match(html,/open-models\.js/);
   assert.match(html,/The population of Japan peaked in 2008/);
@@ -95,6 +99,34 @@ test("Ito: all previous original questions and practice reconstructions exist",(
   assert.match(fig,/Naha City/);
   assert.match(fig,/Joetsu City/);
   assert(!html.includes("語数の減点なし："));
+});
+
+test("Ito: 2022/2023 original exams use shared rubric and source-specific scoring",()=>{
+  const ids=["2022-4","2022-5","2023-4","2023-5"];
+  assert.deepEqual(Object.keys(early).sort(),ids);
+  for(const id of ids){
+    const c=early[id];
+    assert.match(c.prompt,/Read the instructions/);
+    assert(c.model.text.length>200,id);
+    assert(c.rubric.length>400,id);
+    assert.match(c.rubric,/全年度共通【自由英作文問題の採点上の原則】/);
+  }
+  assert.deepEqual(ids.map(id=>early[id].full),[50,30,50,30]);
+  assert.deepEqual(ids.map(id=>[early[id].min,early[id].max]),[[80,120],[55,85],[80,120],[null,null]]);
+  assert.match(early["2022-4"].rubric,/59語以下−40点/);
+  assert.match(early["2022-5"].rubric,/2014年から2020年のＶ字型/);
+  assert.match(early["2023-4"].rubric,/明らかに異なるジャンルの方法/);
+  assert.match(early["2023-5"].rubric,/３〜４英文/);
+  assert.match(early["2023-5"].rubric,/２〜３英文/);
+  assert.match(html,/<option value="2023">2023年度 前期<\/option>/);
+  assert.match(html,/<option value="2022">2022年度 前期<\/option>/);
+  assert.match(html,/DATA\.rubric\["2026-5"\] \+=/);
+  const c2022q5=vm.runInNewContext(earlySource+"\nearlyQuestionHtml('2022-5')",{});
+  const c2023q5=vm.runInNewContext(earlySource+"\nearlyQuestionHtml('2023-5')",{});
+  assert.match(c2022q5,/<svg/);
+  assert.match(c2022q5,/8,736/);
+  assert.match(c2023q5,/<svg/);
+  assert.match(c2023q5,/Japanese citizens by age category/);
 });
 
 test("Ito: no word-count penalty for 2024 mock question 5",()=>{
