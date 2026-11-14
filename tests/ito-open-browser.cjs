@@ -43,7 +43,7 @@ async function check(browser,name,width,height){
     for(const r of records){
       assert.match(r.label,/年度入試対策 九大入試オープン 第[４５]問（20\d{2}年11月実施）/);
       const year=Number(r.key.slice(4,8)),q=r.key.slice(-1);
-      assert.equal(r.display,`${year}年度（${(year-1)%100}年秋実施） 第${q}問`);
+      assert.equal(r.display,`${year}年度（${(year-1)%100}年秋実施） 第${q==="4"?"４":"５"}問`);
     }
     await page.selectOption("#year","open2025");
     await page.selectOption("#qno","4");
