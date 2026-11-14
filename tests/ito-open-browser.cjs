@@ -27,11 +27,11 @@ async function check(browser,name,width,height){
     assert.equal(await page.locator('#year optgroup[label="河合塾 九大入試オープン"]').count(),1);
     const openLabels=await page.locator('#year option[value^="open"]').allTextContents();
     assert.deepEqual(openLabels,[
-      "27年度（26年秋実施）",
-      "26年度（25年秋実施）",
-      "25年度（24年秋実施）",
-      "24年度（23年秋実施）",
-      "23年度（22年秋実施）"
+      "2027年度（26年秋実施）",
+      "2026年度（25年秋実施）",
+      "2025年度（24年秋実施）",
+      "2024年度（23年秋実施）",
+      "2023年度（22年秋実施）"
     ]);
     const records=await page.evaluate(()=>{
       const keys=Object.keys(OPEN_CASES).sort();
@@ -41,12 +41,12 @@ async function check(browser,name,width,height){
     for(const r of records){
       assert.match(r.label,/年度入試対策 九大入試オープン 第[45]問（20\d{2}年11月実施）/);
       const year=Number(r.key.slice(4,8)),q=r.key.slice(-1);
-      assert.equal(r.display,`${year%100}年度（${(year-1)%100}年秋実施） 第${q}問`);
+      assert.equal(r.display,`${year}年度（${(year-1)%100}年秋実施） 第${q}問`);
     }
     await page.selectOption("#year","open2025");
     await page.selectOption("#qno","4");
     assert.equal(await page.locator("#step2").isVisible(),true);
-    assert.equal(await page.locator("#problemTag").innerText(),"25年度（24年秋実施） 第4問（40点）");
+    assert.equal(await page.locator("#problemTag").innerText(),"2025年度（24年秋実施） 第4問（40点）");
     assert.match(await page.locator("#problem").innerText(),/不登校の児童生徒/);
     assert.match(await page.locator("#problem").innerText(),/河合塾の原題・図表そのものではありません/);
     assert.equal(await page.locator("details.passage-box").getAttribute("open"),"");
@@ -60,7 +60,7 @@ async function check(browser,name,width,height){
     const headings=await page.locator("#modelAnswers h3").allInnerTexts();
     assert.deepEqual(headings,["解答例①（100 words）","解答例②（100 words）","解答例③（101 words）"]);
     await page.selectOption("#year","open2026");
-    assert.match(await page.locator("#changeText").innerText(),/26年度（25年秋実施） 第4問/);
+    assert.match(await page.locator("#changeText").innerText(),/2026年度（25年秋実施） 第4問/);
     await page.locator("#changeNo").click();
     const prompt=await page.evaluate(()=>buildPrompt("open2025-4","English sample.",2,"text"));
     assert.match(prompt,/2025年度入試対策 九大入試オープン 第4問（2024年11月実施）/);
@@ -70,7 +70,7 @@ async function check(browser,name,width,height){
     await page.reload({waitUntil:"domcontentloaded"});
     await page.selectOption("#year","open2024");
     await page.selectOption("#qno","5");
-    assert.equal(await page.locator("#problemTag").innerText(),"24年度（23年秋実施） 第5問（30点）");
+    assert.equal(await page.locator("#problemTag").innerText(),"2024年度（23年秋実施） 第5問（30点）");
     assert.match(await page.locator("#problem").innerText(),/那覇市と上越市/);
     assert.doesNotMatch(await page.locator("#problem").innerText(),/語数|文数|減点/);
     await page.locator("#answer").fill(Array.from({length:130},()=> "word").join(" "));
