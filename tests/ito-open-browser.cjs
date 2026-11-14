@@ -47,7 +47,9 @@ async function check(browser,name,width,height){
     await page.selectOption("#qno","4");
     assert.equal(await page.locator("#step2").isVisible(),true);
     assert.equal(await page.locator("#problemTag").innerText(),"25年度（24年秋実施） 第4問（40点）");
-    assert.match(await page.locator("#problem").innerText(),/問題文・図表は掲載していません/);
+    assert.match(await page.locator("#problem").innerText(),/不登校の児童生徒/);
+    assert.match(await page.locator("#problem").innerText(),/河合塾の原題・図表そのものではありません/);
+    assert.equal(await page.locator("details.passage-box").getAttribute("open"),"");
     assert.doesNotMatch(await page.locator("#problem").innerText(),/語数|文数|減点/);
     assert.equal(await page.locator("#wcHint").count(),0);
     await page.locator("#answer").fill("Students can have different learning opportunities. Some can study online and some can build new relationships in their communities.");
@@ -69,6 +71,7 @@ async function check(browser,name,width,height){
     await page.selectOption("#year","open2024");
     await page.selectOption("#qno","5");
     assert.equal(await page.locator("#problemTag").innerText(),"24年度（23年秋実施） 第5問（30点）");
+    assert.match(await page.locator("#problem").innerText(),/那覇市と上越市/);
     assert.doesNotMatch(await page.locator("#problem").innerText(),/語数|文数|減点/);
     await page.locator("#answer").fill(Array.from({length:130},()=> "word").join(" "));
     assert.equal(await page.locator("#wc").getAttribute("class"),"wc none");
@@ -78,13 +81,21 @@ async function check(browser,name,width,height){
     await page.selectOption("#year","2026");
     await page.selectOption("#qno","4");
     assert.match(await page.locator("#problemTag").innerText(),/2026年度 第4問（40点）/);
+    assert.match(await page.locator("#problem").innerText(),/What are three essential abilities of good teachers/);
+    assert.match(await page.locator("#problem").innerText(),/出典：九州大学/);
     assert.doesNotMatch(await page.locator("#problem").innerText(),/語数|文数|減点/);
     await page.locator("#answer").fill(Array.from({length:130},()=> "word").join(" "));
     assert.equal(await page.locator("#wc").getAttribute("class"),"wc none");
     assert.equal(await page.locator("#wc").innerText(),"130 語");
     const original=await page.evaluate(()=>buildPrompt("2026-4","Teachers should listen carefully.",4,"text"));
     assert.match(original,/2026年度 第4問/);
-    assert.match(original,/優れた教師|teachers/i);
+    assert.match(original,/What are three essential abilities of good teachers/);
+    await page.reload({waitUntil:"domcontentloaded"});
+    await page.selectOption("#year","2026");
+    await page.selectOption("#qno","5");
+    assert.equal(await page.locator("#problem svg").count(),1);
+    assert.match(await page.locator("#problem").innerText(),/Springfield University/);
+    assert.doesNotMatch(await page.locator("#problem").innerText(),/語数の減点なし/);
     const scroll=await page.evaluate(()=>document.documentElement.scrollWidth);
     if(scroll>width+1){
       const overflowNodes=await page.evaluate(()=>[...document.querySelectorAll("body *")].map(el=>{
