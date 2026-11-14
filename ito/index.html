@@ -244,7 +244,7 @@ footer .footer-home-link:focus-visible{outline:2px solid #197fbc;outline-offset:
 
     <section class="controls">
       <div class="field"><label for="year">年度</label>
-        <select id="year"><option value="">選択してください</option><optgroup label="九州大学 前期試験"><option value="2026">2026年度 前期</option><option value="2025">2025年度 前期</option><option value="2024">2024年度 前期</option></optgroup><optgroup label="河合塾 九大入試オープン"><option value="open2027">27年度（26年秋実施）</option><option value="open2026">26年度（25年秋実施）</option><option value="open2025">25年度（24年秋実施）</option><option value="open2024">24年度（23年秋実施）</option><option value="open2023">23年度（22年秋実施）</option></optgroup></select></div>
+        <select id="year"><option value="">選択してください</option><optgroup label="九州大学 前期試験"><option value="2026">2026年度 前期</option><option value="2025">2025年度 前期</option><option value="2024">2024年度 前期</option></optgroup><optgroup label="河合塾 九大入試オープン"><option value="open2027">2027年度（26年秋実施）</option><option value="open2026">2026年度（25年秋実施）</option><option value="open2025">2025年度（24年秋実施）</option><option value="open2024">2024年度（23年秋実施）</option><option value="open2023">2023年度（22年秋実施）</option></optgroup></select></div>
       <div class="field"><label for="qno">問題</label>
         <select id="qno"><option value="">選択してください</option><option value="4">第4問</option><option value="5">第5問</option></select></div>
     </section>
@@ -456,7 +456,7 @@ let current = { year: "", qno: "" }, pending = null, fileToken = 0;
 
 function key(){ return (current.year && current.qno) ? `${current.year}-${current.qno}` : null; }
 function label(k){ const m=/^open(20\d{2})-([45])$/.exec(k);if(m){const y=Number(m[1]);return y+"年度入試対策 九大入試オープン 第"+m[2]+"問（"+(y-1)+"年11月実施）";}const [y,q]=k.split("-");return `${y}年度 第${q}問`; }
-function displayLabel(k){ const m=/^open(20\d{2})-([45])$/.exec(k);if(m){const y=Number(m[1]);return (y%100)+"年度（"+((y-1)%100)+"年秋実施） 第"+m[2]+"問";}return label(k); }
+function displayLabel(k){ const m=/^open(20\d{2})-([45])$/.exec(k);if(m){const y=Number(m[1]);return y+"年度（"+((y-1)%100)+"年秋実施） 第"+m[2]+"問";}return label(k); }
 function countWords(t){ return t.split(/\s+/).filter(w => /[A-Za-z0-9\uFF10-\uFF19\uFF21-\uFF3A\uFF41-\uFF5A]/.test(w)).length; }
 function showLoading(id, on){ $(id).classList.toggle("show", on); }
 // 処理中（採点・読み取り・PDF処理）は，処理対象や画面状態を変えてしまう操作をすべて止める。「中止」ボタンは止めない。
