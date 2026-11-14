@@ -134,6 +134,31 @@ test("Ito: 2022/2023 original exams use shared rubric and source-specific scorin
   assert.match(c2023q5,/Japanese citizens by age category/);
 });
 
+test("Ito: clinic-style QA guidance does not overwrite case rubrics or solicit external model answers",()=>{
+  assert.match(html,/const ITO_FEEDBACK_QUALITY = \[/);
+  assert.match(html,/max\(0, M－C－E－W\)/);
+  assert.match(html,/減点一覧の各行の合計とC・E・Wが一致/);
+  assert.match(html,/減点対象外の改善提案/);
+  assert.match(html,/文数条件がある問題では文数も確認/);
+  assert.match(html,/同じ種類の誤りで減点を重ねない箇所も修正案/);
+  assert.match(html,/公開解答例の追加検索は行わず/);
+  assert.doesNotMatch(html,/公開解答例の検索・紹介が明示的に希望されている場合に限り/);
+  assert.doesNotMatch(html,/本文Ⅳ未収録/);
+  assert.match(data.common,/手書き答案の写真・PDFはChatGPTに直接添付する方式/);
+  assert.match(data.common,/手書き答案の写真・PDFではこの値は仮の０語/);
+  assert.doesNotMatch(data.common,/「設問条件の要約」は/);
+  assert.doesNotMatch(data.common,/読み取った答案は生徒が画面上で確認・修正できるようにしている/);
+  assert.deepEqual(Object.keys(data.rubric).sort(),originalKeys.slice().sort());
+  assert.deepEqual(Object.keys(data.model).sort(),originalKeys.slice().sort());
+  assert.deepEqual(Object.keys(cases).sort(),mockKeys.slice().sort());
+  assert.deepEqual(Object.keys(models).sort(),mockKeys.slice().sort());
+  assert.deepEqual(Object.keys(early).sort(),["2022-4","2022-5","2023-4","2023-5"]);
+  assert.match(data.rubric["2026-4"],/59 語以下[\s\S]*－30 点/);
+  assert.match(data.rubric["2026-5"],/101 語以上[\s\S]*－15 点/);
+  assert.match(cases["open2027-5"].rubric,/紙の辞書の減少/);
+  assert.match(early["2023-5"].rubric,/３〜４英文/);
+});
+
 test("Ito: no word-count penalty for 2024 mock question 5",()=>{
   const c=cases["open2024-5"];
   assert.equal(c.min,null);
