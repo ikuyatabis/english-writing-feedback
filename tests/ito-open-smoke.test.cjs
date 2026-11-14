@@ -138,7 +138,7 @@ test("Ito: 2022/2023 original exams use shared rubric and source-specific scorin
 test("Ito: clinic-style QA guidance does not overwrite case rubrics or solicit external model answers",()=>{
   assert.match(html,/const ITO_FEEDBACK_QUALITY = \[/);
   assert.match(html,/max\(0, M－C－E－W\)/);
-  assert.match(html,/減点一覧の各行の合計とC・E・Wが一致/);
+  assert.match(html,/上限適用後の減点合計とC・E・Wが一致/);
   assert.match(html,/減点対象外の改善提案/);
   assert.match(html,/文数条件がある問題では文数も確認/);
   assert.match(html,/同じ種類の誤りで減点を重ねない箇所も修正案/);
@@ -160,7 +160,7 @@ test("Ito: clinic-style QA guidance does not overwrite case rubrics or solicit e
   assert.match(early["2023-5"].rubric,/３〜４英文/);
 });
 
-test("Ito: locked scoring records and model answers SHA-256 (baseline print)",()=>{
+test("Ito: scoring records and model answers remain locked by SHA-256",()=>{
   const rangeLiteral=html.match(/const RANGE = \{[\s\S]*?\n\};/)?.[0];
   assert(rangeLiteral,"Ito native range literals must be present");
   const locked={
@@ -176,8 +176,7 @@ test("Ito: locked scoring records and model answers SHA-256 (baseline print)",()
     mockQuestions:questions
   };
   const checksum=crypto.createHash("sha256").update(JSON.stringify(locked),"utf8").digest("hex");
-  console.log("ITO_SOURCE_SCORING_SHA256="+checksum);
-  assert.match(checksum,/^[a-f0-9]{64}$/);
+  assert.equal(checksum,"a964d516ee11d5f8666143c7547ff856ac52a7fedffa58bfaf998fc3c4588ad0","the 20 case scoring baselines and models must remain unchanged");
 });
 
 test("Ito: audit corrections keep scoring source intact",()=>{
