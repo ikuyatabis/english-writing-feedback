@@ -96,7 +96,7 @@
     margin: 0 0 4px;
     font-family: var(--font-serif);
     font-weight: 800;
-    font-size: calc(clamp(1.5rem, 5vw, 2rem) - 1pt);
+    font-size: clamp(1.5rem, 5vw, 2rem);
     letter-spacing: 0.03em;
     color: var(--ink);
   }
@@ -346,7 +346,7 @@
 /* Keep full form area accessible on phones and short viewports. */
 @media (max-width: 560px) {
   .masthead-inner h1 {
-    font-size: min(calc(clamp(1.5rem, 5vw, 2rem) - 1pt), calc(6vw - 4px));
+    font-size: min(clamp(1.5rem, 5vw, 2rem), calc(6vw - 4px));
     white-space: nowrap;
   }
 }
