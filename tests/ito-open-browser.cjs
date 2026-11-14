@@ -24,6 +24,15 @@ async function check(browser,name,width,height){
     await page.goto(target,{waitUntil:"domcontentloaded"});
     const opts=await page.locator("#year option").evaluateAll(nodes=>nodes.map(x=>x.value).filter(Boolean));
     assert.deepEqual(opts,["2026","2025","2024","open2027","open2026","open2025","open2024","open2023"]);
+    assert.equal(await page.locator('#year optgroup[label="河合塾 九大入試オープン"]').count(),1);
+    const openLabels=await page.locator('#year option[value^="open"]').allTextContents();
+    assert.deepEqual(openLabels,[
+      "2027年度九大オープン（26年秋実施分）",
+      "2026年度九大オープン（25年秋実施分）",
+      "2025年度九大オープン（24年秋実施分）",
+      "2024年度九大オープン（23年秋実施分）",
+      "2023年度九大オープン（22年秋実施分）"
+    ]);
     const records=await page.evaluate(()=>{
       const keys=Object.keys(OPEN_CASES).sort();
       return keys.map(k=>({key:k,label:label(k),full:RANGE[k].full,modelCount:DATA.model[k].variants.length,wordsMin:RANGE[k].min}));
