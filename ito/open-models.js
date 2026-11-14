@@ -23,12 +23,12 @@ const OPEN_MODELS = {
   ],
   "open2024-4": [
     {
-      "label": "解答例",
+      "label": "解答例①",
       "words": 100,
       "text": "Drones can be used to make it easier to transport various things. More and more people are ordering via the Internet and receiving things by home delivery. However, people in rural areas, especially those in the mountains, have trouble having their orders delivered. Drones can be used to deliver them rapidly. Using drones for transportation can also help disaster victims. In natural disasters, truck delivery is often unavailable. In such cases, drones can carry relief goods, including medical supplies, to victims quickly and safely. More people can be saved if we make better use of drones in case of emergency."
     },
     {
-      "label": "別バージョン",
+      "label": "解答例②",
       "words": 102,
       "text": "Drones can be used to carry drugs and organs. These days, many people consult doctors over the phone or on the Internet and receive prescription drugs by mail. However, patients in serious condition sometimes need to take medicine as soon as possible. Drones can be used to deliver it. The medical use of drones can also be good news for patients waiting for an organ transplant. Drones can deliver organs from donors to patients quickly and safely, enabling more organs to be transplanted in the future. More patients can be saved if we make more use of drones in the medical field."
     }
@@ -42,17 +42,17 @@ const OPEN_MODELS = {
   ],
   "open2025-4": [
     {
-      "label": "解答例",
+      "label": "解答例①",
       "words": 100,
       "text": "In recent years, Futōkō has been viewed negatively in Japan. But by addressing this matter, we can gain a different perspective. First, students should not all be treated in the same way. Rather, they should be regarded as individuals with their own unique personalities. Second, schools should be more flexible and should not be bound by strict rules. This will help to foster an environment in which Japanese people place more value on the individuality of children. As the educational system becomes more tolerant of diversity, so will Japanese society. In this way, we can create a more inclusive society."
     },
     {
-      "label": "別バージョン①",
+      "label": "解答例②",
       "words": 100,
       "text": "The increasing number of children refusing to attend school in Japan can have two positive effects on education in Japan. First, this trend can create more supportive and individualized learning experiences. For example, it can lead to the development of specialized learning programs for those children, enabling teaching adapted to each student. Second, it can prompt essential reforms in teachers’ working conditions through the employment of more staff, reducing the burden on teachers, and improving their ability to support students effectively. These effects can improve the Japanese educational environment, enhancing the overall quality of education for both students and teachers."
     },
     {
-      "label": "別バージョン②",
+      "label": "解答例③",
       "words": 101,
       "text": "Futōkō is usually viewed negatively, but this issue can lead to two positive changes for Japanese families. Firstly, this trend can encourage parents to better understand and support their children who refuse to go to school. By listening to their children’s feelings, they can foster stronger family bonds. Secondly, it can offer these children the opportunity to grow by participating in volunteer or community activities under circumstances different from those of traditional schools. Such experiences can help them gain confidence, and broaden their horizons, and learn to accept responsibility. These changes can result in more supportive family relationships and well-rounded children."
     }
