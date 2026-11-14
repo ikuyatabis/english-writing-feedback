@@ -105,6 +105,49 @@ async function check(browser,name,width,height){
     assert.match(await page.locator("#problem").innerText(),/Springfield University/);
     assert.doesNotMatch(await page.locator("#problem").innerText(),/語数の減点なし/);
 
+    // Clinic-to-Ito migration: all 20 case prompts keep their own rubrics and new common QA.
+    const allPromptChecks=await page.evaluate(()=>{
+      return Object.keys(RANGE).sort().map(id=>{
+        const output=buildPrompt(id,"A sample answer.",3,"text");
+        const photo=buildPhotoPrompt(id);
+        return {
+          id,full:RANGE[id].full,range:[RANGE[id].min,RANGE[id].max],
+          promptHasRubric:output.includes(DATA.rubric[id]),
+          promptHasModel:output.includes(DATA.model[id].text),
+          hasQuality:output.includes("【採点・添削の品質管理：年度別採点基準を変更しない補助指示】"),
+          hasFormula:output.includes("max(0, M－C－E－W)"),
+          hasCorrectionSeparation:output.includes("減点対象外の改善提案"),
+          hasYearRule:output.includes("問題ごとの採点基準（正本）"),
+          hasParagraphGuide:output.includes("【段落の書き方：減点なしの学習上の注意】"),
+          oldStatement:output.includes("「設問条件の要約」は")||output.includes("生徒が画面上で確認・修正できるようにしている"),
+          unsolicitedSearch:output.includes("公開解答例の検索・紹介が明示的に希望されている場合に限り"),
+          photoCorrect:photo.includes("【写真・PDF答案についての最優先指示】")&&photo.includes("【手書き答案の判読不能箇所の確認】"),
+          noExternal:output.includes("公開解答例の追加検索は行わず")
+        };
+      });
+    });
+    assert.equal(allPromptChecks.length,20);
+    for(const entry of allPromptChecks){
+      for(const key of ["promptHasRubric","promptHasModel","hasQuality","hasFormula","hasCorrectionSeparation","hasYearRule","hasParagraphGuide","photoCorrect","noExternal"])assert.equal(entry[key],true,entry.id+" "+key);
+      assert.equal(entry.oldStatement,false,entry.id+" old statement");
+      assert.equal(entry.unsolicitedSearch,false,entry.id+" unwanted public examples");
+    }
+    for(const [id,min,max] of [["2023-5",null,null],["2022-5",55,85],["2026-5",60,100],["open2024-5",null,null]]){
+      const row=allPromptChecks.find(x=>x.id===id);
+      assert.deepEqual(row.range,[min,max],id+" grading range must not change");
+    }
+    for(const fmt of ["screen","word","pdf","both"]){
+      await page.locator('input[name="outputFormat"][value="'+fmt+'"]').check();
+      const data=await page.evaluate(()=>getExportInstruction());
+      if(fmt==="screen")assert.equal(data,"");
+      else {
+        assert.match(data,/【添削結果の出力形式：最優先指示】/);
+        assert.match(data,/JIS B5/);
+        assert.doesNotMatch(data,/公開解答例の検索・紹介/);
+      }
+    }
+    await page.locator('input[name="outputFormat"][value="screen"]').check();
+
     const shared=await page.evaluate(()=>DATA.common_rubric);
     assert.match(shared,/図表由来の大文字化の誤り：共通原則の限定的な例外/);
     assert.match(shared,/箇所数・語の種類を問わず，まとめて一律−１点/);
