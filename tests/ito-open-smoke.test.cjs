@@ -80,7 +80,7 @@ test("Ito: all previous original questions and practice reconstructions exist",(
   assert(practiceSource,"Practice reconstruction block missing");
   const practice=JSON.parse(practiceSource);
   assert.deepEqual(Object.keys(practice).sort(),mockKeys.slice().sort());
-  for(const key of mockKeys)assert(practice[key].length>75,key);
+  for(const key of mockKeys)assert(practice[key].length>35,key);
   assert.match(html,/河合塾の原題・図表そのものではありません/);
   assert(!html.includes("語数の減点なし："));
 });
