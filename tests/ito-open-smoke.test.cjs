@@ -153,8 +153,8 @@ test("Ito: clinic-style QA guidance does not overwrite case rubrics or solicit e
   assert.deepEqual(Object.keys(cases).sort(),mockKeys.slice().sort());
   assert.deepEqual(Object.keys(models).sort(),mockKeys.slice().sort());
   assert.deepEqual(Object.keys(early).sort(),["2022-4","2022-5","2023-4","2023-5"]);
-  assert.match(data.rubric["2026-4"],/59 語以下[\s\S]*－30 点/);
-  assert.match(data.rubric["2026-5"],/101 語以上[\s\S]*－15 点/);
+  assert.match(data.rubric["2026-4"],/59\s*語以下[\s\S]*－30\s*点/);
+  assert.match(data.rubric["2026-5"],/101\s*語以上[\s\S]*－15\s*点/);
   assert.match(cases["open2027-5"].rubric,/紙の辞書の減少/);
   assert.match(early["2023-5"].rubric,/３〜４英文/);
 });
