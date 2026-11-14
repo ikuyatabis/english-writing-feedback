@@ -3,6 +3,7 @@ const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
+const crypto = require("node:crypto");
 const { test } = require("node:test");
 const root = path.resolve(__dirname,"..");
 const html = fs.readFileSync(path.join(root,"ito/index.html"),"utf8");
@@ -157,6 +158,43 @@ test("Ito: clinic-style QA guidance does not overwrite case rubrics or solicit e
   assert.match(data.rubric["2026-5"],/101\s*語以上[\s\S]*－15\s*点/);
   assert.match(cases["open2027-5"].rubric,/紙の辞書の減少/);
   assert.match(early["2023-5"].rubric,/３〜４英文/);
+});
+
+test("Ito: locked scoring records and model answers SHA-256 (baseline print)",()=>{
+  const rangeLiteral=html.match(/const RANGE = \{[\s\S]*?\n\};/)?.[0];
+  assert(rangeLiteral,"Ito native range literals must be present");
+  const locked={
+    baseRangeSource:rangeLiteral,
+    originalCommonRubric:data.common_rubric,
+    originalProblem:data.problem,
+    originalRubric:data.rubric,
+    originalInstructions:data.instr,
+    originalModels:data.model,
+    earlyCases:early,
+    mockCases:cases,
+    mockModels:models,
+    mockQuestions:questions
+  };
+  const checksum=crypto.createHash("sha256").update(JSON.stringify(locked),"utf8").digest("hex");
+  console.log("ITO_SOURCE_SCORING_SHA256="+checksum);
+  assert.match(checksum,/^[a-f0-9]{64}$/);
+});
+
+test("Ito: audit corrections keep scoring source intact",()=>{
+  assert.match(html,/上限適用前.*上限適用後/);
+  assert.match(html,/上限超過で追加減点しない誤りも修正一覧から削除せず/);
+  assert.match(html,/満点答案でも差し替え用の１文や部分修正だけにせず/);
+  assert.match(html,/減点対象外の表現改善】に置き/);
+  assert.match(html,/Word＋PDFの両方を指定して一方だけ作成できた場合/);
+  assert.match(html,/指定形式が一つも作成できなかった場合に限り/);
+  assert.match(html,/function copyItoPrompt\(text\)/);
+  assert.match(html,/const copyPromise=copyItoPrompt\(promptText\)/);
+  assert.match(html,/many friend/);
+  assert.match(html,/辞書の用例が存在するだけで今回の文脈での誤用を自動的に免除しない/);
+  assert.match(data.common,/テキスト入力では【確定語数】以外の語数を使わない。写真・PDFでは最優先指示の手順で確定した語数を使う/);
+  assert.doesNotMatch(data.common,/確定語数以外の語数を使わない/);
+  assert.doesNotMatch(html,/公開解答例の検索・紹介が明示的に希望されている場合に限り/);
+  assert.match(html,/A\/Bラベル除外/);
 });
 
 test("Ito: no word-count penalty for 2024 mock question 5",()=>{
