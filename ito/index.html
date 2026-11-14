@@ -113,7 +113,6 @@
   table { border-collapse: collapse; font-size: .9rem; min-width: 520px; font-family: var(--font-sans); }
   th, td { border: 1px solid var(--paper-line); padding: 5px 8px; vertical-align: top; text-align: left; }
   th { background: var(--card); font-weight: 700; }
-  .range-note { font-family: var(--font-sans); font-size: .82rem; color: var(--ink-soft); margin: 0; }
 
   .section-label { margin: 0 0 8px; font-size: 0.8rem; letter-spacing: 0.04em; color: var(--wine); font-weight: 700; font-family: var(--font-serif); }
   .tabs { display: flex; border-bottom: 1px solid var(--paper-line); margin-bottom: 12px; }
@@ -127,7 +126,7 @@
   textarea:focus { outline: 2px solid var(--wine); outline-offset: 1px; }
   .count { display: flex; align-items: center; gap: 10px; margin-top: 8px; font-size: .88rem; flex-wrap: wrap; }
   .wc { font-family: var(--font-serif); font-weight: 700; padding: 1px 10px; border-radius: 20px; border: 1px solid currentColor; }
-  .wc.in { color: var(--ok); background: var(--ok-bg); } .wc.out { color: var(--bad); background: var(--bad-bg); } .wc.none { color: var(--ink-soft); }
+  .wc.none { color: var(--ink-soft); }
   .hint { color: var(--ink-soft); font-size: 0.85rem; margin: 6px 0 0; }
   .thumbs { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
   .thumbs img { max-width: 140px; max-height: 180px; border: 1px solid var(--paper-line); border-radius: 3px; }
@@ -240,7 +239,7 @@ footer .footer-home-link:focus-visible{outline:2px solid #197fbc;outline-offset:
 
     <section class="controls">
       <div class="field"><label for="year">年度</label>
-        <select id="year"><option value="">選択してください</option><optgroup label="九州大学 前期試験"><option value="2026">2026年度 前期</option><option value="2025">2025年度 前期</option><option value="2024">2024年度 前期</option></optgroup><optgroup label="河合塾 九大入試オープン"><option value="open2027">2027年度九大オープン（26年秋実施分）</option><option value="open2026">2026年度九大オープン（25年秋実施分）</option><option value="open2025">2025年度九大オープン（24年秋実施分）</option><option value="open2024">2024年度九大オープン（23年秋実施分）</option><option value="open2023">2023年度九大オープン（22年秋実施分）</option></optgroup></select></div>
+        <select id="year"><option value="">選択してください</option><optgroup label="九州大学 前期試験"><option value="2026">2026年度 前期</option><option value="2025">2025年度 前期</option><option value="2024">2024年度 前期</option></optgroup><optgroup label="河合塾 九大入試オープン"><option value="open2027">27年度（26年秋実施）</option><option value="open2026">26年度（25年秋実施）</option><option value="open2025">25年度（24年秋実施）</option><option value="open2024">24年度（23年秋実施）</option><option value="open2023">23年度（22年秋実施）</option></optgroup></select></div>
       <div class="field"><label for="qno">問題</label>
         <select id="qno"><option value="">選択してください</option><option value="4">第4問</option><option value="5">第5問</option></select></div>
     </section>
@@ -300,7 +299,7 @@ footer .footer-home-link:focus-visible{outline:2px solid #197fbc;outline-offset:
         </details>
       </div>
       <textarea id="answer" spellcheck="false" autocorrect="off" autocomplete="off" autocapitalize="none" writingsuggestions="false" data-gramm="false" data-gramm_editor="false" data-enable-grammarly="false" data-lt-active="false" placeholder="ここに英作文を入力してください"></textarea>
-      <div class="count" id="textCount" aria-live="polite"><span class="wc none" id="wc">0 語</span><span class="sub" id="wcHint"></span></div>
+      <div class="count" id="textCount" aria-live="polite"><span class="wc none" id="wc">0 語</span></div>
       <p class="hint" id="textCountHint">語数は空白区切りで機械的に数えています（記号だけのものは数えません。ハイフンでつないだ語や「67%」は1語）。</p>
       <div id="gradeNote" class="note" hidden></div>
 
@@ -381,6 +380,7 @@ let current = { year: "", qno: "" }, pending = null, fileToken = 0;
 
 function key(){ return (current.year && current.qno) ? `${current.year}-${current.qno}` : null; }
 function label(k){ const m=/^open(20\d{2})-([45])$/.exec(k);if(m){const y=Number(m[1]);return y+"年度入試対策 九大入試オープン 第"+m[2]+"問（"+(y-1)+"年11月実施）";}const [y,q]=k.split("-");return `${y}年度 第${q}問`; }
+function displayLabel(k){ const m=/^open(20\d{2})-([45])$/.exec(k);if(m){const y=Number(m[1]);return (y%100)+"年度（"+((y-1)%100)+"年秋実施） 第"+m[2]+"問";}return label(k); }
 function countWords(t){ return t.split(/\s+/).filter(w => /[A-Za-z0-9\uFF10-\uFF19\uFF21-\uFF3A\uFF41-\uFF5A]/.test(w)).length; }
 function showLoading(id, on){ $(id).classList.toggle("show", on); }
 // 処理中（採点・読み取り・PDF処理）は，処理対象や画面状態を変えてしまう操作をすべて止める。「中止」ボタンは止めない。
@@ -421,9 +421,8 @@ function applyProblem(){
   $("step2").hidden = !k;
   if(!k){ refreshCount(); return; }
   const r = RANGE[k];
-  $("problemTag").textContent = `${label(k)}（${r.full}点）`;
-  const rangeText=r.min===null?"語数による減点なし。指定された文数を守ってください。":"語数の減点なし："+r.min+"〜"+r.max+"語（採点基準による）";
-  $("problem").innerHTML = "<p>問題文・図表は掲載していません。手元の問題冊子を確認してから答案を入力してください。</p><p class=\"range-note\">"+rangeText+"</p>";
+  $("problemTag").textContent = `${displayLabel(k)}（${r.full}点）`;
+  $("problem").innerHTML = "<p>問題文・図表は掲載していません。手元の問題冊子を確認してから答案を入力してください。</p>";
   refreshCount();
 }
 function onSelectChange(){
@@ -433,7 +432,7 @@ function onSelectChange(){
   // 入力中の答案がある場合は，選択をいったん元に戻して確認する
   $("year").value = current.year; $("qno").value = current.qno;
   pending = next;
-  const to = (next.year && next.qno) ? `「${label(`${next.year}-${next.qno}`)}」に` : "";
+  const to = (next.year && next.qno) ? `「${displayLabel(`${next.year}-${next.qno}`)}」に` : "";
   $("changeText").textContent = `入力中の答案があります。問題を${to}変更すると、現在の答案・読み込んだ写真やPDF・読み取り結果・添削結果をリセットします。変更しますか？`;
   $("changeConfirm").hidden = false; $("changeYes").focus();
 }
@@ -445,11 +444,7 @@ $("changeNo").onclick = () => { pending = null; $("changeConfirm").hidden = true
 function refreshCount(){
   const k = key(); const t = $("answer").value; const n = countWords(t);
   const wc = $("wc"); wc.textContent = `${n} 語`;
-  if(!k || n === 0){ wc.className = "wc none"; $("wcHint").textContent = ""; }
-  else { const r = RANGE[k]; const hasRange=r.min!==null && r.max!==null;
-    const inR=!hasRange||(n>=r.min&&n<=r.max);
-    wc.className="wc "+(!hasRange?"none":inR?"in":"out");
-    $("wcHint").textContent=!hasRange?"語数ではなく文数の指定があります":inR?"語数の減点なしの範囲です":"減点なしの範囲（"+r.min+"〜"+r.max+"語）から外れています"; }
+  wc.className = "wc none";
   const unclear = /\[\?/.test(t);
   note("gradeNote", unclear ? "読み取りが不確かな箇所（[? ] の部分）が残っています。答案を見ながら正しい英文に直してから添削してください。読み取れない場合は、撮り直すかテキストで入力してください。" : "");
   $("gradeBtn").disabled = !k || n === 0 || unclear || busy;
