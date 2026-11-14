@@ -8,8 +8,10 @@ const root = path.resolve(__dirname,"..");
 const html = fs.readFileSync(path.join(root,"ito/index.html"),"utf8");
 const casesSource = fs.readFileSync(path.join(root,"ito/open-cases.js"),"utf8");
 const modelsSource = fs.readFileSync(path.join(root,"ito/open-models.js"),"utf8");
+const questionsSource = fs.readFileSync(path.join(root,"ito/open-questions.js"),"utf8");
 const cases=JSON.parse(JSON.stringify(vm.runInNewContext(casesSource+"\nOPEN_CASES", {})));
 const models=JSON.parse(JSON.stringify(vm.runInNewContext(modelsSource+"\nOPEN_MODELS", {})));
+const questions=JSON.parse(JSON.stringify(vm.runInNewContext(questionsSource+"\nOPEN_QUESTIONS", {})));
 const encoded=html.match(/const DATA_B64 = "([^"]+)"/)?.[1];
 assert(encoded,"Existing exam grading data must be present");
 const data=JSON.parse(Buffer.from(encoded,"base64").toString("utf8"));
@@ -21,6 +23,7 @@ test("Ito: browser scripts are valid JavaScript",()=>{
   for(const [,script] of inline)new vm.Script(script);
   new vm.Script(casesSource);
   new vm.Script(modelsSource);
+  new vm.Script(questionsSource);
 });
 
 test("Ito: every open question has grading conditions and model answers",()=>{
@@ -62,7 +65,7 @@ test("Ito: original entrance-exam grading records remain available",()=>{
   }
   assert.match(html,/const ORIGINAL_PROBLEM_HTML =/);
   assert.match(html,/const ORIGINAL_PROMPT_TEXT =/);
-  assert.match(html,/const MOCK_PRACTICE_HTML =/);
+  assert.match(html,/<script src="\.\/open-questions\.js"><\/script>/);
   assert.match(html,/open-cases\.js/);
   assert.match(html,/open-models\.js/);
   assert.match(html,/The population of Japan peaked in 2008/);
@@ -76,12 +79,21 @@ test("Ito: all previous original questions and practice reconstructions exist",(
   assert.deepEqual(Object.keys(original).sort(),originalKeys.slice().sort());
   for(const key of originalKeys)assert(original[key].length>100,key);
   assert.match(original["2026-5"],/<svg/);
-  const practiceSource=html.match(/const MOCK_PRACTICE_HTML = (\{[\s\S]*?\n\});\nconst DATA_B64/)?.[1];
-  assert(practiceSource,"Practice reconstruction block missing");
-  const practice=JSON.parse(practiceSource);
-  assert.deepEqual(Object.keys(practice).sort(),mockKeys.slice().sort());
-  for(const key of mockKeys)assert(practice[key].length>35,key);
-  assert.match(html,/河合塾の原題・図表そのものではありません/);
+  assert.deepEqual(Object.keys(questions).sort(),mockKeys.slice().sort());
+  for(const key of mockKeys){
+    assert(questions[key].text.length>110,key);
+    assert.match(questions[key].text,/\b(?:Read|The chart)\b/,key);
+    assert(!/定額制動画配信サービス（SVOD）には|不登校の児童生徒が増えている状況/.test(questions[key].text));
+  }
+  assert.match(questions["open2023-4"].text,/More and more people are enjoying movies on SVOD services/);
+  assert.match(questions["open2024-4"].text,/A drone is a pilotless aircraft/);
+  assert.match(questions["open2025-4"].text,/299,048/);
+  assert.match(questions["open2026-4"].text,/short-term English language programs/);
+  assert.match(questions["open2027-4"].text,/What are three essential qualities of good medical doctors\?/);
+  const fig=vm.runInNewContext(questionsSource+"\nopenFigureHtml(\"precip\")",{});
+  assert.match(fig,/<svg/);
+  assert.match(fig,/Naha City/);
+  assert.match(fig,/Joetsu City/);
   assert(!html.includes("語数の減点なし："));
 });
 
