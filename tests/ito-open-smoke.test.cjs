@@ -44,6 +44,13 @@ test("Ito: every open question has grading conditions and model answers",()=>{
   assert.equal(Object.values(models).reduce((n,a)=>n+a.length,0),16);
 });
 
+test("Ito: header copy matches the five-mock-exam presentation",()=>{
+  assert.match(html,/<div class="seal" aria-hidden="true">九<\/div>/);
+  assert.match(html,/<p class="kicker">九大前期と九大オープン<\/p>/);
+  assert.match(html,/<h1>伊都への恋文｜自由英作文<\/h1>/);
+  assert.match(html,/<p class="lede">2024～26年度（前期）および九大オープン５回分を、独自の基準に基づき添削します。<\/p>/);
+});
+
 test("Ito: revised 2024 and 2025 answer labels",()=>{
   assert.deepEqual(models["open2024-4"].map(x=>x.label),["解答例①","解答例②"]);
   assert.deepEqual(models["open2025-4"].map(x=>x.label),["解答例①","解答例②","解答例③"]);
