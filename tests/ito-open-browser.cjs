@@ -223,6 +223,8 @@ async function check(browser,name,width,height){
     }
     await page.selectOption("#year","2023");
     await page.selectOption("#qno","5");
+    await page.locator("#answer").fill("A short model answer for test.");
+    await page.locator("#gradeBtn").click();
     await page.locator("#showAnswerBtn").click();
     assert.match(await page.locator("#modelAnswers").innerText(),/A\/Bラベル除外/);
     const labelPrompt=await page.evaluate(()=>buildPrompt("2023-5","Answer.",1,"text"));
