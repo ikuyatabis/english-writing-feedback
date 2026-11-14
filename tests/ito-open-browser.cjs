@@ -133,7 +133,7 @@ async function check(browser,name,width,height){
       assert.equal(info.model.text.length>200,true,id);
       assert.match(info.grade,/すべての年度〔４〕〔５〕共通/,id);
       assert.match(info.grade,new RegExp(topic,"i"),id);
-      assert.match(info.grade,new RegExp("202"+yr.slice(-1)+"年度 前期"),id); // year-specific subject
+      assert(info.grade.includes(yr+"年度前期"),id+": year-specific instructions");
       if(id==="2022-5"){
         assert.equal(info.wordsMin,55);
         assert.equal(info.wordsMax,85);
