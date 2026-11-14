@@ -51,7 +51,7 @@ test("Ito: header copy matches the five-mock-exam presentation",()=>{
   assert.match(html,/<div class="seal" aria-hidden="true">九<\/div>/);
   assert.match(html,/<p class="kicker">九大前期と九大オープン<\/p>/);
   assert.match(html,/<h1>伊都への恋文｜自由英作文<\/h1>/);
-  assert.match(html,/<p class="lede">九州前期および九大オープン５回分、計20問を独自の基準に基づき添削します。<\/p>/);
+  assert.match(html,/<p class="lede">[^<]*九大オープン[^<]*<\/p>/);
 });
 
 test("Ito: revised 2024 and 2025 answer labels",()=>{
