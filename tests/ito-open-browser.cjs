@@ -105,12 +105,20 @@ async function check(browser,name,width,height){
     assert.match(await page.locator("#problem").innerText(),/Springfield University/);
     assert.doesNotMatch(await page.locator("#problem").innerText(),/語数の減点なし/);
 
-    const sixth=await page.evaluate(()=>DATA.rubric["2026-5"]);
-    assert.match(sixth,/図表項目名に由来する大文字・小文字の誤り/);
-    assert.match(sixth,/複数箇所にあっても合計−１点/);
-    assert.match(sixth,/共通原則による書式減点とこの項目を二重計上せず/);
-    const later=await page.evaluate(()=>DATA.rubric["2025-5"]);
-    assert.doesNotMatch(later,/図表項目名に由来する大文字・小文字の誤り/);
+    const shared=await page.evaluate(()=>DATA.common_rubric);
+    assert.match(shared,/図表由来の大文字化の誤り：共通原則の限定的な例外/);
+    assert.match(shared,/箇所数・語の種類を問わず，まとめて一律−１点/);
+    assert.match(shared,/図表に由来しない不適切な大文字化や，その他の大文字・小文字の誤りは，従来の共通原則どおり１箇所につき−１点/);
+    assert.match(shared,/前者を合計−１点，後者を箇所ごとに別途減点/);
+    assert.match(shared,/図表との関係が確認できない誤りを，図表由来と推測して一律減点に含めない/);
+    for(const id of ["2026-5","open2027-5","2022-5","2023-5","2023-4"]){
+      const result=await page.evaluate(id=>buildPrompt(id,"student answer.",2,"text"),id);
+      assert.match(result,/図表由来の大文字化の誤り：共通原則の限定的な例外/,id);
+      assert.match(result,/１箇所につき−１点/,id);
+      assert.equal((result.match(/【図表由来の大文字化の誤り：共通原則の限定的な例外】/g)||[]).length,1,id);
+    }
+    assert.doesNotMatch(await page.evaluate(()=>DATA.rubric["2026-5"]),/図表項目名に由来する大文字・小文字の誤り/);
+    assert.doesNotMatch(await page.evaluate(()=>DATA.rubric["open2027-5"]),/【2027年〔５〕固有の補足】/);
 
     for(const [id,full,topic] of [
       ["2022-4",50,"multicultural society"],
