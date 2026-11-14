@@ -344,6 +344,12 @@
   [hidden] { display: none !important; }
 
 /* Keep full form area accessible on phones and short viewports. */
+@media (max-width: 560px) {
+  .masthead-inner h1 {
+    font-size: min(calc(clamp(1.5rem, 5vw, 2rem) - 1pt), calc(6vw - 4px));
+    white-space: nowrap;
+  }
+}
 @media (max-width: 560px), (max-height: 700px) {
   .masthead { position: static; }
 }
