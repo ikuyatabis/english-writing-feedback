@@ -24,7 +24,7 @@ async function check(browser,name,width,height){
     await page.goto(target,{waitUntil:"domcontentloaded"});
     assert.deepEqual(await page.locator("#qno option").allTextContents(),["選択してください","〔４〕","〔５〕"]);
     const opts=await page.locator("#year option").evaluateAll(nodes=>nodes.map(x=>x.value).filter(Boolean));
-    assert.deepEqual(opts,["2026","2025","2024","open2027","open2026","open2025","open2024","open2023"]);
+    assert.deepEqual(opts,["2026","2025","2024","2023","2022","open2027","open2026","open2025","open2024","open2023"]);
     assert.equal(await page.locator('#year optgroup[label="河合塾 九大入試オープン"]').count(),1);
     const openLabels=await page.locator('#year option[value^="open"]').allTextContents();
     assert.deepEqual(openLabels,[
@@ -104,6 +104,51 @@ async function check(browser,name,width,height){
     assert.equal(await page.locator("#problem svg").count(),1);
     assert.match(await page.locator("#problem").innerText(),/Springfield University/);
     assert.doesNotMatch(await page.locator("#problem").innerText(),/語数の減点なし/);
+
+    const sixth=await page.evaluate(()=>DATA.rubric["2026-5"]);
+    assert.match(sixth,/図表項目名に由来する大文字・小文字の誤り/);
+    assert.match(sixth,/複数箇所にあっても合計−１点/);
+    assert.match(sixth,/共通原則による書式減点とこの項目を二重計上せず/);
+    const later=await page.evaluate(()=>DATA.rubric["2025-5"]);
+    assert.doesNotMatch(later,/図表項目名に由来する大文字・小文字の誤り/);
+
+    for(const [id,full,topic] of [
+      ["2022-4",50,"multicultural society"],
+      ["2022-5",30,"global UFO sightings"],
+      ["2023-4",50,"Virtual reality"],
+      ["2023-5",30,"Japanese citizens in millions"]
+    ]){
+      const [,yr,q]=/^(20\d{2})-([45])$/.exec(id);
+      await page.selectOption("#year",yr);
+      await page.selectOption("#qno",q);
+      assert.equal(await page.locator("#step2").isVisible(),true,id);
+      assert.equal(await page.locator("#problemTag").innerText(),yr+"年度 〔"+(q==="4"?"４":"５")+"〕（"+full+"点）",id);
+      assert.match(await page.locator("#problem").innerText(),new RegExp(topic,"i"),id);
+      assert.equal(await page.locator("#problem svg").count(),q==="5"?1:0,id);
+      const info=await page.evaluate(id=>({
+        full:RANGE[id].full,wordsMin:RANGE[id].min,wordsMax:RANGE[id].max,
+        rubric:DATA.rubric[id],prompt:DATA.problem[id],model:DATA.model[id],grade:buildPrompt(id,"student answer",2,"text")
+      }),id);
+      assert.equal(info.full,full,id);
+      assert.equal(info.model.text.length>200,true,id);
+      assert.match(info.grade,/すべての年度〔４〕〔５〕共通/,id);
+      assert.match(info.grade,new RegExp(topic,"i"),id);
+      assert.match(info.grade,new RegExp("202"+yr.slice(-1)+"年度 前期"),id); // year-specific subject
+      if(id==="2022-5"){
+        assert.equal(info.wordsMin,55);
+        assert.equal(info.wordsMax,85);
+        assert.match(info.rubric,/54語以下−15点/);
+        assert.match(info.prompt,/8,736/);
+      }
+      if(id==="2023-5"){
+        assert.equal(info.wordsMin,null);
+        assert.equal(info.wordsMax,null);
+        assert.match(info.rubric,/３〜４英文/);
+        assert.match(info.rubric,/２〜３英文/);
+      }
+      if(q==="4")assert.equal(info.wordsMin,80);
+    }
+    await page.reload({waitUntil:"domcontentloaded"});
     // Every mock has its original English prompt; data questions have a chart/table.
     for(const id of Object.keys((await page.evaluate(()=>OPEN_QUESTIONS)))){
       const [,yr,q]=/^open(20\d{2})-([45])$/.exec(id);
