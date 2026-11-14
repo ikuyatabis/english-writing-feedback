@@ -56,7 +56,7 @@ async function check(browser,name,width,height){
     assert.doesNotMatch(await page.locator("#problem").innerText(),/語数|文数|減点/);
     assert.equal(await page.locator("#wcHint").count(),0);
     await page.locator("#answer").fill("Students can have different learning opportunities. Some can study online and some can build new relationships in their communities.");
-    assert.equal(await page.locator("#wc").innerText(),"20 語");
+    assert.equal(await page.locator("#wc").innerText(),"19 語");
     assert.equal(await page.locator("#wc").getAttribute("class"),"wc none");
     await page.locator("#gradeBtn").click();
     assert.equal(await page.locator("#showAnswerBtn").isEnabled(),true);
