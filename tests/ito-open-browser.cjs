@@ -61,6 +61,13 @@ async function check(browser,name,width,height){
     assert.match(original,/2026年度 第4問/);
     assert.match(original,/優れた教師|teachers/i);
     const scroll=await page.evaluate(()=>document.documentElement.scrollWidth);
+    if(scroll>width+1){
+      const overflowNodes=await page.evaluate(()=>[...document.querySelectorAll("body *")].map(el=>{
+        const r=el.getBoundingClientRect();
+        return {tag:el.tagName,cls:String(el.className).slice(0,80),id:el.id,right:Math.round(r.right),width:Math.round(r.width),scroll:el.scrollWidth};
+      }).filter(x=>x.right>innerWidth+1).slice(0,15));
+      console.error("ITO_OVERFLOW "+name+": "+JSON.stringify(overflowNodes));
+    }
     assert(scroll<=width+1,name+": horizontal overflow: "+scroll);
     assert.deepEqual(errors,[],name+": JS errors");
     console.log("Ito Open "+name+": PASS; mocks="+records.length+", models="+records.reduce((n,r)=>n+r.modelCount,0));
