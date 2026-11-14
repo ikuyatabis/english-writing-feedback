@@ -27,29 +27,39 @@ async function check(browser,name,width,height){
     assert.equal(await page.locator('#year optgroup[label="河合塾 九大入試オープン"]').count(),1);
     const openLabels=await page.locator('#year option[value^="open"]').allTextContents();
     assert.deepEqual(openLabels,[
-      "2027年度九大オープン（26年秋実施分）",
-      "2026年度九大オープン（25年秋実施分）",
-      "2025年度九大オープン（24年秋実施分）",
-      "2024年度九大オープン（23年秋実施分）",
-      "2023年度九大オープン（22年秋実施分）"
+      "27年度（26年秋実施）",
+      "26年度（25年秋実施）",
+      "25年度（24年秋実施）",
+      "24年度（23年秋実施）",
+      "23年度（22年秋実施）"
     ]);
     const records=await page.evaluate(()=>{
       const keys=Object.keys(OPEN_CASES).sort();
-      return keys.map(k=>({key:k,label:label(k),full:RANGE[k].full,modelCount:DATA.model[k].variants.length,wordsMin:RANGE[k].min}));
+      return keys.map(k=>({key:k,label:label(k),display:displayLabel(k),full:RANGE[k].full,modelCount:DATA.model[k].variants.length,wordsMin:RANGE[k].min}));
     });
     assert.equal(records.length,10);
-    for(const r of records)assert.match(r.label,/年度入試対策 九大入試オープン 第[45]問（20\d{2}年11月実施）/);
+    for(const r of records){
+      assert.match(r.label,/年度入試対策 九大入試オープン 第[45]問（20\d{2}年11月実施）/);
+      const year=Number(r.key.slice(4,8)),q=r.key.slice(-1);
+      assert.equal(r.display,`${year%100}年度（${(year-1)%100}年秋実施） 第${q}問`);
+    }
     await page.selectOption("#year","open2025");
     await page.selectOption("#qno","4");
     assert.equal(await page.locator("#step2").isVisible(),true);
-    assert.match(await page.locator("#problemTag").innerText(),/2025年度入試対策.*第4問.*40点/);
+    assert.equal(await page.locator("#problemTag").innerText(),"25年度（24年秋実施） 第4問（40点）");
     assert.match(await page.locator("#problem").innerText(),/問題文・図表は掲載していません/);
+    assert.doesNotMatch(await page.locator("#problem").innerText(),/語数|文数|減点/);
+    assert.equal(await page.locator("#wcHint").count(),0);
     await page.locator("#answer").fill("Students can have different learning opportunities. Some can study online and some can build new relationships in their communities.");
+    assert.equal(await page.locator("#wc").getAttribute("class"),"wc none");
     await page.locator("#gradeBtn").click();
     assert.equal(await page.locator("#showAnswerBtn").isEnabled(),true);
     await page.locator("#showAnswerBtn").click();
     const headings=await page.locator("#modelAnswers h3").allInnerTexts();
     assert.deepEqual(headings,["解答例①（100 words）","解答例②（100 words）","解答例③（101 words）"]);
+    await page.selectOption("#year","open2026");
+    assert.match(await page.locator("#changeText").innerText(),/26年度（25年秋実施） 第4問/);
+    await page.locator("#changeNo").click();
     const prompt=await page.evaluate(()=>buildPrompt("open2025-4","English sample.",2,"text"));
     assert.match(prompt,/2025年度入試対策 九大入試オープン 第4問（2024年11月実施）/);
     assert.match(prompt,/［解答例③］\(101 words\)/);
@@ -58,14 +68,20 @@ async function check(browser,name,width,height){
     await page.reload({waitUntil:"domcontentloaded"});
     await page.selectOption("#year","open2024");
     await page.selectOption("#qno","5");
-    assert.match(await page.locator("#problem").innerText(),/語数による減点なし。指定された文数/);
+    assert.equal(await page.locator("#problemTag").innerText(),"24年度（23年秋実施） 第5問（30点）");
+    assert.doesNotMatch(await page.locator("#problem").innerText(),/語数|文数|減点/);
     await page.locator("#answer").fill(Array.from({length:130},()=> "word").join(" "));
     assert.equal(await page.locator("#wc").getAttribute("class"),"wc none");
-    assert.match(await page.locator("#wcHint").innerText(),/文数の指定/);
+    assert.equal(await page.locator("#wc").innerText(),"130 語");
+    assert.equal(await page.locator("#wcHint").count(),0);
     await page.reload({waitUntil:"domcontentloaded"});
     await page.selectOption("#year","2026");
     await page.selectOption("#qno","4");
     assert.match(await page.locator("#problemTag").innerText(),/2026年度 第4問（40点）/);
+    assert.doesNotMatch(await page.locator("#problem").innerText(),/語数|文数|減点/);
+    await page.locator("#answer").fill(Array.from({length:130},()=> "word").join(" "));
+    assert.equal(await page.locator("#wc").getAttribute("class"),"wc none");
+    assert.equal(await page.locator("#wc").innerText(),"130 語");
     const original=await page.evaluate(()=>buildPrompt("2026-4","Teachers should listen carefully.",4,"text"));
     assert.match(original,/2026年度 第4問/);
     assert.match(original,/優れた教師|teachers/i);
