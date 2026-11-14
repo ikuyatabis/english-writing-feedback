@@ -12,10 +12,11 @@ async function check(browser,name,width,height){
   const context=await browser.newContext({viewport:{width,height},deviceScaleFactor:1});
   await context.route(/cdnjs\.cloudflare\.com|fonts\.googleapis\.com|fonts\.gstatic\.com/,route=>route.abort());
   await context.addInitScript(()=>{
-    window.open=()=>null;
+    window.__itoEvents=[];
+    window.open=()=>{window.__itoEvents.push("open");return null;};
     Object.defineProperty(navigator,"clipboard",{
       configurable:true,
-      value:{writeText:async text=>{window.__lastCopied=text;}}
+      value:{writeText:async text=>{window.__itoEvents.push("clipboard-start");window.__lastCopied=text;}}
     });
   });
   const page=await context.newPage(),errors=[];
@@ -59,6 +60,11 @@ async function check(browser,name,width,height){
     assert.equal(await page.locator("#wc").innerText(),"19 語");
     assert.equal(await page.locator("#wc").getAttribute("class"),"wc none");
     await page.locator("#gradeBtn").click();
+    assert.deepEqual((await page.evaluate(()=>window.__itoEvents)).slice(0,2),["clipboard-start","open"]);
+    const copiedPrompt=await page.evaluate(()=>window.__lastCopied);
+    assert.match(copiedPrompt,/【採点・添削の品質管理：年度別採点基準を変更しない補助指示】/);
+    assert.match(copiedPrompt,/上限適用後の減点合計とC・E・W/);
+    assert.match(copiedPrompt,/満点答案でも差し替え用の１文や部分修正だけにせず/);
     assert.equal(await page.locator("#showAnswerBtn").isEnabled(),true);
     await page.locator("#showAnswerBtn").click();
     const headings=await page.locator("#modelAnswers h3").allInnerTexts();
@@ -144,10 +150,21 @@ async function check(browser,name,width,height){
         assert.match(data,/【添削結果の出力形式：最優先指示】/);
         assert.match(data,/JIS B5/);
         assert.doesNotMatch(data,/公開解答例の検索・紹介/);
+        assert.match(data,/指定形式が一つも作成できなかった場合に限り/);
+        if(fmt==="both")assert.match(data,/Word＋PDFの両方を指定して一方だけ作成できた場合/);
       }
     }
     await page.locator('input[name="outputFormat"][value="screen"]').check();
 
+    const clipboardRecovery=await page.evaluate(async()=>{
+      const original=navigator.clipboard.writeText, originalExec=document.execCommand;
+      let attempts=0;
+      navigator.clipboard.writeText=async()=>{attempts++;throw Error("copy rejected")};
+      document.execCommand=name=>name==="copy";
+      try{return {ok:await copyItoPrompt("fallback test"),attempts};}
+      finally{navigator.clipboard.writeText=original;document.execCommand=originalExec;}
+    });
+    assert.deepEqual(clipboardRecovery,{ok:true,attempts:1});
     const shared=await page.evaluate(()=>DATA.common_rubric);
     assert.match(shared,/図表由来の大文字化の誤り：共通原則の限定的な例外/);
     assert.match(shared,/箇所数・語の種類を問わず，まとめて一律−１点/);
@@ -162,6 +179,11 @@ async function check(browser,name,width,height){
     }
     assert.doesNotMatch(await page.evaluate(()=>DATA.rubric["2026-5"]),/図表項目名に由来する大文字・小文字の誤り/);
     assert.doesNotMatch(await page.evaluate(()=>DATA.rubric["open2027-5"]),/【2027年〔５〕固有の補足】/);
+    const capAudit=await page.evaluate(()=>buildPrompt("open2027-5","Test.",1,"text"));
+    assert.match(capAudit,/上限適用前/);
+    assert.match(capAudit,/上限超過で追加減点しない誤りも修正一覧から削除せず/);
+    assert.match(capAudit,/問題表現／減点（０点を含む）／理由／修正例/);
+    assert.match(capAudit,/辞書の用例が存在するだけで今回の文脈での誤用を自動的に免除しない/);
 
     for(const [id,full,topic] of [
       ["2022-4",50,"multicultural society"],
@@ -199,6 +221,12 @@ async function check(browser,name,width,height){
       }
       if(q==="4")assert.equal(info.wordsMin,80);
     }
+    await page.selectOption("#year","2023");
+    await page.selectOption("#qno","5");
+    await page.locator("#showAnswerBtn").click();
+    assert.match(await page.locator("#modelAnswers").innerText(),/A\/Bラベル除外/);
+    const labelPrompt=await page.evaluate(()=>buildPrompt("2023-5","Answer.",1,"text"));
+    assert.match(labelPrompt,/登録解答例の語数は，\(A\)\(B\)のラベルを除いた英文部分のみ/);
     await page.reload({waitUntil:"domcontentloaded"});
     // Every mock has its original English prompt; data questions have a chart/table.
     for(const id of Object.keys((await page.evaluate(()=>OPEN_QUESTIONS)))){
