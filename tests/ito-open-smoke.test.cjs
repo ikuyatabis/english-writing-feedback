@@ -60,11 +60,29 @@ test("Ito: original entrance-exam grading records remain available",()=>{
   for(const key of originalKeys){
     for(const field of ["problem","rubric","instr","model"]) assert(data[field]?.[key],field+" "+key);
   }
-  assert(!html.includes("PROBLEM_HTML"),"Full original exam problems must not be embedded");
-  assert.match(html,/問題文・図表は掲載していません/);
+  assert.match(html,/const ORIGINAL_PROBLEM_HTML =/);
+  assert.match(html,/const ORIGINAL_PROMPT_TEXT =/);
+  assert.match(html,/const MOCK_PRACTICE_HTML =/);
   assert.match(html,/open-cases\.js/);
   assert.match(html,/open-models\.js/);
-  assert(!html.includes("The population of Japan peaked in 2008"));
+  assert.match(html,/The population of Japan peaked in 2008/);
+  assert.match(html,/問題を読む/);
+});
+
+test("Ito: all previous original questions and practice reconstructions exist",()=>{
+  const source=html.match(/const ORIGINAL_PROBLEM_HTML = \{[\s\S]*?\n\};/)?.[0];
+  assert(source,"Original question block missing");
+  const original=JSON.parse(JSON.stringify(vm.runInNewContext(source+"\nORIGINAL_PROBLEM_HTML",{})));
+  assert.deepEqual(Object.keys(original).sort(),originalKeys.slice().sort());
+  for(const key of originalKeys)assert(original[key].length>100,key);
+  assert.match(original["2026-5"],/<svg/);
+  const practiceSource=html.match(/const MOCK_PRACTICE_HTML = (\{[\s\S]*?\n\});\nconst DATA_B64/)?.[1];
+  assert(practiceSource,"Practice reconstruction block missing");
+  const practice=JSON.parse(practiceSource);
+  assert.deepEqual(Object.keys(practice).sort(),mockKeys.slice().sort());
+  for(const key of mockKeys)assert(practice[key].length>75,key);
+  assert.match(html,/河合塾の原題・図表そのものではありません/);
+  assert(!html.includes("語数の減点なし："));
 });
 
 test("Ito: no word-count penalty for 2024 mock question 5",()=>{
