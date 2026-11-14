@@ -155,7 +155,7 @@ function renderOpenQuestion(id){
   const item=OPEN_QUESTIONS[id];if(!item)return "<p>Problem data not available.</p>";
   return item.text.split(/(\{\{FIGURE\}\})/).map(part=>{
     if(part==="{{FIGURE}}")return openFigureHtml(item.figure);
-    return part.split(/\n\s*\n/).filter(Boolean).map(p=>"<p>"+openEsc(p).replace(/\n/g,"<span class=\"original-linebreak\"></span>")+"</p>").join("");
+    return part.split(/\n\s*\n/).filter(Boolean).map(p=>"<p>"+openEsc(p.replace(/^〔4〕/,"〔４〕").replace(/^〔5〕/,"〔５〕")).replace(/\n/g,"<span class=\"original-linebreak\"></span>")+"</p>").join("");
   }).join("")+
   '<p class="problem-attribution">河合塾 九大入試オープンの問題文（英文原文）です。図表・表組みは掲載資料のデータに基づき表示用に再作成しています。</p>';
 }
