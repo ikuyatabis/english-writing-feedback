@@ -1,0 +1,51 @@
+name: Ito writing QA
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "ito/**"
+      - "tests/ito-open-*.cjs"
+      - ".github/workflows/ito-qa.yml"
+  pull_request:
+    paths:
+      - "ito/**"
+      - "tests/ito-open-*.cjs"
+      - ".github/workflows/ito-qa.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  node-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Check case data, model answers and syntax
+        run: node --test tests/ito-open-smoke.test.cjs
+
+  chromium-views:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install Playwright Chromium
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+      - name: Check year selection, model answers and original exam mode
+        run: node tests/ito-open-browser.cjs
+      - name: Save test screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ito-open-browser-screenshots
+          path: test-artifacts/ito-open-*.png
+          if-no-files-found: warn
+          retention-days: 7
