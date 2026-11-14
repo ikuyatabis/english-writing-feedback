@@ -47,8 +47,8 @@ async function check(browser,name,width,height){
     await page.selectOption("#qno","4");
     assert.equal(await page.locator("#step2").isVisible(),true);
     assert.equal(await page.locator("#problemTag").innerText(),"2025年度（24年秋実施） 第4問（40点）");
-    assert.match(await page.locator("#problem").innerText(),/不登校の児童生徒/);
-    assert.match(await page.locator("#problem").innerText(),/河合塾の原題・図表そのものではありません/);
+    assert.match(await page.locator("#problem").innerText(),/In the 2022 academic year/);
+    assert.match(await page.locator("#problem").innerText(),/問題文（英文原文）/);
     assert.equal(await page.locator("details.passage-box").getAttribute("open"),"");
     assert.doesNotMatch(await page.locator("#problem").innerText(),/語数|文数|減点/);
     assert.equal(await page.locator("#wcHint").count(),0);
@@ -65,13 +65,17 @@ async function check(browser,name,width,height){
     const prompt=await page.evaluate(()=>buildPrompt("open2025-4","English sample.",2,"text"));
     assert.match(prompt,/2025年度入試対策 九大入試オープン 第4問（2024年11月実施）/);
     assert.match(prompt,/［解答例③］\(101 words\)/);
+    assert.match(prompt,/299,048/);
+    assert.match(prompt,/Describe in about 100 English words two positive future changes/);
     assert(!prompt.includes("2025年度 前期 第4問"));
     await page.screenshot({path:path.join(artifacts,"ito-open-"+name+".png"),fullPage:true});
     await page.reload({waitUntil:"domcontentloaded"});
     await page.selectOption("#year","open2024");
     await page.selectOption("#qno","5");
     assert.equal(await page.locator("#problemTag").innerText(),"2024年度（23年秋実施） 第5問（30点）");
-    assert.match(await page.locator("#problem").innerText(),/那覇市と上越市/);
+    assert.match(await page.locator("#problem").innerText(),/The bar graphs below show the monthly precipitation/);
+    assert.equal(await page.locator("#problem svg").count(),1);
+    assert.match(await page.locator("#problem svg").getAttribute("aria-label"),/all twelve months/);
     assert.doesNotMatch(await page.locator("#problem").innerText(),/語数|文数|減点/);
     await page.locator("#answer").fill(Array.from({length:130},()=> "word").join(" "));
     assert.equal(await page.locator("#wc").getAttribute("class"),"wc none");
@@ -96,6 +100,17 @@ async function check(browser,name,width,height){
     assert.equal(await page.locator("#problem svg").count(),1);
     assert.match(await page.locator("#problem").innerText(),/Springfield University/);
     assert.doesNotMatch(await page.locator("#problem").innerText(),/語数の減点なし/);
+    // Every mock has its original English prompt; data questions have a chart/table.
+    for(const id of Object.keys((await page.evaluate(()=>OPEN_QUESTIONS)))){
+      const [,yr,q]=/^open(20\d{2})-([45])$/.exec(id);
+      await page.selectOption("#year","open"+yr);
+      await page.selectOption("#qno",q);
+      const excerpt=await page.evaluate(id=>OPEN_QUESTIONS[id].text.split(/\n\n/)[1].slice(0,38),id);
+      assert((await page.locator("#problem").textContent()).includes(excerpt),id+": missing original English");
+      assert(!/当ラボが学習用に再構成|次の設問は/.test(await page.locator("#problem").innerText()),id);
+      if(["open2023-5","open2024-5","open2027-5"].includes(id))assert.equal(await page.locator("#problem svg").count(),1,id);
+      if(id==="open2026-4")assert.equal(await page.locator("#problem table").count(),1,id);
+    }
     const scroll=await page.evaluate(()=>document.documentElement.scrollWidth);
     if(scroll>width+1){
       const overflowNodes=await page.evaluate(()=>[...document.querySelectorAll("body *")].map(el=>{
