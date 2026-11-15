@@ -78,14 +78,14 @@ async function checkHome(browser, name, width, height) {
   const titleX = await page.locator(".card.sum h2").evaluate(e => e.getBoundingClientRect().x);
   assert(badgeX > titleX, name + " trial badge must appear to the right of the title start");
   assert.deepEqual(titles, [
-    "持ち込み診療所", "ことのは研究室", "より抜き図書館",
-    "英検の庵", "伊都への恋文", "待ってろ文キャン", "三田キャンへの道"
+    "持ち込み診療所", "伊都への恋文", "ことのは研究室",
+    "より抜き図書館", "英検の庵", "待ってろ文キャン", "三田キャンへの道"
   ]);
-  assert.equal(await page.locator('.card.sum p').innerText(), '英☞日・英☞英│要約問題');
+  assert.equal(await page.locator('.card.sum p').innerText(), '船頭多くして船山に上る│要約問題');
   assert.match(await page.locator(".lead").innerText(), /入試英語の添削ツール\s*でつ/);
   assert.equal(await page.locator(".lead-detsu").innerText(), "でつ");
-  assert.equal(await page.locator(".lead-detsu").evaluate(e => getComputedStyle(e).display), width <= 650 ? "block" : "inline");
-  for (const selector of [".howto-heading h2"]) {
+  assert.equal(await page.locator(".lead-detsu").evaluate(e => getComputedStyle(e).display), "block");
+  for (const selector of [".howto-title"]) {
     const lineCount = await page.locator(selector).evaluate(element => {
       const range = document.createRange();
       range.selectNodeContents(element);

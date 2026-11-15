@@ -50,16 +50,16 @@ function createHarness() {
 test("HTML includes the official label and all seven menus in the required order", () => {
   assert.match(html, /より抜き図書館/);
   assert.match(html, /<div class="seal" aria-hidden="true">図<\/div>/);
-  assert.match(html, /<p class="kicker">日本文も英文も<\/p>/);
+  assert.match(html, /<p class="kicker">Too many cooks spoil the broth\.<\/p>/);
   assert.match(html, /<h1>より抜き図書館│要約問題<\/h1>/);
   assert.match(html, /大学・年度を問わず、独自の基準に基づき添削します。/);
-  assert.match(homepage, /<a class="card sum" href="\.\/sum\/">/);
+  assert.match(homepage, /<a class="card sum bottom-card" href="\.\/sum\/">/);
   assert.match(homepage, /<span class="new-mark">試験運用中<\/span>/);
   assert.match(homepage, /<h2>より抜き図書館<\/h2>/);
-  assert.match(homepage, /<p>英☞日・英☞英│要約問題<\/p>/);
+  assert.match(homepage, /<p>船頭多くして船山に上る│要約問題<\/p>/);
   const order = [...homepage.matchAll(/class="card [^"]+" href="\.\/([^/]+)\//g)].map(m => m[1]);
-  assert.deepEqual(order, ["misc", "trans", "sum", "eiken", "ito", "buncan", "mita"]);
-  assert.match(homepage, /入試英語の添削ツール <span class="lead-detsu">でつ<\/span>/);
+  assert.deepEqual(order, ["misc", "ito", "trans", "sum", "eiken", "buncan", "mita"]);
+  assert.match(homepage, /入試英語の添削ツール<span class="lead-detsu">でつ<\/span>/);
 });
 
 test("History page has noindex, ordered dates, and consistent date labels", () => {
@@ -185,13 +185,13 @@ test("Word and PDF output modes are file-first", () => {
   const h = createHarness();
   for (const [format, expected] of [
     ["word", "Word（.docx）"], ["pdf", "PDF（.pdf）"],
-    ["both", "Word（.docx）とPDF（.pdf）"]
+    ["both", "PDF（.pdf）とWord（.docx）"]
   ]) {
     h.selections.outputFormat = format;
     const prompt = h.call("makePrompt");
     assert(prompt.includes("指定形式：" + expected));
-    assert(prompt.includes("画面への全文表示ではなく"));
-    assert(prompt.includes("字数・語数条件"));
+    assert(prompt.includes("完成ファイルがあれば本文を画面に重複表示しない"));
+    assert(prompt.includes("語数／字数条件"));
   }
 });
 

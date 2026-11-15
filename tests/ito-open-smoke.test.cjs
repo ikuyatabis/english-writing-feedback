@@ -184,8 +184,8 @@ test("Ito: audit corrections keep scoring source intact",()=>{
   assert.match(html,/上限超過で追加減点しない誤りも修正一覧から削除せず/);
   assert.match(html,/満点答案でも差し替え用の１文や部分修正だけにせず/);
   assert.match(html,/減点対象外の表現改善】に置き/);
-  assert.match(html,/Word＋PDFの両方を指定して一方だけ作成できた場合/);
-  assert.match(html,/指定形式が一つも作成できなかった場合に限り/);
+  assert.match(html,/指定した２形式の一方だけ生成できた場合/);
+  assert.match(html,/どの指定形式も生成できなかった場合に限り/);
   assert.match(html,/function copyItoPrompt\(text\)/);
   assert.match(html,/const copyPromise=copyItoPrompt\(promptText\)/);
   assert.match(html,/many friend/);

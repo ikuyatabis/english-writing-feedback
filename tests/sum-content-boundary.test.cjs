@@ -161,10 +161,10 @@ for(const kind of ["ja","en"]){
   test("Output "+kind+" / "+outputFormat+" changes delivery but not content rubric",()=>{
    const p=harness({select:{kind,outputFormat},values:{answer:kind==="en"?"Creativity benefits.":"要約の内容。"}}).prompt;
    assert(p.includes(b3)&&p.includes(c4)&&p.includes(c2)&&p.includes(formula));
-   if(outputFormat==="screen")assert(!p.includes("【添削結果の出力形式：最優先指示】"));
+   if(outputFormat==="screen")assert(!p.includes("【添削結果の出力形式：最優先】"));
    else{
-    assert(p.includes("【添削結果の出力形式：最優先指示】"));
-    assert(p.includes("JIS B5（182×257 mm）"));
+    assert(p.includes("【添削結果の出力形式：最優先】"));
+    assert(p.includes("JIS B5（182×257mm）"));
    }
   });
  }

@@ -147,11 +147,11 @@ async function check(browser,name,width,height){
       const data=await page.evaluate(()=>getExportInstruction());
       if(fmt==="screen")assert.equal(data,"");
       else {
-        assert.match(data,/【添削結果の出力形式：最優先指示】/);
+        assert.match(data,/【添削結果の出力形式：最優先】/);
         assert.match(data,/JIS B5/);
         assert.doesNotMatch(data,/公開解答例の検索・紹介/);
-        assert.match(data,/指定形式が一つも作成できなかった場合に限り/);
-        if(fmt==="both")assert.match(data,/Word＋PDFの両方を指定して一方だけ作成できた場合/);
+        assert.match(data,/どの指定形式も生成できなかった場合に限り/);
+        if(fmt==="both")assert.match(data,/指定した２形式の一方だけ生成できた場合/);
       }
     }
     await page.locator('input[name="outputFormat"][value="screen"]').check();
