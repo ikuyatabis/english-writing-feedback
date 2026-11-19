@@ -1,0 +1,41 @@
+name: Output format contract QA
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "ito/index.html"
+      - "buncan/index.html"
+      - "mita/index.html"
+      - "misc/index.html"
+      - "trans/index.html"
+      - "sum/index.html"
+      - "eiken/index.html"
+      - "tests/export-format-contract.test.cjs"
+      - ".github/workflows/export-format-qa.yml"
+  pull_request:
+    paths:
+      - "ito/index.html"
+      - "buncan/index.html"
+      - "mita/index.html"
+      - "misc/index.html"
+      - "trans/index.html"
+      - "sum/index.html"
+      - "eiken/index.html"
+      - "tests/export-format-contract.test.cjs"
+      - ".github/workflows/export-format-qa.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  export-contract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Test all seven content pages and four export modes
+        run: node --test tests/export-format-contract.test.cjs
