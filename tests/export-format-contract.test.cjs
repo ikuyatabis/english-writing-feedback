@@ -79,6 +79,10 @@ const commonWordRequirements = [
   "日本語本文はＭＳ 明朝（太字は禁止）",
   "ＭＳ ゴシック＋太字",
   "通常本文の英字・数字はCentury",
+  "英文中のアポストロフィは表示上「’」（U+2019）に統一",
+  "原答案の「\x27」（U+0027）も書式上の表記統一",
+  "欧文フォント（WordのASCII／hAnsi）をCenturyに直接指定",
+  "この字形統一を答案のスペル・句読点の誤りとして減点せず",
   "Century Schoolbook Bold",
   "表の見出し行は全列の見出しセルを中央揃え（ＭＳ ゴシック・太字）",
   "見出しの「減点」も例外なく中央揃え",
@@ -135,10 +139,14 @@ for (const [name, directory] of pages) {
 // The sample's score-first layout is clinic-specific; do not override other pages' rubrics.
 test("Clinic score is displayed first without changing other content display orders", () => {
   const clinic = fs.readFileSync(path.join(root, "misc", "index.html"), "utf8");
-  const scoreFirst = '最初の見出し「１．採点結果・減点内訳」の直後';
+  const scoreFirst = '文書の最初の行に，独立した１行で';
   assert(clinic.includes(scoreFirst), "clinic must state the score-first rule");
   assert(clinic.includes('「得点：〈最終得点〉／〈満点〉点」'));
   assert(clinic.includes("採点を保留する場合は得点を示さない"));
+  assert(clinic.includes("得点行の直後には独立した空行をちょうど１行入れ"));
+  assert(clinic.includes("その次の行に最初の見出し「１．採点結果・減点内訳」を置く"));
+  assert(!clinic.includes("最初の見出し「１．採点結果・減点内訳」の直後に"));
+  assert(clinic.includes("段落後のポイント指定や複数の空行で代用しない"));
   for (const [name, directory] of pages) {
     if (directory === "misc") continue;
     const html = fs.readFileSync(path.join(root, directory, "index.html"), "utf8");
