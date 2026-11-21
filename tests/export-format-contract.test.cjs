@@ -80,8 +80,9 @@ const commonWordRequirements = [
   "ＭＳ ゴシック＋太字",
   "通常本文の英字・数字はCentury",
   "Century Schoolbook Bold",
-  "「英語面の修正一覧」表の「減点」列は見出しと全明細を必ず右揃え",
-  "「内容面の減点」表の減点列の右揃えも維持する",
+  "表の見出し行は全列の見出しセルを中央揃え（MSゴシック・太字）",
+  "見出しの「減点」も例外なく中央揃え",
+  "「減点」列は，見出しは中央揃え，明細の減点数値は右揃え"
   "項目が変わる箇所では必ず改行",
   "別項目の見出し前に空行を１行",
   "英作文段落冒頭の字下げは段落書式でなく半角スペース２個",
@@ -130,3 +131,19 @@ for (const [name, directory] of pages) {
     });
   }
 }
+
+// The sample's score-first layout is clinic-specific; do not override other pages' rubrics.
+test("Clinic score is displayed first without changing other content display orders", () => {
+  const clinic = fs.readFileSync(path.join(root, "misc", "index.html"), "utf8");
+  const scoreFirst = '最初の見出し「１．採点結果・減点内訳」の直後';
+  assert(clinic.includes(scoreFirst), "clinic must state the score-first rule");
+  assert(clinic.includes('「得点：〈最終得点〉／〈満点〉点」'));
+  assert(clinic.includes("採点を保留する場合は得点を示さない"));
+  for (const [name, directory] of pages) {
+    if (directory === "misc") continue;
+    const html = fs.readFileSync(path.join(root, directory, "index.html"), "utf8");
+    assert(!html.includes(scoreFirst), name + ": must retain its own result display order");
+  }
+  const eiken = fs.readFileSync(path.join(root, "eiken", "index.html"), "utf8");
+  assert(eiken.includes("【表示順】①形式・語数・設問条件の確認"));
+});
