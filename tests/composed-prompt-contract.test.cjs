@@ -68,6 +68,7 @@ function environment(mode,extra={}){
 }
 async function fullPrompt(page,html,mode,extra){
  const ctx=environment(mode,extra),legacy=["ito","buncan","mita"].includes(page);
+ if(page==="eiken"){const select=ctx.selected;ctx.selected=(id)=>id==="kind"?"essay":select(id)}
  const parts=[extractFn(html,"function getExportInstruction(")];
  if(legacy){
   parts.unshift(override(html));
