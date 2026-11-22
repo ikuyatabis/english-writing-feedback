@@ -110,6 +110,10 @@ for(const page of pages){
    const p=await fullPrompt(page,html,mode);
    assert(p.length>300,"incomplete prompt");
    for(const r of rules[page])assert(p.includes(r),page+" missing original rule "+r);
+   if(page==="misc"){
+    assert(p.includes("文書の最初の行に，独立した１行で"));
+    assert(p.includes("得点行の直後には独立した空行をちょうど１行入れ"));
+   }else assert(!p.includes("得点行の直後には独立した空行をちょうど１行入れ"));
    if(mode==="screen"){
     assert(!p.includes("【Word書式：共通仕様】"));return;
    }
