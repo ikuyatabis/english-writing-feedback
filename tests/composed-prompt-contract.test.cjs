@@ -120,6 +120,12 @@ for(const page of pages){
    assert(p.includes("【添削結果の出力形式：最優先】"));
    assert(p.includes("指定形式："+formats[mode]));
    assert(p.includes("【Word書式：共通仕様】"));
+   if(page==="eiken"){
+    assert(p.includes("この添削は学習支援のための参考情報であり、英検協会の公式採点・CSEスコア・合否を保証するものではありません。"));
+    assert(p.includes("共通採点指示の表示順⑧の短い注意書きはこの定型文に置き換え"));
+    assert(p.includes("この定型文は一字一句変更せず，省略・要約・言い換えを禁止する"));
+    assert(p.includes("生成後は指定形式の各ファイルで末尾に全文が１回だけ記載されていることを確認し，不足があれば修正してから提供する"));
+   }
    assert(p.includes("アポストロフィ自体の欧文フォント（WordのASCII／hAnsi）をCenturyに直接指定"));
    assert(p.includes("表の見出し行は全列の見出しセルを中央揃え"));
    assert(p.includes("通常文字の色を黒などに直接固定せず「自動」を使う"));
