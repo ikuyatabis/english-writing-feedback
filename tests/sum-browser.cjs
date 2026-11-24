@@ -25,7 +25,7 @@ async function checkPage(browser, name, width, height) {
     });
   });
   await page.goto(target, { waitUntil: "domcontentloaded" });
-  assert.match(await page.title(), /より抜き図書館│要約問題/);
+  assert.match(await page.title(), /より抜き図書館｜要約問題/);
   assert.equal(await page.locator(".seal").innerText(), "図");
   assert.equal(await page.locator('input[name="kind"][value="ja"]').isChecked(), true);
   assert.equal(await page.locator("#paraphraseBox").isVisible(), false);
@@ -81,7 +81,7 @@ async function checkHome(browser, name, width, height) {
     "持ち込み診療所", "伊都への恋文", "ことのは研究室",
     "より抜き図書館", "英検の庵", "待ってろ文キャン", "三田キャンへの道"
   ]);
-  assert.equal(await page.locator('.card.sum p').innerText(), '船頭多くして船山に上る│要約問題');
+  assert.equal(await page.locator('.card.sum p').innerText(), '船頭多くして船山に上る｜要約問題');
   assert.match(await page.locator(".lead").innerText(), /入試英語の添削ツール\s*でつ/);
   assert.equal(await page.locator(".lead-detsu").innerText(), "でつ");
   assert.equal(await page.locator(".lead-detsu").evaluate(e => getComputedStyle(e).display), "block");
