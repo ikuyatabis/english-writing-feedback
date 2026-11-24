@@ -10,7 +10,7 @@ function asHTML(source, status = 200) {
     headers: {
       'Content-Type': 'text/html; charset=utf-8',
       'Cache-Control': 'private, no-store',
-      'Content-Security-Policy': "default-src 'none'; style-src 'unsafe-inline'; form-action 'self'; base-uri 'none'; frame-ancestors 'none'",
+      'Content-Security-Policy': "default-src 'none'; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; form-action 'self'; base-uri 'none'; frame-ancestors 'none'",
       'Referrer-Policy': 'same-origin',
       'X-Content-Type-Options': 'nosniff',
       'X-Frame-Options': 'DENY',
