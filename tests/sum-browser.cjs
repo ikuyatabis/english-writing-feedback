@@ -72,11 +72,16 @@ async function checkHome(browser, name, width, height) {
   page.on("pageerror", err => errors.push(err.message));
   await page.goto(homeTarget, { waitUntil: "domcontentloaded" });
   const titles = await page.locator(".grid .card h2").evaluateAll(nodes => nodes.map(node => node.firstChild?.textContent?.trim() || ""));
-  assert.equal(await page.locator(".card.sum .new-mark").innerText(), "試験運用中");
-  assert.equal(await page.locator(".card.sum .new-mark").isVisible(), true);
-  const badgeX = await page.locator(".card.sum .new-mark").evaluate(e => e.getBoundingClientRect().x);
-  const titleX = await page.locator(".card.sum h2").evaluate(e => e.getBoundingClientRect().x);
-  assert(badgeX > titleX, name + " trial badge must appear to the right of the title start");
+  assert.equal(await page.locator(".card.ito .new-mark").count(), 0);
+  assert.equal(await page.locator(".card.sum .new-mark").count(), 0);
+  for (const [card, label] of [["dojo", "new"], ["eiken", "試験運用中"]]) {
+    const badge = page.locator(".card." + card + " .new-mark");
+    assert.equal(await badge.innerText(), label);
+    assert.equal(await badge.isVisible(), true);
+    const badgeX = await badge.evaluate(e => e.getBoundingClientRect().x);
+    const titleX = await page.locator(".card." + card + " h2").evaluate(e => e.getBoundingClientRect().x);
+    assert(badgeX > titleX, name + " " + card + " badge must appear to the right of the title start");
+  }
   assert.deepEqual(titles, [
     "ブレスト道場", "持ち込み診療所", "伊都への恋文",
     "ことのは研究室", "より抜き図書館", "英検の庵",

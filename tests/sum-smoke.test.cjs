@@ -54,7 +54,10 @@ test("HTML includes the official label and all eight menus in the required order
   assert.match(html, /<h1>より抜き図書館｜要約問題<\/h1>/);
   assert.match(html, /大学・年度を問わず、独自の基準に基づき添削します。/);
   assert.match(homepage, /<a class="card sum" href="\.\/sum\/">/);
-  assert.match(homepage, /<span class="new-mark">試験運用中<\/span>/);
+  assert.match(homepage, /<a class="card dojo"[^>]*><span class="new-mark">new<\/span><h2>ブレスト道場<\/h2>/);
+  assert.match(homepage, /<a class="card ito"[^>]*><h2>伊都への恋文<\/h2>/);
+  assert.match(homepage, /<a class="card sum"[^>]*><h2>より抜き図書館<\/h2>/);
+  assert.match(homepage, /<a class="card eiken"[^>]*><span class="new-mark">試験運用中<\/span>/);
   assert.match(homepage, /<h2>より抜き図書館<\/h2>/);
   assert.match(homepage, /<p>船頭多くして船山に上る｜要約問題<\/p>/);
   const order = [...homepage.matchAll(/class="card [^"]+" href="\.\/([^/]+)\//g)].map(m => m[1]);
