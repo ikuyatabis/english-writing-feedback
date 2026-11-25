@@ -215,6 +215,7 @@ async function checkDojo(browser, name, width, height) {
     assert.equal(await page.locator('label[for="kind"]').isVisible(), false);
     assert(await page.locator("#ownKind").isVisible());
     assert.equal(await page.locator("#ownKind").inputValue(), "own");
+    assert.deepEqual(await page.locator("#ownKind option").evaluateAll(es=>es.map(e=>e.value)),["opinion","advice","personal","own"]);
     assert(await page.locator("#ownKind").evaluate(e => Boolean(e.compareDocumentPosition(document.getElementById("ownText")) & Node.DOCUMENT_POSITION_FOLLOWING)));
     assert.equal(await page.locator("#difficulty").isVisible(), false);
     assert(await page.locator('input[name="guide"][value="no"]').isChecked());
