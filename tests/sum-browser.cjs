@@ -286,10 +286,12 @@ async function checkDojo(browser, name, width, height) {
     assert.equal(await page.locator("#clock").innerText(),"03:00");
     await page.evaluate(()=>window.scrollTo(0,0));
     await page.waitForFunction(()=>document.getElementById("floatingTimer").hidden && !document.querySelector(".control-dock").classList.contains("is-docked"));
+    await page.waitForFunction(()=>{const e=document.querySelector(".timer-guidance");return getComputedStyle(e).opacity==="1"&&e.getBoundingClientRect().height>0;});
     assert(await page.locator("#timerPanel .note").isVisible());
     assert.match(await page.locator("#timerPanel").innerText(), /構想を練るのが苦手な人は、まずは時間制限を設けずに取り組むのがおすすめです。\s*100words程度/);
     await page.evaluate(()=>window.scrollTo(0,document.documentElement.scrollHeight));
-    await page.waitForFunction(()=>!document.getElementById("floatingTimer").hidden);
+    await page.waitForFunction(()=>!document.getElementById("floatingTimer").hidden&&document.querySelector(".timer-guidance").getBoundingClientRect().height<1);
+    assert.equal(await page.locator(".timer-guidance").evaluate(e=>getComputedStyle(e).opacity),"0");
     const pinnedScroll=await page.evaluate(()=>window.scrollY);
     assert(pinnedScroll>0);
     for(const selector of [".tool-howto summary","#start","#pause","#reset"]){
