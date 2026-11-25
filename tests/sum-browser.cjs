@@ -105,7 +105,7 @@ async function checkHome(browser, name, width, height) {
   }));
   assert.equal(bounds.length, 8, "Homepage must show eight content cards");
   assert.equal(await page.locator(".card.dojo").getAttribute("href"), "./brest/");
-  assert.equal(await page.locator(".card.dojo p").innerText(), "物は試し｜自由英作文入門");
+  assert.equal(await page.locator(".card.dojo p").innerText(), "自由英作文入門");
   if (width > 830 || (width > 650 && width >= height)) {
     // Three cards on each of the first two rows, then two cards on the final row.
     for (const [first, last] of [[0, 2], [3, 5], [6, 7]]) {
@@ -145,7 +145,7 @@ async function checkDojo(browser, name, width, height) {
     });
     await page.goto(pathToFileURL(path.resolve(__dirname,"..","brest","index.html")).href);
     assert.equal(await page.locator("h1").innerText(),"閃き道場｜自由英作文入門");
-    assert.deepEqual(await page.locator(".masthead-inner").evaluate(el => [...el.children].slice(0,5).map(child => child.textContent.trim())), ["道", "You never know what you can do till you try.", "閃き道場｜自由英作文入門", "", "日本語で構想メモを作る練習を行います。"]);
+    assert.deepEqual(await page.locator(".masthead-inner").evaluate(el => [...el.children].slice(0,5).map(child => child.textContent.trim())), ["道", "作れ、構想メモ", "閃き道場｜自由英作文入門", "", "日本語で構想メモを作る練習を行います。"]);
     assert.equal(await page.locator(".lede strong").innerText(),"日本語");
     assert.equal(await page.locator(".lede strong").evaluate(e=>getComputedStyle(e).color),"rgb(198, 40, 40)");
     assert.equal(await page.locator(".lede strong").evaluate(e=>getComputedStyle(e).fontWeight),"700");
@@ -195,7 +195,7 @@ async function checkDojo(browser, name, width, height) {
     assert.equal(await page.locator("#pause").isEnabled(),false);
     await page.screenshot({ path: path.join(artifacts, "dojo-" + name + ".png"), fullPage: true });
     assert.equal(await page.title(), "閃き道場｜自由英作文入門");
-    assert.equal(await page.locator("header").getByText("You never know what you can do till you try.", { exact: true }).count(), 1);
+    assert.equal(await page.locator("header").getByText("作れ、構想メモ", { exact: true }).count(), 1);
     assert(await page.locator('input[name="source"][value="own"]').isChecked());
     assert.equal(await page.locator("#kind").isVisible(), false);
     assert.equal(await page.locator('label[for="kind"]').isVisible(), false);
@@ -227,7 +227,7 @@ async function checkDojo(browser, name, width, height) {
     assert.equal(await page.locator('label[for="memo-r1"]').innerText(), "１つ目の項目");
     assert(await page.locator('input[name="level"][value="standard"]').isChecked());
     assert(await page.locator('input[name="output"][value="screen"]').isChecked());
-    assert.equal(await page.locator(".output-format-picker label").allTextContents().then(xs=>xs.map(x=>x.trim())).then(xs=>xs.join("|")),"画面結果のみ（標準）※最速です|Word|PDF|Word＋PDF");
+    assert.equal(await page.locator(".output-format-picker label").allTextContents().then(xs=>xs.map(x=>x.trim())).then(xs=>xs.join("|")),"画面表示のみ（標準）※最速です|Word|PDF|Word＋PDF");
     assert.equal(await page.locator(".output-format-picker .note").innerText(),"Word・PDFはJIS B5（182×257 mm）・縦向き。");
     assert.equal(await page.getByText("アドバイスのみ（標準）※最速です",{exact:true}).count(),1);
     assert.equal(await page.getByText("※英文の解答例の作成には時間がかかる場合があります。",{exact:true}).count(),0);
@@ -378,6 +378,10 @@ async function checkDojo(browser, name, width, height) {
     assert.equal(await page.evaluate(()=>window.scrollY),pinnedScroll, name+": start unexpectedly scrolled page");
     assert.equal(await page.locator("#floatingTimer").evaluate(e=>getComputedStyle(e).position),"fixed");
     assert.equal(await page.evaluate(()=>document.getElementById("clock").textContent===document.getElementById("floatingClock").textContent),true);
+    await page.locator("#pause").click();
+    assert.equal(await page.evaluate(()=>window.scrollY),pinnedScroll, name+": pause unexpectedly scrolled page");
+    await page.locator("#start").click();
+    assert.equal(await page.evaluate(()=>window.scrollY),pinnedScroll, name+": resume unexpectedly scrolled page");
     await page.locator("#pause").click();
     await page.locator("#reset").click();assert.equal(await page.locator("#clock").innerText(),"03:00");
     assert.equal(await page.evaluate(()=>window.scrollY),pinnedScroll, name+": pause/reset unexpectedly scrolled page");

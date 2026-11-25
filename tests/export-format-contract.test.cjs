@@ -17,7 +17,7 @@ const pages = [
 ];
 const modes = ["screen", "word", "pdf", "both"];
 const expectedMenu = [
-  ["screen", "画面結果のみ（標準）※最速です"],
+  ["screen", "画面表示のみ（標準）※最速です"],
   ["word", "Word"],
   ["pdf", "PDF"],
   ["both", "Word＋PDF"]

@@ -144,7 +144,9 @@ footer .footer-home-link:focus-visible{outline:2px solid #197fbc;outline-offset:
 /* Dojo controls: common visual theme; retain the existing interaction logic. */
 .control-dock{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--paper);padding:6px 20px 10px;max-height:60vh;max-height:60dvh;overflow-y:auto;overscroll-behavior:contain}
 .control-dock .tool-howto{margin-top:0}
-html{scroll-padding-top:var(--dock-height,0px)}
+/* Apply sticky-header clearance to content targets, not the sticky controls themselves. */
+html{scroll-padding-top:0}
+main :is(input,textarea,select,button,summary,a){scroll-margin-top:var(--dock-height,0px)}
 @media(max-width:560px){.control-dock{padding:6px 0 10px}}
 .timer-guidance{margin:6px 0 0}
 .timer-guidance > summary.tool-howto-title{font-size:.78rem}
@@ -214,7 +216,7 @@ button:disabled{opacity:.5;cursor:default}
 #floatingClock{font-size:1.35rem;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.4}
 #floatingClock.overtime{color:var(--alert)}
 body.timer-fallback{padding-bottom:calc(58px + env(safe-area-inset-bottom,0px))}
-html:has(body.timer-fallback){scroll-padding-bottom:calc(70px + env(safe-area-inset-bottom,0px))}
+body.timer-fallback main :is(input,textarea,select,button,summary,a){scroll-margin-bottom:calc(70px + env(safe-area-inset-bottom,0px))}
 #question{white-space:pre-wrap;font-weight:600;overflow-wrap:anywhere}
 section:has(input[name="source"][value="original"]:checked) #own{display:none!important}
 #add,#addConclusion{margin-top:12px}
@@ -233,7 +235,7 @@ button.memo-remove.secondary{padding:5px 10px;font-size:.82rem}
 <header class="masthead">
   <div class="masthead-inner">
     <div class="seal" aria-hidden="true">道</div>
-    <p class="kicker">You never know what you can do till you try.</p>
+    <p class="kicker">作れ、構想メモ</p>
     <h1>閃き道場｜自由英作文入門</h1>
     <div class="tricolor" aria-hidden="true"><span></span><span></span><span></span></div>
     <p class="lede"><strong style="color:#c62828;font-weight:700">日本語</strong>で構想メモを作る練習を行います。</p>
@@ -255,7 +257,7 @@ button.memo-remove.secondary{padding:5px 10px;font-size:.82rem}
 <section class="panel"><h2>問題を選ぶ</h2><div class="choices"><label class="choice"><input type="radio" name="source" value="own" checked> 自分で問題を入力する</label><label class="choice"><input type="radio" name="source" value="original"> オリジナル問題で練習する</label></div><div id="own"><label class="lbl" for="ownKind">問題の種類</label><select id="ownKind"><option value="own">指定なし</option><option value="opinion">意見の表明</option><option value="advice">提案・助言</option><option value="personal">自分自身についての記述（過去の体験や将来の目標など）</option></select><p class="note">日本語でも英語でも構いません。自分で考えた問題や、手持ちの教材などを活用できます。</p><textarea id="ownText" placeholder="問題文を入力してください"></textarea></div><div id="original" hidden><label class="lbl" for="kind">問題の種類</label><select id="kind"><option value="opinion">意見の表明</option><option value="advice">提案・助言</option><option value="personal">自分自身についての記述（過去の体験や将来の目標など）</option></select><label class="lbl" for="difficulty">問題の難易度</label><select id="difficulty"><option value="standard">標準</option><option value="advanced">発展</option></select><p id="questionLevel" class="note"></p><p id="question"></p><button class="secondary" id="next">別の問題を出す</button></div></section>
 
 <section class="panel"><h2>構想メモ</h2><div class="choices"><label class="choice"><input type="radio" name="guide" value="no" checked> 誘導なし</label><label class="choice"><input type="radio" name="guide" value="yes"> 誘導あり</label></div><p class="note"><strong style="color:#c62828;font-weight:700">日本語</strong>の箇条書きで構いませんが、文章でも可。英単語や英語表現が混ざっていても大丈夫です。</p><div id="fields"></div><button id="add" class="secondary">＋ 理由を追加する</button><div id="conclusionFields"></div><button id="addConclusion" class="secondary" hidden>＋ 結論を追加する</button></section>
-<section class="panel"><h2>受け取るアドバイス</h2><div class="choices"><label class="choice"><input type="radio" name="level" value="standard" checked> 標準</label><label class="choice"><input type="radio" name="level" value="advanced"> 発展</label></div><p class="note">標準では基本的な改善点を簡潔に、発展ではより多角的な視点から構想を深める助言を受けられます。問題の難易度とは独立して選べます。</p><p>アドバイスのみ（標準）※最速です</p><label class="check"><input type="checkbox" id="phrases"> テーマに即したおすすめフレーズを入手する</label><label class="check"><input type="checkbox" id="example"> 英語の解答例も作成する</label><div class="output-format-picker"><div class="output-label">結果の出力形式</div><div><label><input type="radio" name="output" value="screen" checked> 画面結果のみ（標準）※最速です</label><label><input type="radio" name="output" value="word"> Word</label><label><input type="radio" name="output" value="pdf"> PDF</label><label><input type="radio" name="output" value="both"> Word＋PDF</label></div><p class="note">Word・PDFはJIS B5（182×257 mm）・縦向き。</p></div></section><section class="panel">
+<section class="panel"><h2>受け取るアドバイス</h2><div class="choices"><label class="choice"><input type="radio" name="level" value="standard" checked> 標準</label><label class="choice"><input type="radio" name="level" value="advanced"> 発展</label></div><p class="note">標準では基本的な改善点を簡潔に、発展ではより多角的な視点から構想を深める助言を受けられます。問題の難易度とは独立して選べます。</p><p>アドバイスのみ（標準）※最速です</p><label class="check"><input type="checkbox" id="phrases"> テーマに即したおすすめフレーズを入手する</label><label class="check"><input type="checkbox" id="example"> 英語の解答例も作成する</label><div class="output-format-picker"><div class="output-label">結果の出力形式</div><div><label><input type="radio" name="output" value="screen" checked> 画面表示のみ（標準）※最速です</label><label><input type="radio" name="output" value="word"> Word</label><label><input type="radio" name="output" value="pdf"> PDF</label><label><input type="radio" name="output" value="both"> Word＋PDF</label></div><p class="note">Word・PDFはJIS B5（182×257 mm）・縦向き。</p></div></section><section class="panel">
 <button type="button" id="go">ChatGPTを開く</button>
 <p id="feedback" role="status" aria-live="polite"></p>
 <div id="manualBox">
