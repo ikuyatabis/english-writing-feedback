@@ -163,6 +163,11 @@ async function checkDojo(browser, name, width, height) {
     assert.equal(await page.title(), "閃き道場｜自由英作文入門");
     assert.equal(await page.locator("header").getByText("You never know what you can do till you try.", { exact: true }).count(), 1);
     assert(await page.locator('input[name="source"][value="own"]').isChecked());
+    assert.equal(await page.locator("#kind").isVisible(), false);
+    assert.equal(await page.locator('label[for="kind"]').isVisible(), false);
+    assert.equal(await page.locator("#difficulty").isVisible(), false);
+    assert.equal(await page.locator("#memo-stance").count(), 0);
+    assert.equal(await page.locator('label[for="memo-r1"]').innerText(), "1つ目の項目");
     assert(await page.locator('input[name="level"][value="standard"]').isChecked());
     assert(await page.locator('input[name="output"][value="screen"]').isChecked());
     assert(!(await page.locator("#phrases").isChecked()));
@@ -171,9 +176,11 @@ async function checkDojo(browser, name, width, height) {
     await page.locator("#memo-r1").fill("安全面");
     await page.locator("#preview").click();
     let p=await page.locator("#prompt").inputValue();
-    assert.match(p,/ワンバウンド/);assert.match(p,/英語の解答例：希望なし/);assert.match(p,/安全面/);
+    assert.match(p,/ワンバウンド/);assert.match(p,/英語の解答例：希望なし/);assert.match(p,/安全面/);assert.match(p,/"問題の種類": "持ち込み・指定なし（問題文の指示を優先）"/);
     await page.locator('input[name="source"][value="original"]').check();
     assert(!(await page.locator("#ownText").isVisible()));
+    assert(await page.locator("#kind").isVisible());
+    assert(await page.locator("#difficulty").isVisible());
     assert.equal(await page.locator("#memo-r1").inputValue(),"");
     await page.locator("#difficulty").selectOption("advanced");
     assert.equal(await page.locator("#questionLevel").innerText(),"発展");
@@ -186,7 +193,8 @@ async function checkDojo(browser, name, width, height) {
     assert.equal(await page.locator("#difficulty").inputValue(),"standard");
     assert(await page.locator("#memo-a").isVisible());
     await page.locator('input[name="source"][value="own"]').check();
-    await page.locator("#kind").selectOption("opinion");
+    assert.equal(await page.locator("#kind").isVisible(), false);
+    assert.equal(await page.locator("#memo-stance").count(), 0);
     assert.equal(await page.locator("#ownText").inputValue(),"制服は必要ですか。");
     assert.equal(await page.locator("#memo-r1").inputValue(),"安全面");
     await page.locator("#add").click();assert(await page.locator("#memo-r3").isVisible());
