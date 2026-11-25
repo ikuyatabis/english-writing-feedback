@@ -77,3 +77,17 @@ jobs:
           name: yorinuki-browser-screenshots
           path: test-artifacts/*.png
           if-no-files-found: warn
+
+  history-webkit:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install WebKit for Playwright
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps webkit
+      - name: Test history on mobile WebKit across rotation and reload
+        run: node tests/sum-history-browser.cjs
