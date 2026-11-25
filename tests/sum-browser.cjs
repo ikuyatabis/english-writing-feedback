@@ -170,7 +170,13 @@ async function checkDojo(browser, name, width, height) {
     assert.equal(await page.locator("#ownKind").inputValue(), "own");
     assert(await page.locator("#ownKind").evaluate(e => Boolean(e.compareDocumentPosition(document.getElementById("ownText")) & Node.DOCUMENT_POSITION_FOLLOWING)));
     assert.equal(await page.locator("#difficulty").isVisible(), false);
+    assert(await page.locator('input[name="guide"][value="no"]').isChecked());
+    assert(await page.locator("#memo-free").isVisible());
+    assert.equal(await page.locator("#fields textarea").count(), 1);
+    assert.equal(await page.locator("#memo-r1").count(), 0);
     assert.equal(await page.locator("#memo-stance").count(), 0);
+    assert.equal(await page.locator("#add").isVisible(), false);
+    await page.locator('input[name="guide"][value="yes"]').check();
     assert.equal(await page.locator('label[for="memo-r1"]').innerText(), "1つ目の項目");
     assert(await page.locator('input[name="level"][value="standard"]').isChecked());
     assert(await page.locator('input[name="output"][value="screen"]').isChecked());
