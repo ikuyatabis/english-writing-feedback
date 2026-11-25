@@ -140,7 +140,7 @@ async function checkDojo(browser, name, width, height) {
     const page=await context.newPage(), errors=[];
     page.on("pageerror",e=>errors.push(e.message));
     await page.addInitScript(()=>{
-      window.open=()=>null;
+      window.open=()=>({opener:null});
       Object.defineProperty(navigator,"clipboard",{configurable:true,value:{writeText:async text=>{window.__lastCopied=text;}}});
     });
     await page.goto(pathToFileURL(path.resolve(__dirname,"..","brest","index.html")).href);
@@ -153,6 +153,10 @@ async function checkDojo(browser, name, width, height) {
     assert.match(await page.locator("body").evaluate(e => getComputedStyle(e).fontFamily), /Zen Kaku Gothic New/);
     assert.match(await page.locator("h1").evaluate(e => getComputedStyle(e).fontFamily), /Shippori Mincho/);
     assert.equal(await page.locator(".sheet-wrap > .panel").count(), 4);
+    assert.equal(await page.locator("#go").innerText(),"ChatGPTを開く");
+    assert.equal(await page.getByText("指示文を表示",{exact:true}).count(),0);
+    assert.equal(await page.locator("#manualBox").isVisible(),false);
+    const capturePrompt=async()=>{await page.evaluate(()=>{delete window.__lastCopied;});await page.locator("#go").click();await page.waitForFunction(()=>typeof window.__lastCopied==="string");return page.evaluate(()=>window.__lastCopied);};
     assert.equal(await page.locator(".control-dock > .tool-howto + .timer-setup").count(), 1);
     assert.equal(await page.locator(".control-dock").evaluate(e => getComputedStyle(e).position), "sticky");
     assert.equal(await page.locator(".tool-howto summary").innerText(), "事前にChatGPTへログインしてから使ってください（詳しい使い方はこちら）");
@@ -231,18 +235,17 @@ async function checkDojo(browser, name, width, height) {
     assert(!(await page.locator("#example").isChecked()));
     await page.locator("#ownText").fill("制服は必要ですか。");
     await page.locator("#memo-r1").fill("安全面");
-    await page.locator("#preview").click();
-    let p=await page.locator("#prompt").inputValue();
+    let p=await capturePrompt();
+    await page.waitForFunction(()=>document.getElementById("feedback").textContent.includes("コピーしました"));
+    assert.equal(await page.locator("#manualBox").isVisible(),false);
     assert.match(p,/ワンバウンド/);assert.match(p,/構想メモ中の英単語・英語表現も必ず確認/);assert.match(p,/英語表現へのアドバイス/);assert.match(p,/英語の解答例：希望なし/);assert.match(p,/安全面/);assert.match(p,/"問題の種類": "持ち込み・指定なし（問題文の指示を優先）"/);
     await page.locator("#memo-direction").fill("制服の利点を中心に考える");
-    await page.locator("#preview").click();
-    assert.match(await page.locator("#prompt").inputValue(),/制服の利点を中心に考える/);
+    assert.match(await capturePrompt(),/制服の利点を中心に考える/);
     await page.locator("#addConclusion").click();
     assert(await page.locator("#memo-conclusion").isVisible());
     assert.equal(await page.locator("#addConclusion").isVisible(),false);
     await page.locator("#memo-conclusion").fill("学校生活に適した服装を考える");
-    await page.locator("#preview").click();
-    assert.match(await page.locator("#prompt").inputValue(),/学校生活に適した服装を考える/);
+    assert.match(await capturePrompt(),/学校生活に適した服装を考える/);
     await page.locator("#ownKind").selectOption("opinion");
     assert(await page.locator("#addConclusion").isVisible());
     assert.equal(await page.locator("#memo-conclusion").count(),0);
@@ -250,8 +253,7 @@ async function checkDojo(browser, name, width, height) {
     assert(await page.locator("#memo-stance").isVisible());
     assert.equal(await page.locator('label[for="memo-r1"]').innerText(), "理由１");
     await page.locator("#memo-r1").fill("学習環境");
-    await page.locator("#preview").click();
-    assert.match(await page.locator("#prompt").inputValue(), /"問題の種類": "意見の表明"/);
+    assert.match(await capturePrompt(), /"問題の種類": "意見の表明"/);
     await page.locator("#ownKind").selectOption("personal");
     assert(await page.locator("#addConclusion").isVisible());
     assert.equal(await page.locator("#add").isVisible(),false);
@@ -344,9 +346,7 @@ async function checkDojo(browser, name, width, height) {
     await page.locator('input[name="level"][value="advanced"]').check();
     await page.locator("#phrases").check();await page.locator("#example").check();
     await page.locator('input[name="output"][value="both"]').check();
-    await page.locator("#send").click();
-    await page.waitForFunction(()=>typeof window.__lastCopied==="string");
-    p=await page.evaluate(()=>window.__lastCopied);
+    p=await capturePrompt();
     assert.match(p,/学習モード】発展/);assert.match(p,/おすすめフレーズ：希望あり/);
     assert.match(p,/英語の解答例：希望あり/);assert.match(p,/JIS B5/);
     assert.match(p,/Word＋PDF/);assert.match(p,/友人と協力/);
