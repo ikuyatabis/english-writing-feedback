@@ -68,6 +68,7 @@ function environment(mode,extra={}){
 }
 async function fullPrompt(page,html,mode,extra){
  const ctx=environment(mode,extra),legacy=["ito","buncan","mita"].includes(page);
+ if(page==="ito"){const encoded=html.match(/const DATA_B64 = "([A-Za-z0-9+/=]+)"/);assert(encoded);ctx.DATA.common=JSON.parse(Buffer.from(encoded[1],"base64").toString("utf8")).common;}
  if(page==="eiken"){const select=ctx.selected;ctx.selected=(id)=>id==="kind"?"essay":select(id)}
  const parts=[extractFn(html,"function getExportInstruction(")];
  if(legacy){
@@ -109,6 +110,8 @@ for(const page of pages){
   test(page+"/"+mode+": full assembled ChatGPT prompt",async()=>{
    const p=await fullPrompt(page,html,mode);
    assert(p.length>300,"incomplete prompt");
+   const role={ito:/あなたは，九州大学前期試験の自由英作文を添削する大学受験英語の専門家/,buncan:/あなたは早稲田大学文学部・文化構想学部の英文要約問題.*英語科講師/,mita:/あなたは慶應義塾大学経済学部の自由英作文を添削する専門家/,misc:/あなたは大学受験英語の指導に精通し，大学入試の自由英作文の採点・添削を専門とする英語講師/,trans:/あなたは日本の大学入試の和文英訳を指導する英語科講師/,sum:/あなたは大学受験英語の指導に精通し，英文の日本語要約・英語要約の採点・添削を専門とする英語講師/,eiken:/あなたは実用英語技能検定（英検）の受験指導に精通し，ライティングの採点・添削を専門とする英語講師/};
+   assert.match(p,role[page]);assert.doesNotMatch(p,/現行main|持ち込み診療所|閃き道場|秘密基地/);
    for(const r of rules[page])assert(p.includes(r),page+" missing original rule "+r);
    if(page==="misc"){
     assert(p.includes("文書の最初の行に，独立した１行で"));
