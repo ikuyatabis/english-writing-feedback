@@ -174,9 +174,12 @@ async function checkDojo(browser, name, width, height) {
     const timerLayout=await page.locator(".timer-controls").evaluate(el=>{
       const container=el.getBoundingClientRect(),rects=["#minutes","#clock","#start","#pause","#reset"].map(id=>el.querySelector(id).getBoundingClientRect());
       const centers=rects.map(r=>r.top+r.height/2);
-      return {sameLine:Math.max(...centers)-Math.min(...centers)<3,contained:rects.every(r=>r.left>=container.left-1&&r.right<=container.right+1)};
+      return {sameLine:Math.max(...centers)-Math.min(...centers)<3,contained:rects.every(r=>r.left>=container.left-1&&r.right<=container.right+1),gaps:rects.slice(1).map((r,i)=>r.left-rects[i].right)};
     });
     assert(timerLayout.sameLine&&timerLayout.contained,name+": timer controls must fit on one line: "+JSON.stringify(timerLayout));
+    if(width<=560){
+      assert(timerLayout.gaps.slice(1).every(gap=>gap>=(width<=360?5:8)-0.5),name+": timer controls too crowded: "+JSON.stringify(timerLayout));
+    }
     if(width<=1024){
       for(const selector of ["#start","#pause","#reset"]){
         const box=await page.locator(selector).boundingBox();
