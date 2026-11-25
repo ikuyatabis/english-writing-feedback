@@ -214,7 +214,7 @@ async function checkDojo(browser, name, width, height) {
     assert.equal(await page.locator("#kind").isVisible(), false);
     assert.equal(await page.locator('label[for="kind"]').isVisible(), false);
     assert(await page.locator("#ownKind").isVisible());
-    assert.equal(await page.locator("#ownKind").inputValue(), "own");
+    assert.equal(await page.locator("#ownKind").inputValue(), "opinion");
     assert.deepEqual(await page.locator("#ownKind option").evaluateAll(es=>es.map(e=>e.value)),["opinion","advice","personal","own"]);
     assert(await page.locator("#ownKind").evaluate(e => Boolean(e.compareDocumentPosition(document.getElementById("ownText")) & Node.DOCUMENT_POSITION_FOLLOWING)));
     assert.equal(await page.locator("#difficulty").isVisible(), false);
@@ -227,6 +227,13 @@ async function checkDojo(browser, name, width, height) {
     assert.equal(await page.locator("#addConclusion").isVisible(),false);
     assert.equal(await page.locator("#memo-conclusion").count(),0);
     await page.locator('input[name="guide"][value="yes"]').check();
+    assert(await page.locator("#memo-stance").isVisible());
+    assert.equal(await page.locator('label[for="memo-r1"]').innerText(),"理由１");
+    await page.locator("#ownText").fill("制服は必要ですか。");
+    await page.locator("#memo-r1").fill("意見の表明の初期選択");
+    assert.match(await capturePrompt(), /"問題の種類": "意見の表明"/);
+    await page.locator("#memo-r1").fill("");
+    await page.locator("#ownKind").selectOption("own");
     assert(await page.locator("#memo-direction").isVisible());
     assert(await page.locator("#addConclusion").isVisible());
     assert.equal(await page.locator("#memo-conclusion").count(),0);
