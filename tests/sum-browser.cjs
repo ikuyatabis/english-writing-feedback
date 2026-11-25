@@ -168,6 +168,10 @@ async function checkDojo(browser, name, width, height) {
     assert(await page.locator('input[name="timer"][value="on"]').isChecked());
     assert(await page.locator("#timerPanel").isVisible());
     assert.equal(await page.locator("#clock").innerText(),"03:00");
+    assert.equal(await page.locator("#start").innerText(),"▶");
+    assert.equal(await page.locator("#pause").innerText(),"Ⅱ");
+    assert.equal(await page.locator("#start").getAttribute("aria-label"),"開始");
+    assert.equal(await page.locator("#pause").getAttribute("aria-label"),"一時停止");
     assert.equal(await page.locator("#start").isEnabled(),true);
     assert.equal(await page.locator("#pause").isEnabled(),false);
     await page.screenshot({ path: path.join(artifacts, "dojo-" + name + ".png"), fullPage: true });
