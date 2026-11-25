@@ -141,7 +141,8 @@ async function checkDojo(browser, name, width, height) {
     page.on("pageerror",e=>errors.push(e.message));
     await page.addInitScript(()=>{
       window.open=()=>({opener:null});
-      Object.defineProperty(navigator,"clipboard",{configurable:true,value:{writeText:async text=>{window.__lastCopied=text;}}});
+      Object.defineProperty(navigator,"clipboard",{configurable:true,value:{writeText:async text=>{if(window.__failCopy)throw Error("test clipboard failure");window.__lastCopied=text;}}});
+      const execCommand=document.execCommand.bind(document);document.execCommand=(...args)=>window.__failCopy&&args[0]==="copy"?false:execCommand(...args);
     });
     await page.goto(pathToFileURL(path.resolve(__dirname,"..","brest","index.html")).href);
     assert.equal(await page.locator("h1").innerText(),"ひらめき道場｜自由英作文入門");
@@ -354,13 +355,18 @@ async function checkDojo(browser, name, width, height) {
     await page.locator("#memo-s2").fill("削除する補足");
     await page.locator("#memo-r3").fill("残す項目");
     await page.locator("#memo-s3").fill("残す補足");
+    const captureManual=async()=>{await page.evaluate(()=>{window.__failCopy=true});await page.locator("#go").click();await page.locator("#manualBox").waitFor({state:"visible"});assert.match(await page.locator("#feedback").innerText(),/自動コピーできませんでした/);return page.locator("#manual").inputValue()};
+    const assertCopyCleared=async()=>{assert.equal(await page.locator("#manual").inputValue(),"");assert.equal(await page.locator("#manualBox").isVisible(),false);assert.equal(await page.locator("#feedback").textContent(),"");assert.equal(await page.locator("#feedback").getAttribute("class"),"")};
+    const itemPrompt=await captureManual();assert(itemPrompt.includes("削除する項目")&&itemPrompt.includes("削除する補足"));
     page.once("dialog",d=>d.dismiss());
     await page.locator("#remove-item-2").click();
     assert.equal(await page.locator("#memo-r2").inputValue(),"削除する項目");
+    assert(await page.locator("#manualBox").isVisible());assert.equal(await page.locator("#manual").inputValue(),itemPrompt);
     page.once("dialog",d=>d.accept());
     await page.locator("#remove-item-2").click();
     assert.equal(await page.locator("#memo-r2").inputValue(),"残す項目");
     assert.equal(await page.locator("#memo-s2").inputValue(),"残す補足");
+    await assertCopyCleared();
     assert.equal(await page.locator("#memo-r3").count(),0);
     assert.equal(await page.locator("#memo-r1").inputValue(),"安全面");
     await page.locator("#add").click();
@@ -368,12 +374,15 @@ async function checkDojo(browser, name, width, height) {
     assert.equal(await page.locator("#memo-s3").inputValue(),"");
     await page.locator("#remove-item-3").click();
     assert.equal(await page.locator("#memo-r3").count(),0);
+    const conclusionPrompt=await captureManual();assert(conclusionPrompt.includes("学校生活に適した服装を考える"));assert(!conclusionPrompt.includes("削除する項目"));assert(!conclusionPrompt.includes("削除する補足"));
     page.once("dialog",d=>d.dismiss());
     await page.locator("#remove-conclusion").click();
     assert.equal(await page.locator("#memo-conclusion").inputValue(),"学校生活に適した服装を考える");
+    assert(await page.locator("#manualBox").isVisible());assert.equal(await page.locator("#manual").inputValue(),conclusionPrompt);
     page.once("dialog",d=>d.accept());
     await page.locator("#remove-conclusion").click();
     assert.equal(await page.locator("#memo-conclusion").count(),0);
+    await assertCopyCleared();await page.evaluate(()=>{window.__failCopy=false});
     assert(await page.locator("#addConclusion").isVisible());
     await page.locator("#addConclusion").click();
     assert.equal(await page.locator("#memo-conclusion").inputValue(),"");
@@ -403,7 +412,7 @@ async function checkDojo(browser, name, width, height) {
     assert.equal(await page.locator(".timer-guidance summary").innerText(),"（使い方のヒント）");
     await page.locator(".timer-guidance summary").click();
     assert(await page.locator(".timer-guidance .note").isVisible());
-    assert.match(await page.locator(".timer-guidance").innerText(), /構想を練るのが苦手な人は、まずは時間制限を設けずに取り組むのがおすすめです。\s*100words程度/);
+    assert.match(await page.locator(".timer-guidance").innerText(), /構想を練るのが苦手な人は、まずは時間制限を設けずに取り組むのがおすすめです。\s*慣れてきても、100words程度/);
     await page.locator(".timer-guidance summary").click();
     assert.equal(await page.locator(".timer-guidance").evaluate(e=>e.open),false);
     await page.evaluate(()=>window.scrollTo(0,document.documentElement.scrollHeight));
