@@ -79,7 +79,7 @@ async function checkHome(browser, name, width, height) {
   assert(badgeX > titleX, name + " trial badge must appear to the right of the title start");
   assert.deepEqual(titles, [
     "持ち込み診療所", "伊都への恋文", "ことのは研究室",
-    "より抜き図書館", "英検の庵", "待ってろ文キャン", "三田キャンへの道"
+    "より抜き図書館", "英検の庵", "待ってろ文キャン", "三田キャンへの道", "ブレスト道場"
   ]);
   assert.equal(await page.locator('.card.sum p').innerText(), '船頭多くして船山に上る｜要約問題');
   assert.match(await page.locator(".lead").innerText(), /入試英語の添削ツール\s*でつ/);
@@ -97,7 +97,9 @@ async function checkHome(browser, name, width, height) {
     const b = n.getBoundingClientRect();
     return { x: Math.round(b.x), y: Math.round(b.y), width: Math.round(b.width) };
   }));
-  assert.equal(bounds.length, 7, "Homepage must show seven content cards");
+  assert.equal(bounds.length, 8, "Homepage must show eight content cards");
+  assert.equal(await page.locator(".card.dojo").getAttribute("href"), "./brest/");
+  assert(bounds[7].y > bounds[6].y, "Dojo uses its own final row");
   if (width > 830 || (width > 650 && width >= height)) {
     // Three cards on the first row, then two two-card rows.
     assert.equal(bounds[0].y, bounds[1].y);
@@ -118,8 +120,68 @@ async function checkHome(browser, name, width, height) {
   assert(maxWidth <= width + 1, "Homepage overflow: " + maxWidth + " > " + width);
   assert.equal(errors.length, 0, errors.join("; "));
   await page.screenshot({ path: path.join(artifacts, "home-" + name + ".png"), fullPage: true });
-  console.log("Homepage " + name + ": PASS; seven cards in correct order");
+  console.log("Homepage " + name + ": PASS; eight cards in correct order");
   await context.close();
+}
+
+async function checkDojo(browser, name, width, height) {
+  const context=await browser.newContext({viewport:{width,height},deviceScaleFactor:1});
+  try {
+    const page=await context.newPage(), errors=[];
+    page.on("pageerror",e=>errors.push(e.message));
+    await page.addInitScript(()=>{
+      window.open=()=>null;
+      Object.defineProperty(navigator,"clipboard",{configurable:true,value:{writeText:async text=>{window.__lastCopied=text;}}});
+    });
+    await page.goto(pathToFileURL(path.resolve(__dirname,"..","brest","index.html")).href);
+    assert.equal(await page.locator("h1").innerText(),"ブレスト道場");
+    assert(await page.locator('input[name="source"][value="own"]').isChecked());
+    assert(await page.locator('input[name="level"][value="standard"]').isChecked());
+    assert(await page.locator('input[name="output"][value="screen"]').isChecked());
+    assert(!(await page.locator("#phrases").isChecked()));
+    assert(!(await page.locator("#example").isChecked()));
+    await page.locator("#ownText").fill("制服は必要ですか。");
+    await page.locator("#memo-r1").fill("安全面");
+    await page.locator("#preview").click();
+    let p=await page.locator("#prompt").inputValue();
+    assert.match(p,/ワンバウンド/);assert.match(p,/英語の解答例：希望なし/);assert.match(p,/安全面/);
+    await page.locator('input[name="source"][value="original"]').check();
+    assert(!(await page.locator("#ownText").isVisible()));
+    assert.equal(await page.locator("#memo-r1").inputValue(),"");
+    await page.locator("#difficulty").selectOption("advanced");
+    assert.equal(await page.locator("#questionLevel").innerText(),"発展");
+    const previous=await page.locator("#question").innerText();
+    await page.locator("#memo-r1").fill("前の問題のメモ");
+    await page.locator("#next").click();
+    assert.notEqual(await page.locator("#question").innerText(),previous);
+    assert.equal(await page.locator("#memo-r1").inputValue(),"");
+    await page.locator("#kind").selectOption("personal");
+    assert.equal(await page.locator("#difficulty").inputValue(),"standard");
+    assert(await page.locator("#memo-a").isVisible());
+    await page.locator('input[name="source"][value="own"]').check();
+    await page.locator("#kind").selectOption("opinion");
+    assert.equal(await page.locator("#ownText").inputValue(),"制服は必要ですか。");
+    assert.equal(await page.locator("#memo-r1").inputValue(),"安全面");
+    await page.locator("#add").click();assert(await page.locator("#memo-r3").isVisible());
+    await page.locator('input[name="guide"][value="no"]').check();
+    await page.locator("#memo-free").fill("友人と協力");
+    await page.locator('input[name="level"][value="advanced"]').check();
+    await page.locator("#phrases").check();await page.locator("#example").check();
+    await page.locator('input[name="output"][value="both"]').check();
+    await page.locator("#send").click();
+    await page.waitForFunction(()=>typeof window.__lastCopied==="string");
+    p=await page.evaluate(()=>window.__lastCopied);
+    assert.match(p,/学習モード】発展/);assert.match(p,/おすすめフレーズ：希望あり/);
+    assert.match(p,/英語の解答例：希望あり/);assert.match(p,/JIS B5/);
+    assert.match(p,/Word＋PDF/);assert.match(p,/友人と協力/);
+    await page.locator('input[name="timer"][value="on"]').check();
+    assert.equal(await page.locator("#clock").innerText(),"03:00");
+    await page.locator("#start").click();await page.locator("#pause").click();
+    await page.locator("#reset").click();assert.equal(await page.locator("#clock").innerText(),"03:00");
+    assert((await page.evaluate(()=>document.documentElement.scrollWidth))<=width+1);
+    assert.equal(errors.length,0,errors.join("; "));
+    console.log("Brest dojo "+name+": PASS");
+  }finally{await context.close();}
 }
 
 async function checkHistory(browser, name, width, height) {
@@ -201,6 +263,9 @@ async function checkAuditHowto(browser, width, height) {
     await checkHome(browser, "desktop", 1365, 900);
     await checkHome(browser, "mobile", 390, 844);
     await checkHome(browser, "small-mobile", 320, 700);
+    await checkDojo(browser, "desktop", 1365, 900);
+    await checkDojo(browser, "mobile", 390, 844);
+    await checkDojo(browser, "small-mobile", 320, 700);
     await checkHistory(browser, "desktop", 1365, 900);
     await checkHistory(browser, "mobile", 390, 844);
     await checkHistory(browser, "small-mobile", 320, 700);
