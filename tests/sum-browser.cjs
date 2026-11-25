@@ -149,7 +149,8 @@ async function checkDojo(browser, name, width, height) {
     assert.equal(await page.locator(".tricolor span").count(), 3);
     assert.match(await page.locator("body").evaluate(e => getComputedStyle(e).fontFamily), /Zen Kaku Gothic New/);
     assert.match(await page.locator("h1").evaluate(e => getComputedStyle(e).fontFamily), /Shippori Mincho/);
-    assert.equal(await page.locator(".sheet-wrap > .panel").count(), 5);
+    assert.equal(await page.locator(".sheet-wrap > .panel").count(), 4);
+    assert.equal(await page.locator(".tool-howto + .timer-setup").count(), 1);
     assert.equal(await page.locator(".tool-howto summary").innerText(), "事前にChatGPTへログインしてから使ってください（詳しい使い方はこちら）");
     assert.equal(await page.locator(".tool-howto").evaluate(e => e.open), false);
     await page.locator(".tool-howto summary").click();
@@ -233,12 +234,16 @@ async function checkDojo(browser, name, width, height) {
     await page.locator('input[name="timer"][value="on"]').check();
     assert.equal(await page.locator("#clock").innerText(),"03:00");
     assert.equal(await page.locator("#timerPanel").getByText("時間切れになっても解答を続けることは可能です。", {exact:true}).isVisible(), true);
-    await page.locator("#clock").evaluate(e => e.scrollIntoView({block:"center"}));
+    await page.evaluate(()=>window.scrollTo(0,0));
     await page.waitForFunction(()=>document.getElementById("floatingTimer").hidden);
     await page.locator("#start").click();
     await page.evaluate(()=>window.scrollTo(0,document.documentElement.scrollHeight));
-    await page.waitForFunction(()=>!document.getElementById("floatingTimer").hidden);
-    assert.equal(await page.locator("#floatingTimer").evaluate(e=>getComputedStyle(e).position),"fixed");
+    if(width > 560 && height > 700){
+      await page.waitForFunction(()=>{const r=document.getElementById("clock").getBoundingClientRect();return r.top>=0&&r.bottom<=innerHeight&&document.getElementById("floatingTimer").hidden});
+    }else{
+      await page.waitForFunction(()=>!document.getElementById("floatingTimer").hidden);
+      assert.equal(await page.locator("#floatingTimer").evaluate(e=>getComputedStyle(e).position),"fixed");
+    }
     assert.equal(await page.evaluate(()=>document.getElementById("clock").textContent===document.getElementById("floatingClock").textContent),true);
     await page.locator("#pause").click();
     await page.locator("#reset").click();assert.equal(await page.locator("#clock").innerText(),"03:00");
