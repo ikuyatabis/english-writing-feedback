@@ -153,12 +153,13 @@ async function checkDojo(browser, name, width, height) {
     assert.match(await page.locator("body").evaluate(e => getComputedStyle(e).fontFamily), /Zen Kaku Gothic New/);
     assert.match(await page.locator("h1").evaluate(e => getComputedStyle(e).fontFamily), /Shippori Mincho/);
     assert.equal(await page.locator(".sheet-wrap > .panel").count(), 4);
-    assert.equal(await page.locator(".tool-howto + .timer-setup").count(), 1);
+    assert.equal(await page.locator(".control-dock > .tool-howto + .timer-setup").count(), 1);
+    assert.equal(await page.locator(".control-dock").evaluate(e => getComputedStyle(e).position), "sticky");
     assert.equal(await page.locator(".tool-howto summary").innerText(), "事前にChatGPTへログインしてから使ってください（詳しい使い方はこちら）");
     assert.equal(await page.locator(".tool-howto").evaluate(e => e.open), false);
     await page.locator(".tool-howto summary").click();
     assert.equal(await page.locator(".tool-howto").evaluate(e => e.open), true);
-    assert.equal(await page.locator(".masthead").evaluate(e => getComputedStyle(e).position), "static");
+    assert.equal(await page.locator(".control-dock").evaluate(e => getComputedStyle(e).position), "sticky");
     await page.locator("#ownText").click({trial:true});
     await page.locator(".tool-howto summary").click();
     assert.equal(await page.locator(".tool-howto").evaluate(e => e.open), false);
@@ -266,16 +267,24 @@ async function checkDojo(browser, name, width, height) {
     assert.match(await page.locator("#timerPanel").innerText(), /構想を練るのが苦手な人は、まずは時間制限を設けずに取り組むのがおすすめです。\s*100words程度/);
     await page.evaluate(()=>window.scrollTo(0,0));
     await page.waitForFunction(()=>document.getElementById("floatingTimer").hidden);
-    await page.locator("#start").click();
     await page.evaluate(()=>window.scrollTo(0,document.documentElement.scrollHeight));
     await page.waitForFunction(()=>!document.getElementById("floatingTimer").hidden);
+    const pinnedScroll=await page.evaluate(()=>window.scrollY);
+    assert(pinnedScroll>0);
+    for(const selector of [".tool-howto summary","#start","#pause","#reset"]){
+      const box=await page.locator(selector).boundingBox();
+      assert(box&&box.y>=0&&box.y+box.height<=height, name+": fixed control not visible "+selector);
+    }
+    await page.locator("#start").click();
+    assert.equal(await page.evaluate(()=>window.scrollY),pinnedScroll, name+": start unexpectedly scrolled page");
     assert.equal(await page.locator("#floatingTimer").evaluate(e=>getComputedStyle(e).position),"fixed");
     assert.equal(await page.evaluate(()=>document.getElementById("clock").textContent===document.getElementById("floatingClock").textContent),true);
     await page.locator("#pause").click();
     await page.locator("#reset").click();assert.equal(await page.locator("#clock").innerText(),"03:00");
+    assert.equal(await page.evaluate(()=>window.scrollY),pinnedScroll, name+": pause/reset unexpectedly scrolled page");
     assert.equal(await page.locator("#floatingClock").textContent(),"03:00");
     await page.locator('input[name="timer"][value="off"]').check();
-    assert.equal(await page.locator(".masthead").evaluate(e => getComputedStyle(e).position), width > 560 && height > 700 ? "sticky" : "static");
+    assert.equal(await page.locator(".control-dock").evaluate(e => getComputedStyle(e).position), "sticky");
     assert.equal(await page.locator("#floatingTimer").isVisible(),false);
     assert.equal(await page.locator("#timerPanel").isVisible(),false);
     assert((await page.evaluate(()=>document.documentElement.scrollWidth))<=width+1);
