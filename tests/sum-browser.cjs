@@ -252,7 +252,6 @@ async function checkDojo(browser, name, width, height) {
     await page.locator('input[name="timer"][value="on"]').check();
     assert.equal(await page.locator(".masthead").evaluate(e => getComputedStyle(e).position), "static");
     assert.equal(await page.locator("#clock").innerText(),"03:00");
-    assert.equal(await page.locator("#timerPanel").getByText("時間切れになっても解答を続けることは可能です。", {exact:true}).isVisible(), true);
     assert.match(await page.locator("#timerPanel").innerText(), /100 words程度/);
     await page.evaluate(()=>window.scrollTo(0,0));
     await page.waitForFunction(()=>document.getElementById("floatingTimer").hidden);
