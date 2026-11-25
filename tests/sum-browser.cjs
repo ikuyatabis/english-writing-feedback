@@ -135,6 +135,7 @@ async function checkHome(browser, name, width, height) {
 
 async function checkDojo(browser, name, width, height) {
   const context=await browser.newContext({viewport:{width,height},deviceScaleFactor:1});
+  await context.route(/fonts\.googleapis\.com|fonts\.gstatic\.com/, route => route.abort());
   try {
     const page=await context.newPage(), errors=[];
     page.on("pageerror",e=>errors.push(e.message));
@@ -144,7 +145,21 @@ async function checkDojo(browser, name, width, height) {
     });
     await page.goto(pathToFileURL(path.resolve(__dirname,"..","brest","index.html")).href);
     assert.equal(await page.locator("h1").innerText(),"閃き道場｜自由英作文入門");
-    assert.deepEqual(await page.locator("header").evaluate(el => [...el.children].map(child => child.textContent.trim())), ["道", "You never know what you can do till you try.", "閃き道場｜自由英作文入門", "", "構想メモを作る練習を行います。"]);
+    assert.deepEqual(await page.locator(".masthead-inner").evaluate(el => [...el.children].slice(0,5).map(child => child.textContent.trim())), ["道", "You never know what you can do till you try.", "閃き道場｜自由英作文入門", "", "構想メモを作る練習を行います。"]);
+    assert.equal(await page.locator(".tricolor span").count(), 3);
+    assert.match(await page.locator("body").evaluate(e => getComputedStyle(e).fontFamily), /Zen Kaku Gothic New/);
+    assert.match(await page.locator("h1").evaluate(e => getComputedStyle(e).fontFamily), /Shippori Mincho/);
+    assert.equal(await page.locator(".sheet-wrap > .panel").count(), 5);
+    assert.equal(await page.locator(".tool-howto summary").innerText(), "事前にChatGPTへログインしてから使ってください（詳しい使い方はこちら）");
+    assert.equal(await page.locator(".tool-howto").evaluate(e => e.open), false);
+    await page.locator(".tool-howto summary").click();
+    assert.equal(await page.locator(".tool-howto").evaluate(e => e.open), true);
+    assert.equal(await page.locator(".masthead").evaluate(e => getComputedStyle(e).position), "static");
+    await page.locator("#ownText").click({trial:true});
+    await page.locator(".tool-howto summary").click();
+    assert.equal(await page.locator(".tool-howto").evaluate(e => e.open), false);
+    assert.equal(await page.locator(".masthead").evaluate(e => getComputedStyle(e).position), width > 560 && height > 700 ? "sticky" : "static");
+    await page.screenshot({ path: path.join(artifacts, "dojo-" + name + ".png"), fullPage: true });
     assert.equal(await page.title(), "閃き道場｜自由英作文入門");
     assert.equal(await page.locator("header").getByText("You never know what you can do till you try.", { exact: true }).count(), 1);
     assert(await page.locator('input[name="source"][value="own"]').isChecked());
