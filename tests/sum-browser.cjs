@@ -177,6 +177,10 @@ async function checkDojo(browser, name, width, height) {
     assert.equal(await page.locator("#memo-stance").count(), 0);
     assert.equal(await page.locator("#add").isVisible(), false);
     await page.locator('input[name="guide"][value="yes"]').check();
+    assert(await page.locator("#memo-r1").isVisible());
+    assert(await page.locator("#memo-s1").isVisible());
+    assert.equal(await page.locator("#memo-r2").count(), 0);
+    assert.equal(await page.locator("#memo-s2").count(), 0);
     assert.equal(await page.locator('label[for="memo-r1"]').innerText(), "１つ目の項目");
     assert(await page.locator('input[name="level"][value="standard"]').isChecked());
     assert(await page.locator('input[name="output"][value="screen"]').isChecked());
@@ -224,7 +228,15 @@ async function checkDojo(browser, name, width, height) {
     assert.equal(await page.locator("#ownKind").inputValue(), "own");
     assert.equal(await page.locator("#ownText").inputValue(),"制服は必要ですか。");
     assert.equal(await page.locator("#memo-r1").inputValue(),"安全面");
-    await page.locator("#add").click();assert(await page.locator("#memo-r3").isVisible());
+    assert.equal(await page.locator("#memo-r2").count(), 0);
+    await page.locator("#add").click();
+    assert(await page.locator("#memo-r2").isVisible());
+    assert(await page.locator("#memo-s2").isVisible());
+    assert.equal(await page.locator("#memo-r3").count(), 0);
+    assert.equal(await page.locator("#memo-r1").inputValue(),"安全面");
+    await page.locator("#add").click();
+    assert(await page.locator("#memo-r3").isVisible());
+    assert(await page.locator("#memo-s3").isVisible());
     await page.locator('input[name="guide"][value="no"]').check();
     await page.locator("#memo-free").fill("友人と協力");
     await page.locator('input[name="level"][value="advanced"]').check();
