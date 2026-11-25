@@ -88,7 +88,7 @@ async function checkHome(browser, name, width, height) {
     "待ってろ文キャン", "三田キャンへの道"
   ]);
   assert.equal(await page.locator('.card.sum p').innerText(), '船頭多くして船山に上る｜要約問題');
-  assert.match(await page.locator(".lead").innerText(), /入試英語の添削ツール\s*でつ/);
+  assert.match(await page.locator(".lead").innerText(), /入試英語の支援ツール\s*でつ/);
   assert.equal(await page.locator(".lead-detsu").innerText(), "でつ");
   assert.equal(await page.locator(".lead-detsu").evaluate(e => getComputedStyle(e).display), "block");
   for (const selector of [".howto-title"]) {

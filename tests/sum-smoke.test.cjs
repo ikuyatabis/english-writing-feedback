@@ -62,7 +62,7 @@ test("HTML includes the official label and all eight menus in the required order
   assert.match(homepage, /<p>船頭多くして船山に上る｜要約問題<\/p>/);
   const order = [...homepage.matchAll(/class="card [^"]+" href="\.\/([^/]+)\//g)].map(m => m[1]);
   assert.deepEqual(order, ["brest", "misc", "ito", "trans", "sum", "eiken", "buncan", "mita"]);
-  assert.match(homepage, /入試英語の添削ツール<span class="lead-detsu">でつ<\/span>/);
+  assert.match(homepage, /入試英語の支援ツール<span class="lead-detsu">でつ<\/span>/);
 });
 
 test("History page has noindex, ordered dates, and consistent date labels", () => {
