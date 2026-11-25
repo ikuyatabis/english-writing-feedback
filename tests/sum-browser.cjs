@@ -145,7 +145,7 @@ async function checkDojo(browser, name, width, height) {
     });
     await page.goto(pathToFileURL(path.resolve(__dirname,"..","brest","index.html")).href);
     assert.equal(await page.locator("h1").innerText(),"閃き道場｜自由英作文入門");
-    assert.deepEqual(await page.locator(".masthead-inner").evaluate(el => [...el.children].slice(0,5).map(child => child.textContent.trim())), ["道", "英文の添削じゃないよ", "閃き道場｜自由英作文入門", "", "日本語で構想メモを作る練習を行います。"]);
+    assert.deepEqual(await page.locator(".masthead-inner").evaluate(el => [...el.children].slice(0,5).map(child => child.textContent.trim())), ["道", "英文の添削？まだ早い！", "閃き道場｜自由英作文入門", "", "日本語で構想メモを作る練習を行います。"]);
     assert.equal(await page.locator(".lede strong").innerText(),"日本語");
     assert.equal(await page.locator(".lede strong").evaluate(e=>getComputedStyle(e).color),"rgb(198, 40, 40)");
     assert.equal(await page.locator(".lede strong").evaluate(e=>getComputedStyle(e).fontWeight),"700");
@@ -209,7 +209,7 @@ async function checkDojo(browser, name, width, height) {
     assert.equal(await page.locator("#pause").isEnabled(),false);
     await page.screenshot({ path: path.join(artifacts, "dojo-" + name + ".png"), fullPage: true });
     assert.equal(await page.title(), "閃き道場｜自由英作文入門");
-    assert.equal(await page.locator("header").getByText("英文の添削じゃないよ", { exact: true }).count(), 1);
+    assert.equal(await page.locator("header").getByText("英文の添削？まだ早い！", { exact: true }).count(), 1);
     assert(await page.locator('input[name="source"][value="own"]').isChecked());
     assert.equal(await page.locator("#kind").isVisible(), false);
     assert.equal(await page.locator('label[for="kind"]').isVisible(), false);
