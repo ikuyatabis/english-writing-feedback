@@ -145,7 +145,10 @@ async function checkDojo(browser, name, width, height) {
     });
     await page.goto(pathToFileURL(path.resolve(__dirname,"..","brest","index.html")).href);
     assert.equal(await page.locator("h1").innerText(),"閃き道場｜自由英作文入門");
-    assert.deepEqual(await page.locator(".masthead-inner").evaluate(el => [...el.children].slice(0,5).map(child => child.textContent.trim())), ["道", "You never know what you can do till you try.", "閃き道場｜自由英作文入門", "", "構想メモを作る練習を行います。"]);
+    assert.deepEqual(await page.locator(".masthead-inner").evaluate(el => [...el.children].slice(0,5).map(child => child.textContent.trim())), ["道", "You never know what you can do till you try.", "閃き道場｜自由英作文入門", "", "日本語で構想メモを作る練習を行います。"]);
+    assert.equal(await page.locator(".lede strong").innerText(),"日本語");
+    assert.equal(await page.locator(".lede strong").evaluate(e=>getComputedStyle(e).color),"rgb(198, 40, 40)");
+    assert.equal(await page.locator(".lede strong").evaluate(e=>getComputedStyle(e).fontWeight),"700");
     assert.equal(await page.locator(".tricolor span").count(), 3);
     assert.match(await page.locator("body").evaluate(e => getComputedStyle(e).fontFamily), /Zen Kaku Gothic New/);
     assert.match(await page.locator("h1").evaluate(e => getComputedStyle(e).fontFamily), /Shippori Mincho/);
