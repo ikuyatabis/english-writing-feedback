@@ -388,7 +388,7 @@ async function checkDojo(browser, name, width, height) {
     await page.locator("#phrases").check();await page.locator("#example").check();
     await page.locator('input[name="output"][value="both"]').check();
     p=await capturePrompt();
-    assert.match(p,/学習モード】発展/);assert.match(p,/おすすめフレーズ：希望あり/);
+    assert.match(p,/学習モード】発展/);assert.match(p,/おすすめフレーズ：希望あり/);assert(p.includes("テーマや文脈により的確な語彙・熟語・自然な語の組み合わせを選び、表現の幅を広げる。不必要な難語は避ける。"));assert(p.includes("論理を深め、内容に即した的確な語彙・多様な構文で表現力を高める。ただし、不必要な難語・複雑な構文は避け、高校生が学習して再現できる自然な英語にする。"));assert(!p.includes("高校生が自力で使いやすい、平易で汎用性の高い語彙・表現を優先する。"));assert(!p.includes("高校生が自力で再現しやすい平易な語彙・構文を用いる。大学入試の答案として十分な正確さ・明快さ・論理性を保つ。"));
     assert.match(p,/英語の解答例：希望あり/);assert.match(p,/JIS B5/);
     assert.match(p,/Word＋PDF/);assert.match(p,/友人と協力/);
     await page.locator('input[name="timer"][value="off"]').check();
