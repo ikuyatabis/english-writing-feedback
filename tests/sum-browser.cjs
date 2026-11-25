@@ -284,7 +284,7 @@ async function checkDojo(browser, name, width, height) {
     assert.match(await capturePrompt(), /"問題の種類": "意見の表明"/);
     await page.locator("#ownKind").selectOption("personal");
     assert(await page.locator("#ownPersonalHint").isVisible());
-    assert.equal(await page.locator("#ownPersonalHint").innerText(),"過去の体験や目標など");
+    assert.equal(await page.locator("#ownPersonalHint").innerText(),"過去の体験や将来の目標など");
     assert.equal(await page.locator("#originalPersonalHint").isVisible(),false);
     assert(await page.locator("#addConclusion").isVisible());
     assert.equal(await page.locator("#add").isVisible(),false);
@@ -324,7 +324,7 @@ async function checkDojo(browser, name, width, height) {
     assert.equal(await page.locator("#memo-r1").inputValue(),"");
     await page.locator("#kind").selectOption("personal");
     assert(await page.locator("#originalPersonalHint").isVisible());
-    assert.equal(await page.locator("#originalPersonalHint").innerText(),"過去の体験や目標など");
+    assert.equal(await page.locator("#originalPersonalHint").innerText(),"過去の体験や将来の目標など");
     assert.equal(await page.locator("#ownPersonalHint").isVisible(),false);
     await page.locator("#kind").selectOption("opinion");
     assert.equal(await page.locator("#originalPersonalHint").isVisible(),false);
