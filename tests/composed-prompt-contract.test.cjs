@@ -156,3 +156,28 @@ test("unavailable passage IV survives Mita's final handoff",async()=>{
  assert(p.includes("【最優先の例外ルール：本文Ⅳが未収録の場合の扱い】"));
  assert(p.includes("【本文Ⅳ未収録時のハードストップ】"));
 });
+
+test("Ito and clinic: two non-scoring coaching rules reach final prompts in all modes",async()=>{
+ for(const page of ["ito","misc"]){const html=fs.readFileSync(path.join(root,page,"index.html"),"utf8");
+ for(const mode of modes){const prompt=await fullPrompt(page,html,mode);assert.match(prompt,/減点対象外の文章構成・表現への助言/);assert.match(prompt,/伝聞よりも断定/);assert.match(prompt,/末尾の一文が冒頭・本文/);assert.match(prompt,/振替減点も禁止/);}}
+});
+test("Brest dojo: bank, syntax, defaults, mode and optional output contracts",()=>{
+ const html=fs.readFileSync(path.join(root,"brest/index.html"),"utf8");
+ const js=html.match(/<script>([\s\S]*?)<\/script>/)[1];new vm.Script(js);
+ assert.match(html,/name="level" value="standard" checked/);assert.match(html,/name="output" value="screen" checked/);
+ assert.match(html,/type="checkbox" id="phrases">/);assert.match(html,/type="checkbox" id="example">/);
+ assert.match(html,/clock\.overtime/);assert.doesNotMatch(html,/スタンダード|アドバンスト/);
+ const bankCode=js.slice(js.indexOf("const bank="),js.indexOf("function syncDifficulty"));
+ const bankContext=vm.createContext({});vm.runInContext(bankCode,bankContext);
+ assert.equal(vm.runInContext("Object.values(bank).flat().length",bankContext),38);
+ for(const k of ["opinion","advice","personal"]){assert(vm.runInContext("bank["+JSON.stringify(k)+"].some(q=>difficultyOf("+JSON.stringify(k)+",q)==='standard')",bankContext));}
+ for(const k of ["opinion","advice"]){assert(vm.runInContext("bank["+JSON.stringify(k)+"].some(q=>difficultyOf("+JSON.stringify(k)+",q)==='advanced')",bankContext));}
+ for(const level of ["standard","advanced"])for(const mode of ["screen","word","pdf","both"])for(const phrases of [false,true])for(const example of [false,true]){
+ const values={ownText:{value:"制服は必要ですか。"},fields:{querySelectorAll:()=>[{id:"memo-free",value:"安全面"}]},kind:{selectedOptions:[{textContent:"意見の表明"}]},phrases:{checked:phrases},example:{checked:example},difficulty:{value:"standard"}};
+ const ctx=vm.createContext({$:id=>values[id],chosen:n=>({source:"own",level,output:mode})[n],document:{querySelector:()=>({textContent:"構想メモ"})}});
+ vm.runInContext(extractFn(html,"function build("),ctx);const p=vm.runInContext("build()",ctx);
+ assert(p.includes("【学習モード】"+(level==="standard"?"標準":"発展")));assert(p.includes("【おすすめフレーズ：希望"+(phrases?"あり":"なし")+"】"));assert(p.includes("【英語の解答例：希望"+(example?"あり":"なし")+"】"));assert.match(p,/ワンバウンド/);assert.match(p,/１回で完結/);
+ if(mode==="screen")assert.doesNotMatch(p,/ASCII\/hAnsi/);else{assert.match(p,/JIS B5/);assert.match(p,/ASCII\/hAnsi/);assert.match(p,/Century Schoolbook Bold/);assert.match(p,/PDFを直接独立組版しない/);}
+ }
+ assert.match(fs.readFileSync(path.join(root,"index.html"),"utf8"),/href="\.\/brest\//);
+});
