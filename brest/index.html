@@ -164,14 +164,24 @@ button:disabled{opacity:.5;cursor:default}
 .timer-options h2{margin:0;font-family:var(--font-serif);font-size:.88rem;font-weight:700;color:var(--teal-dark)}
 .timer-setup .choices{flex-direction:row;gap:6px}
 .timer-setup .choice{width:auto;padding:3px 8px;font-size:.84rem;gap:4px}
-.timer-controls{display:flex;align-items:center;gap:8px 14px;flex-wrap:wrap}
-.timer-controls .row{margin-top:5px}
+.timer-controls{display:flex;align-items:center;gap:12px;flex-wrap:nowrap}
+.timer-controls .row{margin-top:5px;flex-wrap:nowrap;flex:0 0 auto;white-space:nowrap}
+.timer-controls .row button{flex:0 0 auto;white-space:nowrap}
 #minutes{width:64px;min-height:32px;padding:3px 6px}
 .timer-controls button,.timer-controls button.secondary{padding:5px 10px;font-size:.82rem}
 #start,#pause{min-width:36px;font-family:var(--font-sans);font-size:1rem;line-height:1.35}
 .timer-setup .note{margin:4px 0 0;font-size:.78rem}
 #timerMessage{margin:0;font-size:.78rem;color:var(--alert)}
-@media(max-width:560px){.timer-setup{margin-left:26px;margin-right:26px;padding:6px 8px}.timer-options{gap:4px 8px}.timer-setup .choice{padding:3px 5px}.timer-controls{gap:0 8px}}
+@media(max-width:560px){
+  .timer-setup{margin-left:26px;margin-right:26px;padding:6px 8px}
+  .timer-options{gap:4px 8px}.timer-setup .choice{padding:3px 5px}
+  .timer-controls{gap:6px}.timer-controls .row{gap:4px;font-size:.82rem}
+  #minutes{width:44px;padding:3px 4px;font-size:.9rem}
+  #start,#pause{min-width:30px;padding:5px 6px}
+  #reset{padding:5px 6px;font-size:.78rem}
+  .timer-controls #clock{font-size:1.2rem}
+}
+@media(max-width:400px){.control-dock .tool-howto,.timer-setup{margin-left:4px;margin-right:4px}}
 #clock{font-size:1.45rem;font-variant-numeric:tabular-nums;font-weight:700}
 #clock.overtime{color:var(--alert)}
 #floatingTimer{position:fixed;right:max(12px,env(safe-area-inset-right));bottom:calc(12px + env(safe-area-inset-bottom,0px));z-index:10;display:flex;align-items:center;gap:9px;padding:6px 12px;background:var(--card);border:1px solid var(--teal-soft);border-radius:5px;box-shadow:0 2px 8px #00000020;color:var(--teal-dark);pointer-events:none;font-size:.82rem}

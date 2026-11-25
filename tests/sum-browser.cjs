@@ -170,6 +170,12 @@ async function checkDojo(browser, name, width, height) {
     assert.equal(await page.locator("#clock").innerText(),"03:00");
     assert.equal(await page.locator("#start").innerText(),"▶");
     assert.equal(await page.locator("#pause").innerText(),"Ⅱ");
+    const timerLayout=await page.locator(".timer-controls").evaluate(el=>{
+      const container=el.getBoundingClientRect(),rects=["#minutes","#clock","#start","#pause","#reset"].map(id=>el.querySelector(id).getBoundingClientRect());
+      const centers=rects.map(r=>r.top+r.height/2);
+      return {sameLine:Math.max(...centers)-Math.min(...centers)<3,contained:rects.every(r=>r.left>=container.left-1&&r.right<=container.right+1)};
+    });
+    assert(timerLayout.sameLine&&timerLayout.contained,name+": timer controls must fit on one line: "+JSON.stringify(timerLayout));
     assert.equal(await page.locator("#start").getAttribute("aria-label"),"開始");
     assert.equal(await page.locator("#pause").getAttribute("aria-label"),"一時停止");
     assert.equal(await page.locator("#start").isEnabled(),true);
