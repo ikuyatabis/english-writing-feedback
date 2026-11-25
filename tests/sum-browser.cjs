@@ -229,7 +229,7 @@ async function checkDojo(browser, name, width, height) {
     await page.locator("#memo-r1").fill("安全面");
     await page.locator("#preview").click();
     let p=await page.locator("#prompt").inputValue();
-    assert.match(p,/ワンバウンド/);assert.match(p,/英語の解答例：希望なし/);assert.match(p,/安全面/);assert.match(p,/"問題の種類": "持ち込み・指定なし（問題文の指示を優先）"/);
+    assert.match(p,/ワンバウンド/);assert.match(p,/構想メモ中の英単語・英語表現も必ず確認/);assert.match(p,/英語表現へのアドバイス/);assert.match(p,/英語の解答例：希望なし/);assert.match(p,/安全面/);assert.match(p,/"問題の種類": "持ち込み・指定なし（問題文の指示を優先）"/);
     await page.locator("#memo-direction").fill("制服の利点を中心に考える");
     await page.locator("#preview").click();
     assert.match(await page.locator("#prompt").inputValue(),/制服の利点を中心に考える/);
