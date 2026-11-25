@@ -184,6 +184,27 @@ button:disabled{opacity:.5;cursor:default}
   .timer-controls #clock{font-size:1.2rem}
 }
 @media(max-width:400px){.control-dock .tool-howto,.timer-setup{margin-left:4px;margin-right:4px}}
+@media (pointer:coarse), (max-width:1024px){
+  #start,#pause,#reset{min-height:44px}
+  #start,#pause{min-width:56px;padding:6px 12px}
+  #reset{min-width:76px}
+  #start svg{width:16px;height:16px}
+}
+@media(max-width:560px){
+  #start,#pause{min-width:48px;padding:5px 8px}
+  #reset{min-width:70px}
+  #minutes{font-size:1rem}
+  .timer-setup{margin-left:4px;margin-right:4px}
+  .control-dock .tool-howto{margin-left:4px;margin-right:4px}
+}
+@media(max-width:360px){
+  .timer-controls{gap:4px}
+  .timer-controls .row{gap:3px}
+  #minutes{width:40px;padding:3px}
+  #start,#pause{min-width:44px;padding:5px 6px}
+  #reset{min-width:64px;padding:5px 4px}
+  .timer-controls #clock{font-size:1.1rem}
+}
 #clock{font-size:1.45rem;font-variant-numeric:tabular-nums;font-weight:700}
 #clock.overtime{color:var(--alert)}
 #floatingTimer{position:fixed;right:max(12px,env(safe-area-inset-right));bottom:calc(12px + env(safe-area-inset-bottom,0px));z-index:10;display:flex;align-items:center;gap:9px;padding:6px 12px;background:var(--card);border:1px solid var(--teal-soft);border-radius:5px;box-shadow:0 2px 8px #00000020;color:var(--teal-dark);pointer-events:none;font-size:.82rem}

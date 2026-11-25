@@ -177,6 +177,12 @@ async function checkDojo(browser, name, width, height) {
       return {sameLine:Math.max(...centers)-Math.min(...centers)<3,contained:rects.every(r=>r.left>=container.left-1&&r.right<=container.right+1)};
     });
     assert(timerLayout.sameLine&&timerLayout.contained,name+": timer controls must fit on one line: "+JSON.stringify(timerLayout));
+    if(width<=1024){
+      for(const selector of ["#start","#pause","#reset"]){
+        const box=await page.locator(selector).boundingBox();
+        assert(box&&box.width>=44&&box.height>=44,name+": touch target too small "+selector);
+      }
+    }
     assert.equal(await page.locator("#start").getAttribute("aria-label"),"開始");
     assert.equal(await page.locator("#pause").getAttribute("aria-label"),"一時停止");
     assert.equal(await page.locator("#start").isEnabled(),true);
