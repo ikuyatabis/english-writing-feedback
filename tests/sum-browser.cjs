@@ -177,7 +177,7 @@ async function checkDojo(browser, name, width, height) {
     assert.equal(await page.locator("#memo-stance").count(), 0);
     assert.equal(await page.locator("#add").isVisible(), false);
     await page.locator('input[name="guide"][value="yes"]').check();
-    assert.equal(await page.locator('label[for="memo-r1"]').innerText(), "1つ目の項目");
+    assert.equal(await page.locator('label[for="memo-r1"]').innerText(), "１つ目の項目");
     assert(await page.locator('input[name="level"][value="standard"]').isChecked());
     assert(await page.locator('input[name="output"][value="screen"]').isChecked());
     assert(!(await page.locator("#phrases").isChecked()));
@@ -189,14 +189,14 @@ async function checkDojo(browser, name, width, height) {
     assert.match(p,/ワンバウンド/);assert.match(p,/英語の解答例：希望なし/);assert.match(p,/安全面/);assert.match(p,/"問題の種類": "持ち込み・指定なし（問題文の指示を優先）"/);
     await page.locator("#ownKind").selectOption("opinion");
     assert(await page.locator("#memo-stance").isVisible());
-    assert.equal(await page.locator('label[for="memo-r1"]').innerText(), "理由1");
+    assert.equal(await page.locator('label[for="memo-r1"]').innerText(), "理由１");
     await page.locator("#memo-r1").fill("学習環境");
     await page.locator("#preview").click();
     assert.match(await page.locator("#prompt").inputValue(), /"問題の種類": "意見の表明"/);
     await page.locator("#ownKind").selectOption("personal");
     assert(await page.locator("#memo-a").isVisible());
     await page.locator("#ownKind").selectOption("advice");
-    assert.equal(await page.locator('label[for="memo-r1"]').innerText(), "1つ目の項目");
+    assert.equal(await page.locator('label[for="memo-r1"]').innerText(), "１つ目の項目");
     await page.locator("#ownKind").selectOption("opinion");
     assert.equal(await page.locator("#memo-r1").inputValue(), "学習環境");
     await page.locator("#ownKind").selectOption("own");
@@ -241,6 +241,7 @@ async function checkDojo(browser, name, width, height) {
     assert.equal(await page.locator(".masthead").evaluate(e => getComputedStyle(e).position), "static");
     assert.equal(await page.locator("#clock").innerText(),"03:00");
     assert.equal(await page.locator("#timerPanel").getByText("時間切れになっても解答を続けることは可能です。", {exact:true}).isVisible(), true);
+    assert.match(await page.locator("#timerPanel").innerText(), /１００ words程度/);
     await page.evaluate(()=>window.scrollTo(0,0));
     await page.waitForFunction(()=>document.getElementById("floatingTimer").hidden);
     await page.locator("#start").click();
