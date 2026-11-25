@@ -17,7 +17,9 @@ async function inspect(page, viewport, name) {
       return { date: box(date), desc: box(desc), dateRight: d.right, descLeft: p.left,
         fontDate: getComputedStyle(date).fontSize, fontDesc: getComputedStyle(desc).fontSize };
     });
-    return { adjust: getComputedStyle(document.documentElement).webkitTextSizeAdjust,
+    const rootStyle = getComputedStyle(document.documentElement);
+    const adjust = rootStyle.getPropertyValue("text-size-adjust").trim() || rootStyle.getPropertyValue("-webkit-text-size-adjust").trim();
+    return { adjust,
       viewport: innerWidth, scrollWidth: document.documentElement.scrollWidth, panel: box(document.querySelector(".panel")), rows };
   });
   assert.equal(layout.adjust, "100%", name + ": automatic text enlargement");
