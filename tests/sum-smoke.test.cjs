@@ -47,7 +47,7 @@ function createHarness() {
   };
 }
 
-test("HTML includes the official label and all seven menus in the required order", () => {
+test("HTML includes the official label and all eight menus in the required order", () => {
   assert.match(html, /より抜き図書館/);
   assert.match(html, /<div class="seal" aria-hidden="true">図<\/div>/);
   assert.match(html, /<p class="kicker">Too many cooks spoil the broth\.<\/p>/);
@@ -58,7 +58,7 @@ test("HTML includes the official label and all seven menus in the required order
   assert.match(homepage, /<h2>より抜き図書館<\/h2>/);
   assert.match(homepage, /<p>船頭多くして船山に上る｜要約問題<\/p>/);
   const order = [...homepage.matchAll(/class="card [^"]+" href="\.\/([^/]+)\//g)].map(m => m[1]);
-  assert.deepEqual(order, ["misc", "ito", "trans", "sum", "eiken", "buncan", "mita"]);
+  assert.deepEqual(order, ["misc", "ito", "trans", "sum", "eiken", "buncan", "mita", "brest"]);
   assert.match(homepage, /入試英語の添削ツール<span class="lead-detsu">でつ<\/span>/);
 });
 
