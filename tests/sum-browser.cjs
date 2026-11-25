@@ -232,23 +232,21 @@ async function checkDojo(browser, name, width, height) {
     assert.match(p,/Word＋PDF/);assert.match(p,/友人と協力/);
     assert.equal(await page.locator("#floatingTimer").isVisible(), false);
     await page.locator('input[name="timer"][value="on"]').check();
+    assert.equal(await page.locator(".masthead").evaluate(e => getComputedStyle(e).position), "static");
     assert.equal(await page.locator("#clock").innerText(),"03:00");
     assert.equal(await page.locator("#timerPanel").getByText("時間切れになっても解答を続けることは可能です。", {exact:true}).isVisible(), true);
     await page.evaluate(()=>window.scrollTo(0,0));
     await page.waitForFunction(()=>document.getElementById("floatingTimer").hidden);
     await page.locator("#start").click();
     await page.evaluate(()=>window.scrollTo(0,document.documentElement.scrollHeight));
-    if(width > 560 && height > 700){
-      await page.waitForFunction(()=>{const r=document.getElementById("clock").getBoundingClientRect();return r.top>=0&&r.bottom<=innerHeight&&document.getElementById("floatingTimer").hidden});
-    }else{
-      await page.waitForFunction(()=>!document.getElementById("floatingTimer").hidden);
-      assert.equal(await page.locator("#floatingTimer").evaluate(e=>getComputedStyle(e).position),"fixed");
-    }
+    await page.waitForFunction(()=>!document.getElementById("floatingTimer").hidden);
+    assert.equal(await page.locator("#floatingTimer").evaluate(e=>getComputedStyle(e).position),"fixed");
     assert.equal(await page.evaluate(()=>document.getElementById("clock").textContent===document.getElementById("floatingClock").textContent),true);
     await page.locator("#pause").click();
     await page.locator("#reset").click();assert.equal(await page.locator("#clock").innerText(),"03:00");
     assert.equal(await page.locator("#floatingClock").textContent(),"03:00");
     await page.locator('input[name="timer"][value="off"]').check();
+    assert.equal(await page.locator(".masthead").evaluate(e => getComputedStyle(e).position), width > 560 && height > 700 ? "sticky" : "static");
     assert.equal(await page.locator("#floatingTimer").isVisible(),false);
     assert.equal(await page.locator("#timerPanel").isVisible(),false);
     assert((await page.evaluate(()=>document.documentElement.scrollWidth))<=width+1);
@@ -337,6 +335,7 @@ async function checkAuditHowto(browser, width, height) {
     await checkHome(browser, "mobile", 390, 844);
     await checkHome(browser, "small-mobile", 320, 700);
     await checkDojo(browser, "desktop", 1365, 900);
+    await checkDojo(browser, "tablet", 820, 1180);
     await checkDojo(browser, "mobile", 390, 844);
     await checkDojo(browser, "small-mobile", 320, 700);
     await checkHistory(browser, "desktop", 1365, 900);
