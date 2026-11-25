@@ -168,7 +168,8 @@ async function checkDojo(browser, name, width, height) {
     assert(await page.locator('input[name="timer"][value="on"]').isChecked());
     assert(await page.locator("#timerPanel").isVisible());
     assert.equal(await page.locator("#clock").innerText(),"03:00");
-    assert.equal(await page.locator("#start").innerText(),"▶");
+    assert.equal(await page.locator("#start svg path").getAttribute("d"),"M4 1.5 L14 8 L4 14.5 Z");
+    assert(await page.locator("#start svg").isVisible());
     assert.equal(await page.locator("#pause").innerText(),"Ⅱ");
     const timerLayout=await page.locator(".timer-controls").evaluate(el=>{
       const container=el.getBoundingClientRect(),rects=["#minutes","#clock","#start","#pause","#reset"].map(id=>el.querySelector(id).getBoundingClientRect());
