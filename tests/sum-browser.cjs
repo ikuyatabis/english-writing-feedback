@@ -143,7 +143,8 @@ async function checkDojo(browser, name, width, height) {
       Object.defineProperty(navigator,"clipboard",{configurable:true,value:{writeText:async text=>{window.__lastCopied=text;}}});
     });
     await page.goto(pathToFileURL(path.resolve(__dirname,"..","brest","index.html")).href);
-    assert.equal(await page.locator("h1").innerText(),"閃き道場");
+    assert.equal(await page.locator("h1").innerText(),"閃き道場｜自由英作文入門");
+    assert.deepEqual(await page.locator("header").evaluate(el => [...el.children].map(child => child.textContent.trim())), ["道", "Practice makes perfect.", "閃き道場｜自由英作文入門", "", "構想メモを作る練習を行います。"]);
     assert.equal(await page.title(), "閃き道場｜自由英作文入門");
     assert.equal(await page.locator("header").getByText("Practice makes perfect.", { exact: true }).count(), 1);
     assert(await page.locator('input[name="source"][value="own"]').isChecked());
