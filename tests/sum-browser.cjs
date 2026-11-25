@@ -78,8 +78,9 @@ async function checkHome(browser, name, width, height) {
   const titleX = await page.locator(".card.sum h2").evaluate(e => e.getBoundingClientRect().x);
   assert(badgeX > titleX, name + " trial badge must appear to the right of the title start");
   assert.deepEqual(titles, [
-    "持ち込み診療所", "伊都への恋文", "ことのは研究室",
-    "より抜き図書館", "英検の庵", "待ってろ文キャン", "三田キャンへの道", "ブレスト道場"
+    "ブレスト道場", "持ち込み診療所", "伊都への恋文",
+    "ことのは研究室", "より抜き図書館", "英検の庵",
+    "待ってろ文キャン", "三田キャンへの道"
   ]);
   assert.equal(await page.locator('.card.sum p').innerText(), '船頭多くして船山に上る｜要約問題');
   assert.match(await page.locator(".lead").innerText(), /入試英語の添削ツール\s*でつ/);
@@ -99,19 +100,21 @@ async function checkHome(browser, name, width, height) {
   }));
   assert.equal(bounds.length, 8, "Homepage must show eight content cards");
   assert.equal(await page.locator(".card.dojo").getAttribute("href"), "./brest/");
-  assert(bounds[7].y > bounds[6].y, "Dojo uses its own final row");
   if (width > 830 || (width > 650 && width >= height)) {
-    // Three cards on the first row, then two two-card rows.
-    assert.equal(bounds[0].y, bounds[1].y);
-    assert.equal(bounds[1].y, bounds[2].y);
-    assert.equal(bounds[3].y, bounds[4].y);
-    assert.equal(bounds[5].y, bounds[6].y);
-    assert(bounds[0].x < bounds[1].x && bounds[1].x < bounds[2].x);
+    // Three cards on each of the first two rows, then two cards on the final row.
+    for (const [first, last] of [[0, 2], [3, 5], [6, 7]]) {
+      for (let i = first + 1; i <= last; i++) {
+        assert.equal(bounds[i].y, bounds[first].y);
+        assert(bounds[i].x > bounds[i - 1].x);
+        assert.equal(bounds[i].width, bounds[first].width);
+      }
+    }
     assert(bounds[3].y > bounds[2].y);
-    assert(bounds[5].y > bounds[4].y);
+    assert(bounds[6].y > bounds[5].y);
+    assert(bounds[6].width > bounds[0].width);
   } else if (width > 650) {
     // Two columns in portrait tablet mode.
-    for(const i of [0,2,4]) assert.equal(bounds[i].y,bounds[i+1].y);
+    for(const i of [0,2,4,6]) assert.equal(bounds[i].y,bounds[i+1].y);
     for(const i of [2,4,6]) assert(bounds[i].y>bounds[i-2].y);
   } else {
     assert(bounds.every((item, i) => i === 0 || item.y > bounds[i-1].y));
