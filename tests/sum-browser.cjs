@@ -264,9 +264,10 @@ async function checkDojo(browser, name, width, height) {
     await page.locator('input[name="timer"][value="on"]').check();
     assert.equal(await page.locator(".masthead").evaluate(e => getComputedStyle(e).position), "static");
     assert.equal(await page.locator("#clock").innerText(),"03:00");
-    assert.match(await page.locator("#timerPanel").innerText(), /構想を練るのが苦手な人は、まずは時間制限を設けずに取り組むのがおすすめです。\s*100words程度/);
     await page.evaluate(()=>window.scrollTo(0,0));
-    await page.waitForFunction(()=>document.getElementById("floatingTimer").hidden);
+    await page.waitForFunction(()=>document.getElementById("floatingTimer").hidden && !document.querySelector(".control-dock").classList.contains("is-docked"));
+    assert(await page.locator("#timerPanel .note").isVisible());
+    assert.match(await page.locator("#timerPanel").innerText(), /構想を練るのが苦手な人は、まずは時間制限を設けずに取り組むのがおすすめです。\s*100words程度/);
     await page.evaluate(()=>window.scrollTo(0,document.documentElement.scrollHeight));
     await page.waitForFunction(()=>!document.getElementById("floatingTimer").hidden);
     const pinnedScroll=await page.evaluate(()=>window.scrollY);
