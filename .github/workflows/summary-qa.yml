@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - "sum/**"
+      - "brest/**"
       - "index.html"
       - "tests/sum-*.cjs"
       - "tests/yorinuki-content-boundary-cases.md"
@@ -14,6 +15,7 @@ on:
   pull_request:
     paths:
       - "sum/**"
+      - "brest/**"
       - "index.html"
       - "tests/sum-*.cjs"
       - "tests/yorinuki-content-boundary-cases.md"
