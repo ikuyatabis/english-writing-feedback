@@ -159,7 +159,13 @@ async function checkDojo(browser, name, width, height) {
     await page.locator("#ownText").click({trial:true});
     await page.locator(".tool-howto summary").click();
     assert.equal(await page.locator(".tool-howto").evaluate(e => e.open), false);
-    assert.equal(await page.locator(".masthead").evaluate(e => getComputedStyle(e).position), width > 560 && height > 700 ? "sticky" : "static");
+    assert.equal(await page.locator(".masthead").evaluate(e => getComputedStyle(e).position), "static");
+    assert.deepEqual(await page.locator('input[name="timer"]').evaluateAll(es=>es.map(e=>e.value)), ["on","off"]);
+    assert(await page.locator('input[name="timer"][value="on"]').isChecked());
+    assert(await page.locator("#timerPanel").isVisible());
+    assert.equal(await page.locator("#clock").innerText(),"03:00");
+    assert.equal(await page.locator("#start").isEnabled(),true);
+    assert.equal(await page.locator("#pause").isEnabled(),false);
     await page.screenshot({ path: path.join(artifacts, "dojo-" + name + ".png"), fullPage: true });
     assert.equal(await page.title(), "閃き道場｜自由英作文入門");
     assert.equal(await page.locator("header").getByText("You never know what you can do till you try.", { exact: true }).count(), 1);
@@ -248,6 +254,8 @@ async function checkDojo(browser, name, width, height) {
     assert.match(p,/学習モード】発展/);assert.match(p,/おすすめフレーズ：希望あり/);
     assert.match(p,/英語の解答例：希望あり/);assert.match(p,/JIS B5/);
     assert.match(p,/Word＋PDF/);assert.match(p,/友人と協力/);
+    await page.locator('input[name="timer"][value="off"]').check();
+    assert.equal(await page.locator("#timerPanel").isVisible(), false);
     assert.equal(await page.locator("#floatingTimer").isVisible(), false);
     await page.locator('input[name="timer"][value="on"]').check();
     assert.equal(await page.locator(".masthead").evaluate(e => getComputedStyle(e).position), "static");
