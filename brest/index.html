@@ -167,9 +167,9 @@ button:disabled{opacity:.5;cursor:default}
 .timer-options h2{margin:0;font-family:var(--font-serif);font-size:.88rem;font-weight:700;color:var(--teal-dark)}
 .timer-setup .choices{flex-direction:row;gap:6px}
 .timer-setup .choice{width:auto;padding:3px 8px;font-size:.84rem;gap:4px}
-.timer-controls{display:flex;align-items:center;gap:12px;flex-wrap:nowrap}
-.timer-controls .row{margin-top:5px;flex-wrap:nowrap;flex:0 0 auto;white-space:nowrap}
-.timer-controls .row button{flex:0 0 auto;white-space:nowrap}
+.timer-controls{display:flex;align-items:center;justify-content:flex-start;gap:12px;flex-wrap:nowrap;margin-top:5px;white-space:nowrap}
+.timer-controls>*{flex:0 0 auto}
+.timer-controls button{width:auto;flex:0 0 auto;white-space:nowrap}
 #minutes{width:64px;min-height:32px;padding:3px 6px}
 .timer-controls button,.timer-controls button.secondary{padding:5px 10px;font-size:.82rem}
 #start,#pause{min-width:36px;font-family:var(--font-sans);font-size:1rem;line-height:1.35}
@@ -180,7 +180,7 @@ button:disabled{opacity:.5;cursor:default}
 @media(max-width:560px){
   .timer-setup{margin-left:26px;margin-right:26px;padding:6px 8px}
   .timer-options{gap:4px 8px}.timer-setup .choice{padding:3px 5px}
-  .timer-controls{gap:12px;justify-content:space-between}.timer-controls .row{gap:8px;font-size:.82rem}
+  .timer-controls{gap:8px;font-size:.82rem}
   #minutes{width:44px;padding:3px 4px;font-size:.9rem}
   #start,#pause{min-width:30px;padding:5px 6px}
   #reset{padding:5px 6px;font-size:.78rem}
@@ -201,8 +201,7 @@ button:disabled{opacity:.5;cursor:default}
   .control-dock .tool-howto{margin-left:4px;margin-right:4px}
 }
 @media(max-width:360px){
-  .timer-controls{gap:6px}
-  .timer-controls .row{gap:5px}
+  .timer-controls{gap:5px}
   #minutes{width:40px;padding:3px}
   #start,#pause{min-width:44px;padding:5px 6px}
   #reset{min-width:64px;padding:5px 4px}
@@ -247,7 +246,7 @@ section:has(input[name="source"][value="original"]:checked) #own{display:none!im
         <li>④ ChatGPTの入力欄に貼り付けて送信します。</li>
       </ol>
     </details>
-    <section class="timer-setup" aria-label="タイマー"><div class="timer-options"><h2>タイマー</h2><div class="choices"><label class="choice"><input type="radio" name="timer" value="on" checked> 設定する</label><label class="choice"><input type="radio" name="timer" value="off"> 設定しない</label></div></div><div id="timerPanel"><div class="timer-controls"><div class="row"><input type="number" id="minutes" min="1" max="10" step="1" value="3" aria-label="分">分 <span id="clock" role="timer">03:00</span></div><div class="row"><button id="start" aria-label="開始" title="開始"><svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" focusable="false"><path d="M4 1.5 L14 8 L4 14.5 Z" fill="currentColor"/></svg></button><button id="pause" class="secondary" aria-label="一時停止" title="一時停止">Ⅱ</button><button id="reset" class="secondary">リセット</button></div></div><div class="timer-guidance"><div class="timer-guidance-inner"><p class="note">構想を練るのが苦手な人は、まずは時間制限を設けずに取り組むのがおすすめです。<br>100words程度の自由英作文であれば、構想メモの作成に少なくとも３分は充てましょう。</p></div></div><p id="timerMessage" role="status"></p></div></section>
+    <section class="timer-setup" aria-label="タイマー"><div class="timer-options"><h2>タイマー</h2><div class="choices"><label class="choice"><input type="radio" name="timer" value="on" checked> 設定する</label><label class="choice"><input type="radio" name="timer" value="off"> 設定しない</label></div></div><div id="timerPanel"><div class="timer-controls"><input type="number" id="minutes" min="1" max="10" step="1" value="3" aria-label="分"><span class="timer-unit">分</span><span id="clock" role="timer">03:00</span><button id="start" aria-label="開始" title="開始"><svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" focusable="false"><path d="M4 1.5 L14 8 L4 14.5 Z" fill="currentColor"/></svg></button><button id="pause" class="secondary" aria-label="一時停止" title="一時停止">Ⅱ</button><button id="reset" class="secondary">リセット</button></div><div class="timer-guidance"><div class="timer-guidance-inner"><p class="note">構想を練るのが苦手な人は、まずは時間制限を設けずに取り組むのがおすすめです。<br>100words程度の自由英作文であれば、構想メモの作成に少なくとも３分は充てましょう。</p></div></div><p id="timerMessage" role="status"></p></div></section>
 </div>
 <main class="sheet-wrap">
 <section class="panel"><h2>問題を選ぶ</h2><div class="choices"><label class="choice"><input type="radio" name="source" value="own" checked> 自分で問題を入力する</label><label class="choice"><input type="radio" name="source" value="original"> オリジナル問題で練習する</label></div><div id="own"><label class="lbl" for="ownKind">問題の種類</label><select id="ownKind"><option value="own">指定なし</option><option value="opinion">意見の表明</option><option value="advice">提案・助言</option><option value="personal">自分自身についての記述（過去の体験や将来の目標など）</option></select><p class="note">日本語でも英語でも構いません。自分で考えた問題や、手持ちの教材などを活用できます。</p><textarea id="ownText" placeholder="問題文を入力してください"></textarea></div><div id="original" hidden><label class="lbl" for="kind">問題の種類</label><select id="kind"><option value="opinion">意見の表明</option><option value="advice">提案・助言</option><option value="personal">自分自身についての記述（過去の体験や将来の目標など）</option></select><label class="lbl" for="difficulty">問題の難易度</label><select id="difficulty"><option value="standard">標準</option><option value="advanced">発展</option></select><p id="questionLevel" class="note"></p><p id="question"></p><button class="secondary" id="next">別の問題を出す</button></div></section>
