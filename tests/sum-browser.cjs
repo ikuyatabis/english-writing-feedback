@@ -105,7 +105,7 @@ async function checkHome(browser, name, width, height) {
   }));
   assert.equal(bounds.length, 8, "Homepage must show eight content cards");
   assert.equal(await page.locator(".card.dojo").getAttribute("href"), "./brest/");
-  assert.equal(await page.locator(".card.dojo p").innerText(), "習うより慣れよ｜自由英作文入門");
+  assert.equal(await page.locator(".card.dojo p").innerText(), "物は試し｜自由英作文入門");
   if (width > 830 || (width > 650 && width >= height)) {
     // Three cards on each of the first two rows, then two cards on the final row.
     for (const [first, last] of [[0, 2], [3, 5], [6, 7]]) {
@@ -144,9 +144,9 @@ async function checkDojo(browser, name, width, height) {
     });
     await page.goto(pathToFileURL(path.resolve(__dirname,"..","brest","index.html")).href);
     assert.equal(await page.locator("h1").innerText(),"閃き道場｜自由英作文入門");
-    assert.deepEqual(await page.locator("header").evaluate(el => [...el.children].map(child => child.textContent.trim())), ["道", "Practice makes perfect.", "閃き道場｜自由英作文入門", "", "構想メモを作る練習を行います。"]);
+    assert.deepEqual(await page.locator("header").evaluate(el => [...el.children].map(child => child.textContent.trim())), ["道", "You never know what you can do till you try.", "閃き道場｜自由英作文入門", "", "構想メモを作る練習を行います。"]);
     assert.equal(await page.title(), "閃き道場｜自由英作文入門");
-    assert.equal(await page.locator("header").getByText("Practice makes perfect.", { exact: true }).count(), 1);
+    assert.equal(await page.locator("header").getByText("You never know what you can do till you try.", { exact: true }).count(), 1);
     assert(await page.locator('input[name="source"][value="own"]').isChecked());
     assert(await page.locator('input[name="level"][value="standard"]').isChecked());
     assert(await page.locator('input[name="output"][value="screen"]').isChecked());
