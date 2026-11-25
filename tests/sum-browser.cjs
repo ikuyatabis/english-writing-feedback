@@ -223,6 +223,10 @@ async function checkDojo(browser, name, width, height) {
     assert.equal(await page.locator('label[for="memo-r1"]').innerText(), "１つ目の項目");
     assert(await page.locator('input[name="level"][value="standard"]').isChecked());
     assert(await page.locator('input[name="output"][value="screen"]').isChecked());
+    assert.equal(await page.locator(".output-format-picker label").allTextContents().then(xs=>xs.map(x=>x.trim())).then(xs=>xs.join("|")),"画面結果のみ（標準）※最速です|Word|PDF|Word＋PDF");
+    assert.equal(await page.locator(".output-format-picker .note").innerText(),"Word・PDFはJIS B5（182×257 mm）・縦向き。");
+    assert.equal(await page.getByText("アドバイスのみ（標準）※最速です",{exact:true}).count(),1);
+    assert.equal(await page.getByText("※英文の解答例の作成には時間がかかる場合があります。",{exact:true}).count(),0);
     assert(!(await page.locator("#phrases").isChecked()));
     assert(!(await page.locator("#example").isChecked()));
     await page.locator("#ownText").fill("制服は必要ですか。");
