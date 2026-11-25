@@ -105,7 +105,7 @@ async function checkHome(browser, name, width, height) {
   }));
   assert.equal(bounds.length, 8, "Homepage must show eight content cards");
   assert.equal(await page.locator(".card.dojo").getAttribute("href"), "./brest/");
-  assert.equal(await page.locator(".card.dojo p").innerText(), "自由英作文入門");
+  assert.equal(await page.locator(".card.dojo p").innerText(), "はじめの一歩｜自由英作文");
   if (width > 830 || (width > 650 && width >= height)) {
     // Three cards on each of the first two rows, then two cards on the final row.
     for (const [first, last] of [[0, 2], [3, 5], [6, 7]]) {
