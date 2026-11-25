@@ -145,7 +145,7 @@ async function checkDojo(browser, name, width, height) {
     });
     await page.goto(pathToFileURL(path.resolve(__dirname,"..","brest","index.html")).href);
     assert.equal(await page.locator("h1").innerText(),"閃き道場｜自由英作文入門");
-    assert.deepEqual(await page.locator(".masthead-inner").evaluate(el => [...el.children].slice(0,5).map(child => child.textContent.trim())), ["道", "自由英作は構想メモで決まる", "閃き道場｜自由英作文入門", "", "日本語で構想メモを作る練習を行います。"]);
+    assert.deepEqual(await page.locator(".masthead-inner").evaluate(el => [...el.children].slice(0,5).map(child => child.textContent.trim())), ["道", "自由英作は構想メモで決まる", "閃き道場｜自由英作文入門", "", "日本語で構想メモを作る練習を行います。英文の添削は行いません。"]);
     assert.equal(await page.locator(".lede strong").innerText(),"日本語");
     assert.equal(await page.locator(".lede strong").evaluate(e=>getComputedStyle(e).color),"rgb(198, 40, 40)");
     assert.equal(await page.locator(".lede strong").evaluate(e=>getComputedStyle(e).fontWeight),"700");
