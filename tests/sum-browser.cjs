@@ -312,12 +312,15 @@ async function checkDojo(browser, name, width, height) {
     assert(!(await page.locator("#ownText").isVisible()));
     assert(await page.locator("#kind").isVisible());
     assert(await page.locator("#difficulty").isVisible());
+    assert(await page.locator('input[name="level"][value="basic"]').isChecked());
     assert.equal(await page.locator("#memo-direction").count(),0);
     assert.equal(await page.locator("#memo-r1").inputValue(),"");
     assert.equal(await page.locator("#question").isVisible(),false);
     assert.equal(await page.locator("#question").textContent(),"");
     assert.equal(await page.locator("#next").innerText(),"問題を見る");
     await page.locator("#difficulty").selectOption("advanced");
+    assert(await page.locator('input[name="level"][value="advanced"]').isChecked());
+    await page.locator('input[name="level"][value="basic"]').check();
     assert.equal(await page.locator("#question").isVisible(),false);
     await page.locator("#go").click();
     assert.match(await page.locator("#feedback").innerText(),/問題を見る/);
@@ -327,6 +330,7 @@ async function checkDojo(browser, name, width, height) {
     assert(await page.locator("#question").isVisible());
     assert.match(await page.locator("#question").innerText(),/^（発展レベル）.+/);
     assert.equal(await page.locator("#next").innerText(),"問題を変更する");
+    assert(await page.locator('input[name="level"][value="basic"]').isChecked());
     assert.equal(await page.locator("#clock").innerText(),beforeReveal);
     assert(await page.locator("#start").isEnabled());
     assert(!(await page.locator("#pause").isEnabled()));
@@ -349,6 +353,7 @@ async function checkDojo(browser, name, width, height) {
     assert.equal(await page.locator("#originalPersonalHint").isVisible(),false);
     await page.locator("#kind").selectOption("personal");
     assert.equal(await page.locator("#difficulty").inputValue(),"basic");
+    assert(await page.locator('input[name="level"][value="basic"]').isChecked());
     assert.equal(await page.locator("#question").isVisible(),false);
     assert.equal(await page.locator("#next").innerText(),"問題を見る");
     await page.locator("#next").click();
