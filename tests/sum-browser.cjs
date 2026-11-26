@@ -312,6 +312,7 @@ async function checkDojo(browser, name, width, height) {
     assert(!(await page.locator("#ownText").isVisible()));
     assert(await page.locator("#kind").isVisible());
     assert(await page.locator("#difficulty").isVisible());
+    assert.equal(await page.locator("#advancedQuestionAdviceHint").isVisible(),false);
     assert(await page.locator('input[name="level"][value="basic"]').isChecked());
     assert.equal(await page.locator("#memo-direction").count(),0);
     assert.equal(await page.locator("#memo-r1").inputValue(),"");
@@ -319,6 +320,8 @@ async function checkDojo(browser, name, width, height) {
     assert.equal(await page.locator("#question").textContent(),"");
     assert.equal(await page.locator("#next").innerText(),"問題を見る");
     await page.locator("#difficulty").selectOption("advanced");
+    assert(await page.locator("#advancedQuestionAdviceHint").isVisible());
+    assert.equal((await page.locator("#advancedQuestionAdviceHint").innerText()).trim(),"基礎的な改善点のみシンプルに知りたい場合は、「基礎」を選択してください。");
     assert(await page.locator('input[name="level"][value="advanced"]').isChecked());
     await page.locator('input[name="level"][value="basic"]').check();
     assert.equal(await page.locator("#question").isVisible(),false);
@@ -353,6 +356,7 @@ async function checkDojo(browser, name, width, height) {
     assert.equal(await page.locator("#originalPersonalHint").isVisible(),false);
     await page.locator("#kind").selectOption("personal");
     assert.equal(await page.locator("#difficulty").inputValue(),"basic");
+    assert.equal(await page.locator("#advancedQuestionAdviceHint").isVisible(),false);
     assert(await page.locator('input[name="level"][value="basic"]').isChecked());
     assert.equal(await page.locator("#question").isVisible(),false);
     assert.equal(await page.locator("#next").innerText(),"問題を見る");
