@@ -321,7 +321,7 @@ async function checkDojo(browser, name, width, height) {
     assert.equal(await page.locator("#next").innerText(),"問題を見る");
     await page.locator("#difficulty").selectOption("advanced");
     assert(await page.locator("#advancedQuestionAdviceHint").isVisible());
-    assert.equal((await page.locator("#advancedQuestionAdviceHint").innerText()).trim(),"基礎的な改善点のみシンプルに知りたい場合は、「基礎」を選択してください。");
+    assert.equal((await page.locator("#advancedQuestionAdviceHint").innerText()).trim(),"基礎的な改善点のみシンプルに知りたい場合は「基礎」を選択してください。");
     assert(await page.locator('input[name="level"][value="advanced"]').isChecked());
     await page.locator('input[name="level"][value="basic"]').check();
     assert.equal(await page.locator("#question").isVisible(),false);
