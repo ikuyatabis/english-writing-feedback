@@ -104,7 +104,7 @@ async function checkHome(browser, name, width, height) {
     return { x: Math.round(b.x), y: Math.round(b.y), width: Math.round(b.width) };
   }));
   assert.equal(bounds.length, 8, "Homepage must show eight content cards");
-  assert.equal(await page.locator(".card.dojo").getAttribute("href"), "./brest/");
+  assert.equal(await page.locator(".card.dojo").getAttribute("href"), "./brain/");
   assert.equal(await page.locator(".card.dojo p").innerText(), "初めの一歩｜自由英作文");
   if (width > 830 || (width > 650 && width >= height)) {
     // Three cards on each of the first two rows, then two cards on the final row.
@@ -144,7 +144,7 @@ async function checkDojo(browser, name, width, height) {
       Object.defineProperty(navigator,"clipboard",{configurable:true,value:{writeText:async text=>{if(window.__failCopy)throw Error("test clipboard failure");window.__lastCopied=text;}}});
       const execCommand=document.execCommand.bind(document);document.execCommand=(...args)=>window.__failCopy&&args[0]==="copy"?false:execCommand(...args);
     });
-    await page.goto(pathToFileURL(path.resolve(__dirname,"..","brest","index.html")).href);
+    await page.goto(pathToFileURL(path.resolve(__dirname,"..","brain","index.html")).href);
     assert.equal(await page.locator("h1").innerText(),"ブレスト道場｜自由英作文入門");
     assert.deepEqual(await page.locator(".masthead-inner").evaluate(el => [...el.children].slice(0,5).map(child => child.textContent.trim())), ["道", "英文の添削？まだ早い！", "ブレスト道場｜自由英作文入門", "", "日本語で構想メモを作る練習を行います。"]);
     assert.equal(await page.locator(".lede strong").innerText(),"日本語");
@@ -493,7 +493,7 @@ async function checkDojo(browser, name, width, height) {
     assert.equal(await page.locator(".timer-guidance").evaluate(e=>e.open),false);
     assert((await page.evaluate(()=>document.documentElement.scrollWidth))<=width+1);
     assert.equal(errors.length,0,errors.join("; "));
-    console.log("Brest dojo "+name+": PASS");
+    console.log("Brain dojo "+name+": PASS");
   }finally{await context.close();}
 }
 

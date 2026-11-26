@@ -5,7 +5,7 @@ on:
     branches: [main]
     paths:
       - "sum/**"
-      - "brest/**"
+      - "brain/**"
       - "ito/index.html"
       - "mita/index.html"
       - "misc/index.html"
@@ -20,7 +20,7 @@ on:
   pull_request:
     paths:
       - "sum/**"
-      - "brest/**"
+      - "brain/**"
       - "ito/index.html"
       - "mita/index.html"
       - "misc/index.html"

@@ -164,8 +164,8 @@ test("Ito and clinic: two non-scoring coaching rules reach final prompts in all 
  for(const page of ["ito","misc"]){const html=fs.readFileSync(path.join(root,page,"index.html"),"utf8");
  for(const mode of modes){const prompt=await fullPrompt(page,html,mode);assert.match(prompt,/減点対象外の文章構成・表現への助言/);assert.match(prompt,/伝聞よりも断定/);assert.match(prompt,/末尾の一文が冒頭・本文/);assert.match(prompt,/振替減点も禁止/);}}
 });
-test("Brest dojo: bank, syntax, defaults, mode and optional output contracts",()=>{
- const html=fs.readFileSync(path.join(root,"brest/index.html"),"utf8");
+test("Brain dojo: bank, syntax, defaults, mode and optional output contracts",()=>{
+ const html=fs.readFileSync(path.join(root,"brain/index.html"),"utf8");
  const js=html.match(/<script>([\s\S]*?)<\/script>/)[1];new vm.Script(js);
  assert.match(html,/name="level" value="basic" checked/);assert.match(html,/name="level" value="basic" checked> 基礎/);assert.match(html,/name="level" value="advanced"> 発展/);assert.match(html,/<option value="basic">基礎<\/option><option value="advanced">発展<\/option>/);assert.doesNotMatch(html,/value="(?:standard|applied)"/);assert.match(html,/画面表示のみ（標準）※最速です/);assert.match(html,/name="output" value="screen" checked/);
  assert.match(html,/type="checkbox" id="phrases">/);assert.match(html,/type="checkbox" id="example">/);
@@ -184,5 +184,5 @@ test("Brest dojo: bank, syntax, defaults, mode and optional output contracts",()
  assert.match(p,/学習モードは問題の難易度とは独立して適用/);assert.match(p,/ワンバウンド/);assert.match(p,/１回で完結/);assert.match(p,/構想メモ中の英単語・英語表現も必ず確認/);assert.doesNotMatch(p,/英検に限定しません|柴田答案ラボ|(?:閃き道場|ひらめき道場|ブレスト道場|道場ひらめき)/);assert(p.startsWith('あなたは大学受験英語の指導に精通した英語講師です。大学入試の自由英作文を書く前の準備として、生徒が作成した構想メモを読み、設問に即した説得力のある内容と論理的な構成を自力で考えられるように助言してください。'));assert.match(p,/英語表現へのアドバイス/);assert.match(p,/メモとして自然な省略は誤りとしない/);assert.match(p,/おすすめフレーズ・英語の解答例の希望の有無、出力形式にかかわらず適用/);assert.match(p,/enviroment・discuss about the issue/);
  if(mode==="screen")assert.doesNotMatch(p,/ASCII\/hAnsi/);else{assert.match(p,/JIS B5/);assert.match(p,/ASCII\/hAnsi/);assert.match(p,/Century Schoolbook Bold/);assert.match(p,/PDFを直接独立組版しない/);}
  }
- assert.match(fs.readFileSync(path.join(root,"index.html"),"utf8"),/href="\.\/brest\//);
+ assert.match(fs.readFileSync(path.join(root,"index.html"),"utf8"),/href="\.\/brain\//);
 });

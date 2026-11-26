@@ -38,7 +38,7 @@ async function inspectPublicPage(page, viewport, name) {
   return layout;
 }
 async function checkPublicPages(browser) {
-  const files = ["index.html", "history/index.html", "ito/index.html", "buncan/index.html", "mita/index.html", "misc/index.html", "trans/index.html", "sum/index.html", "eiken/index.html", "brest/index.html"];
+  const files = ["index.html", "history/index.html", "ito/index.html", "buncan/index.html", "mita/index.html", "misc/index.html", "trans/index.html", "sum/index.html", "eiken/index.html", "brain/index.html"];
   const fs = require("node:fs");
   const failures = [];
   for (const file of files) {

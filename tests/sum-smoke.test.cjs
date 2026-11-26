@@ -61,7 +61,7 @@ test("HTML includes the official label and all eight menus in the required order
   assert.match(homepage, /<h2>より抜き図書館<\/h2>/);
   assert.match(homepage, /<p>船頭多くして船山に上る｜要約問題<\/p>/);
   const order = [...homepage.matchAll(/class="card [^"]+" href="\.\/([^/]+)\//g)].map(m => m[1]);
-  assert.deepEqual(order, ["brest", "misc", "ito", "trans", "sum", "eiken", "buncan", "mita"]);
+  assert.deepEqual(order, ["brain", "misc", "ito", "trans", "sum", "eiken", "buncan", "mita"]);
   assert.match(homepage, /入試英語の支援ツール<span class="lead-detsu">でつ<\/span>/);
 });
 
