@@ -224,6 +224,7 @@ async function checkDojo(browser, name, width, height) {
     assert(await page.locator("#ownKind").evaluate(e => Boolean(e.compareDocumentPosition(document.getElementById("ownText")) & Node.DOCUMENT_POSITION_FOLLOWING)));
     assert.equal(await page.locator("#difficulty").isVisible(), false);
     assert(await page.locator('input[name="guide"][value="no"]').isChecked());
+    assert.equal(await page.locator("#brainstormStart").innerText(),"誘導の有無を選んだら、ひとりブレインストーミング開始です！\n慣れてきたら、ここでタイマーをonにしてみましょう🕒");
     assert(await page.locator("#memo-free").isVisible());
     assert.equal(await page.locator("#fields textarea").count(), 1);
     assert.equal(await page.locator("#memo-r1").count(), 0);
