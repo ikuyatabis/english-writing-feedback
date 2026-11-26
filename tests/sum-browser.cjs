@@ -74,7 +74,7 @@ async function checkHome(browser, name, width, height) {
   const titles = await page.locator(".grid .card h2").evaluateAll(nodes => nodes.map(node => node.firstChild?.textContent?.trim() || ""));
   assert.equal(await page.locator(".card.ito .new-mark").count(), 0);
   assert.equal(await page.locator(".card.sum .new-mark").count(), 0);
-  for (const [card, label] of [["dojo", "試験運用中"], ["eiken", "試験運用中"]]) {
+  for (const [card, label] of [["dojo", "new"], ["eiken", "試験運用中"]]) {
     const badge = page.locator(".card." + card + " .new-mark");
     assert.equal(await badge.innerText(), label);
     assert.equal(await badge.isVisible(), true);
