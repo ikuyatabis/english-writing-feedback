@@ -6,6 +6,11 @@ on:
     paths:
       - "sum/**"
       - "brest/**"
+      - "ito/index.html"
+      - "mita/index.html"
+      - "misc/index.html"
+      - "trans/index.html"
+      - "eiken/index.html"
       - "index.html"
       - "tests/sum-*.cjs"
       - "tests/yorinuki-content-boundary-cases.md"
@@ -16,6 +21,11 @@ on:
     paths:
       - "sum/**"
       - "brest/**"
+      - "ito/index.html"
+      - "mita/index.html"
+      - "misc/index.html"
+      - "trans/index.html"
+      - "eiken/index.html"
       - "index.html"
       - "tests/sum-*.cjs"
       - "tests/yorinuki-content-boundary-cases.md"
@@ -89,5 +99,5 @@ jobs:
         run: |
           npm install --no-save playwright@1.55.0
           npx playwright install --with-deps webkit
-      - name: Test history on mobile WebKit across rotation and reload
+      - name: Test all public pages on mobile WebKit across rotation and reload
         run: node tests/sum-history-browser.cjs
