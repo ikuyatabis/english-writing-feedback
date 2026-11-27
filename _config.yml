@@ -1,2 +1,5 @@
 exclude:
   - README.md
+  - tests/
+  - test-artifacts/
+  - scripts/
