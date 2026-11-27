@@ -205,8 +205,8 @@ async function checkDojo(browser, name, width, height) {
       const sameLine=rs=>Math.max(...rs)-Math.min(...rs)<3;
       return {sameLine:sameLine(centers),groupsAligned:sameLine(centers.slice(0,3))&&sameLine(centers.slice(3)),contained:rects.every(r=>r.left>=container.left-1&&r.right<=container.right+1),gaps:rects.slice(1).flatMap((r,i)=>Math.abs(centers[i+1]-centers[i])<3?[r.left-rects[i].right]:[])};
     });
-    assert(timerLayout.groupsAligned&&timerLayout.contained&&(width<=560||timerLayout.sameLine),name+": timer controls must fit with each group on one line: "+JSON.stringify(timerLayout));
-    const expectedGap=width<=360?5:width<=560?8:12;
+    assert(timerLayout.groupsAligned&&timerLayout.contained&&(width<390||timerLayout.sameLine),name+": timer controls must fit with each group on one line: "+JSON.stringify(timerLayout));
+    const expectedGap=width<=560?5:12;
     assert(timerLayout.gaps.every(gap=>Math.abs(gap-expectedGap)<0.75),name+": timer control gaps must be uniform: "+JSON.stringify(timerLayout));
     if(width<=1024){
       for(const selector of ["#start","#pause","#reset"]){
@@ -591,6 +591,7 @@ async function checkAuditHowto(browser, width, height) {
     await checkDojo(browser, "desktop", 1365, 900);
     await checkDojo(browser, "tablet", 820, 1180);
     await checkDojo(browser, "mobile", 390, 844);
+    await checkDojo(browser, "iphone15pro-portrait", 393, 852);
     await checkDojo(browser, "small-mobile", 320, 700);
     await checkHistory(browser, "desktop", 1365, 900);
     await checkHistory(browser, "mobile", 390, 844);

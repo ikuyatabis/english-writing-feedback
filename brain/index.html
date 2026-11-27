@@ -186,8 +186,9 @@ button:disabled{opacity:.5;cursor:default}
 @media(max-width:560px){
   .timer-setup{margin-left:26px;margin-right:26px;padding:6px 8px}
   .timer-options{gap:4px 8px}.timer-setup .choice{padding:3px 5px}
-  .timer-controls{gap:8px;font-size:.82rem;flex-wrap:wrap}
-  #minutes{width:44px;padding:3px 4px;font-size:.9rem}
+  .timer-controls{gap:5px;font-size:.82rem;flex-wrap:wrap}
+  #minutes{width:30px;min-width:0;padding:3px 2px;text-align:center;font-size:.9rem;appearance:textfield;-moz-appearance:textfield}
+  #minutes::-webkit-inner-spin-button,#minutes::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
   #start,#pause{min-width:30px;padding:5px 6px}
   #reset{padding:5px 6px;font-size:.78rem}
   .timer-controls #clock{font-size:1.2rem}
@@ -206,7 +207,7 @@ button:disabled{opacity:.5;cursor:default}
 @media(max-width:360px){
   .timer-setup{padding-inline:3px}
   .timer-controls{gap:5px}
-  #minutes{width:36px;padding:2px}
+  #minutes{padding:2px}
   #start,#pause{min-width:44px;padding:5px 6px}
   #reset{min-width:54px;padding:5px 2px}
   .timer-controls #clock{font-size:1rem}
