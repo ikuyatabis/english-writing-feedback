@@ -1,0 +1,71 @@
+name: Sync Eiken and clinic rules
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'eiken/index.html'
+      - 'assets/**'
+      - 'misc/index.html'
+      - 'scripts/sync-clones.mjs'
+      - '.github/workflows/sync-clones.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: canonical-clone-sync
+  cancel-in-progress: false
+jobs:
+  sync:
+    name: Sync ${{ matrix.target }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: eikentest
+            kind: eiken
+          - target: hq
+            kind: hq
+    steps:
+      - name: Check cross-repository access
+        env:
+          SYNC_TOKEN: ${{ secrets.LAB_SYNC_TOKEN }}
+        run: |
+          if [ -z "$SYNC_TOKEN" ]; then
+            echo "::error::Configure the LAB_SYNC_TOKEN Actions secret with Contents read/write on eikentest and hq."
+            exit 1
+          fi
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          path: source
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          repository: ikuyatabis/${{ matrix.target }}
+          ref: main
+          token: ${{ secrets.LAB_SYNC_TOKEN }}
+          path: target
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Generate and validate clone
+        run: node source/scripts/sync-clones.mjs ${{ matrix.kind }} source target
+      - name: Publish validated changes
+        working-directory: target
+        env:
+          KIND: ${{ matrix.kind }}
+        run: |
+          if [ "$KIND" = eiken ]; then
+            git add -- index.html assets/
+          else
+            git add -- clinic-rules.json
+          fi
+          if git diff --cached --quiet; then
+            echo "Already synchronized."
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m "Sync canonical source $(git -C ../source rev-parse --short HEAD)"
+          git push origin HEAD:main
