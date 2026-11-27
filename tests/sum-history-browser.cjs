@@ -6,8 +6,6 @@ const { webkit, devices } = require("playwright");
 const url = pathToFileURL(path.resolve(__dirname, "..", "history", "index.html")).href;
 const portrait = { width: 393, height: 852 };
 const landscape = { width: 852, height: 393 };
-async function inspect(page, viewport, name) {
-  await page.evaluate
 /* Check every public page, including mobile landscape entry and reload.
    Width-dependent heading/timer sizes remain intentional; compare the
    same orientation across loads, and the body font across orientations. */
@@ -73,7 +71,8 @@ async function checkPublicPages(browser) {
   assert.equal(failures.length, 0, failures.join("\n"));
 }
 
-(async () => { await document.fonts.ready; await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))); });
+async function inspect(page, viewport, name) {
+  await page.evaluate(async () => { await document.fonts.ready; await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))); });
   const layout = await page.evaluate(() => {
     const box = el => { const r = el.getBoundingClientRect(); return [r.x, r.y, r.width, r.height]; };
     const rows = [...document.querySelectorAll(".updates li")].map(li => {
