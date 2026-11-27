@@ -152,6 +152,14 @@ export async function onRequest(context) {
     return redirect('/__lab/login?next=' + encodeURIComponent(next));
   }
 
+  // Developer-only files are not served by the public website, even after login.
+  let path;
+  try { path = decodeURIComponent(url.pathname).replace(/\\/g, '/'); }
+  catch { return new Response('Not found', { status: 404, headers: { 'Cache-Control': 'no-store', 'X-Robots-Tag': 'noindex, nofollow' } }); }
+  if (/^\/(?:tests|test-artifacts|scripts)(?:\/|$)/i.test(path) || /^\/README\.md\/?$/i.test(path)) {
+    return new Response('Not found', { status: 404, headers: { 'Cache-Control': 'private, no-store', 'X-Robots-Tag': 'noindex, nofollow' } });
+  }
+
   // Do not serve authenticated content from the browser's cache after logout.
   const original = await context.next();
   const response = new Response(original.body, original);
