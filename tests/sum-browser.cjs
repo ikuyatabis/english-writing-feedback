@@ -190,12 +190,19 @@ async function checkDojo(browser, name, width, height) {
     assert.equal(await page.locator("#start svg path").getAttribute("d"),"M4 1.5 L14 8 L4 14.5 Z");
     assert(await page.locator("#start svg").isVisible());
     assert.equal(await page.locator("#pause").innerText(),"Ⅱ");
+    const dockWidths=await page.locator(".control-dock").evaluate(el=>{
+      const dock=el.getBoundingClientRect(),guide=el.querySelector(".tool-howto").getBoundingClientRect(),timer=el.querySelector(".timer-setup").getBoundingClientRect();
+      return {aligned:Math.abs(guide.left-timer.left)<1&&Math.abs(guide.right-timer.right)<1,left:guide.left-dock.left,right:dock.right-guide.right};
+    });
+    assert(dockWidths.aligned,name+": login guide and timer must align");
+    if(width<=560)assert(Math.abs(dockWidths.left-26)<1&&Math.abs(dockWidths.right-26)<1,name+": mobile guide margins must be 26px: "+JSON.stringify(dockWidths));
     const timerLayout=await page.locator(".timer-controls").evaluate(el=>{
       const container=el.getBoundingClientRect(),rects=["#minutes",".timer-unit","#clock","#start","#pause","#reset"].map(id=>el.querySelector(id).getBoundingClientRect());
       const centers=rects.map(r=>r.top+r.height/2);
-      return {sameLine:Math.max(...centers)-Math.min(...centers)<3,contained:rects.every(r=>r.left>=container.left-1&&r.right<=container.right+1),gaps:rects.slice(1).map((r,i)=>r.left-rects[i].right)};
+      const sameLine=rs=>Math.max(...rs)-Math.min(...rs)<3;
+      return {sameLine:sameLine(centers),groupsAligned:sameLine(centers.slice(0,3))&&sameLine(centers.slice(3)),contained:rects.every(r=>r.left>=container.left-1&&r.right<=container.right+1),gaps:rects.slice(1).flatMap((r,i)=>Math.abs(centers[i+1]-centers[i])<3?[r.left-rects[i].right]:[])};
     });
-    assert(timerLayout.sameLine&&timerLayout.contained,name+": timer controls must fit on one line: "+JSON.stringify(timerLayout));
+    assert(timerLayout.groupsAligned&&timerLayout.contained&&(width<=560||timerLayout.sameLine),name+": timer controls must fit with each group on one line: "+JSON.stringify(timerLayout));
     const expectedGap=width<=360?5:width<=560?8:12;
     assert(timerLayout.gaps.every(gap=>Math.abs(gap-expectedGap)<0.75),name+": timer control gaps must be uniform: "+JSON.stringify(timerLayout));
     if(width<=1024){
