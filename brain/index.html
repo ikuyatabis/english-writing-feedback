@@ -143,12 +143,13 @@ footer .footer-home-link, footer .footer-home-link:hover{color:inherit;text-deco
 footer .footer-home-link:focus-visible{outline:2px solid #197fbc;outline-offset:3px}
 
 /* Dojo controls: common visual theme; retain the existing interaction logic. */
-.control-dock{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--paper);padding:6px 20px 10px;max-height:60vh;max-height:60dvh;overflow-y:auto;overscroll-behavior:contain}
-.control-dock .tool-howto{margin-top:0}
+.login-guide{padding:6px 20px 0}
+.login-guide .tool-howto{margin-top:0}
+.control-dock{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--paper);padding:8px 20px 10px;max-height:60vh;max-height:60dvh;overflow-y:auto;overscroll-behavior:contain}
 /* Apply sticky-header clearance to content targets, not the sticky controls themselves. */
 html{scroll-padding-top:0}
 main :is(input,textarea,select,button,summary,a){scroll-margin-top:var(--dock-height,0px)}
-@media(max-width:560px){.control-dock{padding:6px 0 10px}}
+@media(max-width:560px){.login-guide{padding:6px 0 0}.control-dock{padding:8px 0 10px}}
 .timer-guidance{margin:6px 0 0}
 .timer-guidance > summary.tool-howto-title{font-size:.78rem}
 .timer-guidance > summary.tool-howto-title::before{margin-right:0}
@@ -165,7 +166,7 @@ select:focus{outline:2px solid var(--teal);outline-offset:1px}
 button.secondary{width:auto;background:transparent;color:var(--teal-dark);border:1px solid var(--teal);padding:8px 12px;font-family:var(--font-sans);font-size:.94rem}
 button:disabled{opacity:.5;cursor:default}
 /* Timer belongs directly below the shared login guide. */
-.timer-setup{max-width:680px;margin:8px auto 0;padding:6px 12px;text-align:left;background:var(--card);border:1px solid var(--line);border-left:4px solid var(--teal);border-radius:4px}
+.timer-setup{max-width:680px;margin:0 auto;padding:6px 12px;text-align:left;background:var(--card);border:1px solid var(--line);border-left:4px solid var(--teal);border-radius:4px}
 .timer-options{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .timer-options h2{margin:0;font-family:var(--font-serif);font-size:.88rem;font-weight:700;color:var(--teal-dark)}
 .timer-setup .choices{flex-direction:row;gap:6px}
@@ -241,7 +242,7 @@ button.memo-remove.secondary{padding:5px 10px;font-size:.82rem}
     <p class="lede"><strong style="color:#c62828;font-weight:700">日本語</strong>で構想メモを作る練習を行います。</p>
   </div>
 </header>
-<div class="control-dock">
+<div class="login-guide">
     <details class="tool-howto">
       <summary class="tool-howto-title"><strong>事前にChatGPTへログインしてから使ってください（詳しい使い方はこちら）</strong></summary>
       <ol>
@@ -251,6 +252,8 @@ button.memo-remove.secondary{padding:5px 10px;font-size:.82rem}
         <li>④ ChatGPTの入力欄に貼り付けて送信します。</li>
       </ol>
     </details>
+</div>
+<div class="control-dock">
     <section class="timer-setup" aria-label="タイマー"><div class="timer-options"><h2>タイマー</h2><div class="choices"><label class="choice"><input type="radio" name="timer" value="off" checked> 設定しない</label><label class="choice"><input type="radio" name="timer" value="on"> 設定する</label></div></div><div id="timerPanel" hidden><div class="timer-controls"><div class="timer-group"><input type="number" id="minutes" min="1" max="10" step="1" value="3" aria-label="分"><span class="timer-unit">分</span><span id="clock" role="timer">03:00</span></div><div class="timer-group"><button id="start" aria-label="開始" title="開始"><svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" focusable="false"><path d="M4 1.5 L14 8 L4 14.5 Z" fill="currentColor"/></svg></button><button id="pause" class="secondary" aria-label="一時停止" title="一時停止">Ⅱ</button><button id="reset" class="secondary">リセット</button></div></div><p id="timerMessage" role="status"></p></div><details class="timer-guidance"><summary class="tool-howto-title">（使い方のヒント）</summary><p class="note">構想を練るのが苦手な人は、まずは時間制限を設けずに取り組むのがおすすめです。<br>慣れてきても、100words程度の自由英作文であれば、少なくとも３分は充てましょう。</p></details></section>
 </div>
 <main class="sheet-wrap">

@@ -158,7 +158,10 @@ async function checkDojo(browser, name, width, height) {
     assert.equal(await page.getByText("指示文を表示",{exact:true}).count(),0);
     assert.equal(await page.locator("#manualBox").isVisible(),false);
     const capturePrompt=async()=>{await page.evaluate(()=>{delete window.__lastCopied;});await page.locator("#go").click();await page.waitForFunction(()=>typeof window.__lastCopied==="string");return page.evaluate(()=>window.__lastCopied);};
-    assert.equal(await page.locator(".control-dock > .tool-howto + .timer-setup").count(), 1);
+    assert.equal(await page.locator(".login-guide > .tool-howto").count(), 1);
+    assert.equal(await page.locator(".login-guide + .control-dock > .timer-setup").count(), 1);
+    assert.equal(await page.locator(".control-dock .tool-howto").count(), 0);
+    assert.equal(await page.locator(".login-guide").evaluate(e=>getComputedStyle(e).position),"static");
     assert.equal(await page.locator(".control-dock").evaluate(e => getComputedStyle(e).position), "sticky");
     assert.equal(await page.locator(".tool-howto summary").innerText(), "事前にChatGPTへログインしてから使ってください（詳しい使い方はこちら）");
     assert.equal(await page.locator(".tool-howto").evaluate(e => e.open), false);
@@ -191,7 +194,7 @@ async function checkDojo(browser, name, width, height) {
     assert(await page.locator("#start svg").isVisible());
     assert.equal(await page.locator("#pause").innerText(),"Ⅱ");
     const dockWidths=await page.locator(".control-dock").evaluate(el=>{
-      const dock=el.getBoundingClientRect(),guide=el.querySelector(".tool-howto").getBoundingClientRect(),timer=el.querySelector(".timer-setup").getBoundingClientRect();
+      const dock=el.getBoundingClientRect(),guide=document.querySelector(".login-guide > .tool-howto").getBoundingClientRect(),timer=el.querySelector(".timer-setup").getBoundingClientRect();
       return {aligned:Math.abs(guide.left-timer.left)<1&&Math.abs(guide.right-timer.right)<1,left:guide.left-dock.left,right:dock.right-guide.right};
     });
     assert(dockWidths.aligned,name+": login guide and timer must align");
@@ -463,7 +466,9 @@ async function checkDojo(browser, name, width, height) {
     assert.equal(await page.locator(".timer-guidance").evaluate(e=>e.open),false);
     const pinnedScroll=await page.evaluate(()=>window.scrollY);
     assert(pinnedScroll>0);
-    for(const selector of [".tool-howto summary","#start","#pause","#reset"]){
+    const guideBox=await page.locator(".login-guide").boundingBox();
+    assert(guideBox&&guideBox.y+guideBox.height<=1,name+": login guide must scroll out of view");
+    for(const selector of ["#start","#pause","#reset"]){
       const box=await page.locator(selector).boundingBox();
       assert(box&&box.y>=0&&box.y+box.height<=height, name+": fixed control not visible "+selector);
     }
