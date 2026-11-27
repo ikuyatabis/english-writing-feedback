@@ -203,11 +203,11 @@ async function checkDojo(browser, name, width, height) {
       const container=el.getBoundingClientRect(),rects=["#minutes",".timer-unit","#clock","#start","#pause","#reset"].map(id=>el.querySelector(id).getBoundingClientRect());
       const centers=rects.map(r=>r.top+r.height/2);
       const sameLine=rs=>Math.max(...rs)-Math.min(...rs)<3;
-      return {sameLine:sameLine(centers),groupsAligned:sameLine(centers.slice(0,3))&&sameLine(centers.slice(3)),contained:rects.every(r=>r.left>=container.left-1&&r.right<=container.right+1),gaps:rects.slice(1).flatMap((r,i)=>Math.abs(centers[i+1]-centers[i])<3?[r.left-rects[i].right]:[])};
+      return {sameLine:sameLine(centers),groupsAligned:sameLine(centers.slice(0,3))&&sameLine(centers.slice(3)),contained:rects.every(r=>r.left>=container.left-1&&r.right<=container.right+1),gaps:rects.slice(1).flatMap((r,i)=>Math.abs(centers[i+1]-centers[i])<3?[{index:i,gap:r.left-rects[i].right}]:[])};
     });
     assert(timerLayout.groupsAligned&&timerLayout.contained&&(width<390||timerLayout.sameLine),name+": timer controls must fit with each group on one line: "+JSON.stringify(timerLayout));
     const expectedGap=width<=560?5:12;
-    assert(timerLayout.gaps.every(gap=>Math.abs(gap-expectedGap)<0.75),name+": timer control gaps must be uniform: "+JSON.stringify(timerLayout));
+    assert(timerLayout.gaps.every(({index,gap})=>Math.abs(gap-expectedGap-(index===2?3:0))<0.75),name+": timer control gaps must match spacing with extra room after clock: "+JSON.stringify(timerLayout));
     if(width<=1024){
       for(const selector of ["#start","#pause","#reset"]){
         const box=await page.locator(selector).boundingBox();
