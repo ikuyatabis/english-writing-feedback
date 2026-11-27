@@ -50,7 +50,7 @@ function createHarness() {
 test("HTML includes the official label and all eight menus in the required order", () => {
   assert.match(html, /より抜き図書館/);
   assert.match(html, /<div class="seal" aria-hidden="true">図<\/div>/);
-  assert.match(html, /<p class="kicker">Too many cooks spoil the broth\.<\/p>/);
+  assert.match(html, /<p class="kicker">Too many cooks spoil the broth\. - 船頭多くして船山へ上る<\/p>/);
   assert.match(html, /<h1>より抜き図書館｜要約問題<\/h1>/);
   assert.match(html, /大学・年度を問わず、独自の基準に基づき添削します。/);
   assert.match(homepage, /<a class="card sum" href="\.\/sum\/">/);
