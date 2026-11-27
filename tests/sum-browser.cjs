@@ -193,6 +193,7 @@ async function checkDojo(browser, name, width, height) {
     assert.equal(await page.locator("#start svg path").getAttribute("d"),"M4 1.5 L14 8 L4 14.5 Z");
     assert(await page.locator("#start svg").isVisible());
     assert.equal(await page.locator("#pause").innerText(),"Ⅱ");
+    assert.equal(await page.locator("#reset").innerText(),"ﾘｾｯﾄ");
     const dockWidths=await page.locator(".control-dock").evaluate(el=>{
       const dock=el.getBoundingClientRect(),guide=document.querySelector(".login-guide > .tool-howto").getBoundingClientRect(),timer=el.querySelector(".timer-setup").getBoundingClientRect();
       return {aligned:Math.abs(guide.left-timer.left)<1&&Math.abs(guide.right-timer.right)<1,left:guide.left-dock.left,right:dock.right-guide.right};
@@ -206,7 +207,7 @@ async function checkDojo(browser, name, width, height) {
       return {sameLine:sameLine(centers),groupsAligned:sameLine(centers.slice(0,3))&&sameLine(centers.slice(3)),contained:rects.every(r=>r.left>=container.left-1&&r.right<=container.right+1),gaps:rects.slice(1).flatMap((r,i)=>Math.abs(centers[i+1]-centers[i])<3?[{index:i,gap:r.left-rects[i].right}]:[])};
     });
     assert(timerLayout.groupsAligned&&timerLayout.contained&&(width<390||timerLayout.sameLine),name+": timer controls must fit with each group on one line: "+JSON.stringify(timerLayout));
-    const expectedGap=width<=560?5:12;
+    const expectedGap=width<=360?5:width<=560?8:12;
     assert(timerLayout.gaps.every(({index,gap})=>Math.abs(gap-expectedGap-(index===2?3:0))<0.75),name+": timer control gaps must match spacing with extra room after clock: "+JSON.stringify(timerLayout));
     if(width<=1024){
       for(const selector of ["#start","#pause","#reset"]){

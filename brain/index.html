@@ -187,7 +187,7 @@ button:disabled{opacity:.5;cursor:default}
 @media(max-width:560px){
   .timer-setup{margin-left:26px;margin-right:26px;padding:6px 8px}
   .timer-options{gap:4px 8px}.timer-setup .choice{padding:3px 5px}
-  .timer-controls{gap:5px;font-size:.82rem;flex-wrap:wrap}
+  .timer-controls{gap:8px;font-size:.82rem;flex-wrap:wrap}
   #minutes{width:30px;min-width:0;padding:3px 2px;text-align:center;font-size:.9rem;appearance:textfield;-moz-appearance:textfield}
   #minutes::-webkit-inner-spin-button,#minutes::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
   #start,#pause{min-width:30px;padding:5px 6px}
@@ -202,7 +202,7 @@ button:disabled{opacity:.5;cursor:default}
 }
 @media(max-width:560px){
   #start,#pause{min-width:48px;padding:5px 8px}
-  #reset{min-width:70px}
+  #reset{min-width:48px}
   #minutes{font-size:1rem}
 }
 @media(max-width:360px){
@@ -210,7 +210,7 @@ button:disabled{opacity:.5;cursor:default}
   .timer-controls{gap:5px}
   #minutes{padding:2px}
   #start,#pause{min-width:44px;padding:5px 6px}
-  #reset{min-width:54px;padding:5px 2px}
+  #reset{min-width:44px;padding:5px 2px}
   .timer-controls #clock{font-size:1rem}
 }
 #clock{font-size:1.45rem;font-variant-numeric:tabular-nums;font-weight:700}
@@ -256,7 +256,7 @@ button.memo-remove.secondary{padding:5px 10px;font-size:.82rem}
     </details>
 </div>
 <div class="control-dock">
-    <section class="timer-setup" aria-label="タイマー"><div class="timer-options"><h2>タイマー</h2><div class="choices"><label class="choice"><input type="radio" name="timer" value="off" checked> 設定しない</label><label class="choice"><input type="radio" name="timer" value="on"> 設定する</label></div></div><div id="timerPanel" hidden><div class="timer-controls"><div class="timer-group"><input type="number" id="minutes" min="1" max="10" step="1" value="3" aria-label="分"><span class="timer-unit">分</span><span id="clock" role="timer">03:00</span></div><div class="timer-group"><button id="start" aria-label="開始" title="開始"><svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" focusable="false"><path d="M4 1.5 L14 8 L4 14.5 Z" fill="currentColor"/></svg></button><button id="pause" class="secondary" aria-label="一時停止" title="一時停止">Ⅱ</button><button id="reset" class="secondary">リセット</button></div></div><p id="timerMessage" role="status"></p></div><details class="timer-guidance"><summary class="tool-howto-title">（使い方のヒント）</summary><p class="note">構想を練るのが苦手な人は、まずは時間制限を設けずに取り組むのがおすすめです。<br>慣れてきても、100words程度の自由英作文であれば、少なくとも３分は充てましょう。</p></details></section>
+    <section class="timer-setup" aria-label="タイマー"><div class="timer-options"><h2>タイマー</h2><div class="choices"><label class="choice"><input type="radio" name="timer" value="off" checked> 設定しない</label><label class="choice"><input type="radio" name="timer" value="on"> 設定する</label></div></div><div id="timerPanel" hidden><div class="timer-controls"><div class="timer-group"><input type="number" id="minutes" min="1" max="10" step="1" value="3" aria-label="分"><span class="timer-unit">分</span><span id="clock" role="timer">03:00</span></div><div class="timer-group"><button id="start" aria-label="開始" title="開始"><svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" focusable="false"><path d="M4 1.5 L14 8 L4 14.5 Z" fill="currentColor"/></svg></button><button id="pause" class="secondary" aria-label="一時停止" title="一時停止">Ⅱ</button><button id="reset" class="secondary" aria-label="リセット">ﾘｾｯﾄ</button></div></div><p id="timerMessage" role="status"></p></div><details class="timer-guidance"><summary class="tool-howto-title">（使い方のヒント）</summary><p class="note">構想を練るのが苦手な人は、まずは時間制限を設けずに取り組むのがおすすめです。<br>慣れてきても、100words程度の自由英作文であれば、少なくとも３分は充てましょう。</p></details></section>
 </div>
 <main class="sheet-wrap">
 <section class="panel"><h2>問題を選ぶ</h2><div class="choices"><label class="choice"><input type="radio" name="source" value="own" checked> 自分で問題を入力する</label><label class="choice"><input type="radio" name="source" value="original"> オリジナル問題で練習する</label></div><div id="own"><label class="lbl" for="ownKind">問題の種類</label><select id="ownKind" aria-describedby="ownPersonalHint"><option value="opinion" selected>意見の表明</option><option value="advice">提案・助言</option><option value="personal">自分自身についての記述</option><option value="own">指定なし</option></select><p id="ownPersonalHint" class="note personal-hint" hidden>過去の体験や将来の目標など</p><p class="note">日本語でも英語でも構いません。自分で考えた問題や、手持ちの教材などを活用できます。</p><textarea id="ownText" placeholder="問題文を入力してください"></textarea></div><div id="original" hidden><label class="lbl" for="kind">問題の種類</label><select id="kind" aria-describedby="originalPersonalHint"><option value="opinion">意見の表明</option><option value="advice">提案・助言</option><option value="personal">自分自身についての記述</option></select><p id="originalPersonalHint" class="note personal-hint" hidden>過去の体験や将来の目標など</p><label class="lbl" for="difficulty">問題の難易度</label><select id="difficulty"><option value="basic">基礎</option><option value="advanced">発展</option></select><p id="question" aria-live="polite" hidden></p><button class="secondary" id="next" type="button">問題を見る</button></div></section>
