@@ -65,7 +65,7 @@ async function checkPage(browser, name, width, height) {
 }
 
 async function checkHome(browser, name, width, height) {
-  const context = await browser.newContext({ viewport: { width, height }, deviceScaleFactor: 1 });
+  const context = await browser.newContext({ viewport: { width, height }, deviceScaleFactor: 1, hasTouch: width <= 560 });
   await context.route(/fonts\.googleapis\.com|fonts\.gstatic\.com/, route => route.abort());
   const page = await context.newPage();
   const errors = [];
@@ -106,6 +106,13 @@ async function checkHome(browser, name, width, height) {
   assert.equal(bounds.length, 8, "Homepage must show eight content cards");
   assert.equal(await page.locator(".card.dojo").getAttribute("href"), "./brain/");
   assert.equal(await page.locator(".card.dojo p").innerText(), "初めの一歩｜自由英作文");
+  assert.equal(await page.locator(".card.eiken p").innerText(), "準1～準2p｜ライティング");
+  if(name==="mobile"){
+    await page.setViewportSize({width:852,height:393});
+    assert.equal(await page.locator(".card.eiken p").innerText(), "準1~準2p｜ライティング");
+    await page.setViewportSize({width,height});
+    assert.equal(await page.locator(".card.eiken p").innerText(), "準1～準2p｜ライティング");
+  }
   if (width > 830 || (width > 650 && width >= height)) {
     // Three cards on each of the first two rows, then two cards on the final row.
     for (const [first, last] of [[0, 2], [3, 5], [6, 7]]) {
