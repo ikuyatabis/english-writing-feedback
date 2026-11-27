@@ -134,7 +134,7 @@ async function checkHome(browser, name, width, height) {
 }
 
 async function checkDojo(browser, name, width, height) {
-  const context=await browser.newContext({viewport:{width,height},deviceScaleFactor:1});
+  const context=await browser.newContext({viewport:{width,height},deviceScaleFactor:1,hasTouch:width<=560});
   await context.route(/fonts\.googleapis\.com|fonts\.gstatic\.com/, route => route.abort());
   try {
     const page=await context.newPage(), errors=[];
@@ -194,6 +194,13 @@ async function checkDojo(browser, name, width, height) {
     assert(await page.locator("#start svg").isVisible());
     assert.equal(await page.locator("#pause").innerText(),"Ⅱ");
     assert.equal(await page.locator("#reset").innerText(),"ﾘｾｯﾄ");
+    if(name==="iphone15pro-portrait"){
+      await page.setViewportSize({width:height,height:width});
+      assert.equal(await page.locator("#reset").innerText(),"リセット");
+      assert.equal(await page.locator("#clock").innerText(),"03:00");
+      await page.setViewportSize({width,height});
+      assert.equal(await page.locator("#reset").innerText(),"ﾘｾｯﾄ");
+    }
     const dockWidths=await page.locator(".control-dock").evaluate(el=>{
       const dock=el.getBoundingClientRect(),guide=document.querySelector(".login-guide > .tool-howto").getBoundingClientRect(),timer=el.querySelector(".timer-setup").getBoundingClientRect();
       return {aligned:Math.abs(guide.left-timer.left)<1&&Math.abs(guide.right-timer.right)<1,left:guide.left-dock.left,right:dock.right-guide.right};
