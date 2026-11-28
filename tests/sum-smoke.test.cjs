@@ -343,3 +343,21 @@ test("Audit: manually reviewed 2025 content-boundary fixtures retain exact chara
   assert(base.includes("有害になりうる"), "Fixture must preserve the original may/can nuance");
   assert(base.includes("偶然の結びつき"), "Fixture must include the creativity mechanism");
 });
+
+
+test("Free-plan thinking guidance is identical across the homepage and all eight contents", () => {
+  const pages = ["index.html", ...["brain", "misc", "ito", "trans", "sum", "eiken", "buncan", "mita"].map(name => name + "/index.html")];
+  const pattern = /<span style="color:#c62828;font-weight:700">※無料プランをご利用の場合は、より丁寧な結果が得られる「思考モード」を送信前に選ぶことをおすすめします。<\/span><span style="font-weight:400">[\s\S]*?<\/span>/g;
+  let expected;
+  for (const file of pages) {
+    const source = fs.readFileSync(path.join(__dirname, "..", file), "utf8");
+    const matches = source.match(pattern) || [];
+    assert.equal(matches.length, 1, file);
+    const guide = matches[0];
+    assert.equal((guide.match(/<svg\b/g) || []).length, 2, file);
+    assert(guide.includes("「思考／Think」、あるいは「＋」から"), file);
+    assert(guide.includes("「考えて／より深く思考する／Think」などを選んでください。表示名称は利用環境によって異なります）"), file);
+    if (expected === undefined) expected = guide;
+    else assert.equal(guide, expected, file);
+  }
+});
