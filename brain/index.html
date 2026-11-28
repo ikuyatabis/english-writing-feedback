@@ -216,6 +216,13 @@ button:disabled{opacity:.5;cursor:default}
   #reset{min-width:44px;padding:5px 2px}
   .timer-controls #clock{font-size:1rem}
 }
+/* Tablet and phone landscape: close the gap before the clock without changing desktop or phone portrait. */
+@media (min-width:561px) and (pointer:coarse){
+  .timer-group #clock{margin-left:-11px}
+}
+@media (max-width:560px) and (orientation:landscape) and (pointer:coarse){
+  .timer-group #clock{margin-left:-5px}
+}
 .reset-short{display:none}
 .reset-landscape{display:inline}
 @media (orientation:portrait) and (max-width:560px) and (pointer:coarse){
