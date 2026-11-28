@@ -519,6 +519,7 @@ async function checkDojo(browser, name, width, height) {
     assert.equal(await page.locator(".timer-guidance").evaluate(e=>e.open),false);
     const pinnedScroll=await page.evaluate(()=>window.scrollY);
     assert(pinnedScroll>0);
+    assert(await page.locator("#floatingStart").isVisible(),name+": compact start before timing");
     const guideBox=await page.locator(".login-guide").boundingBox();
     assert(guideBox&&guideBox.y+guideBox.height<=1,name+": login guide must scroll out of view");
     for(const selector of ["#start","#pause","#reset"]){
@@ -529,7 +530,9 @@ async function checkDojo(browser, name, width, height) {
     assert.equal(await page.evaluate(()=>window.scrollY),pinnedScroll, name+": start unexpectedly scrolled page");
     assert.equal(await page.locator("#floatingTimer").evaluate(e=>getComputedStyle(e).position),"fixed");
     assert.equal(await page.evaluate(()=>document.getElementById("clock").textContent===document.getElementById("floatingClock").textContent),true);
+    assert.equal(await page.locator("#floatingStart").isVisible(),false,name+": compact start hidden while running");
     await page.locator("#pause").click();
+    assert(await page.locator("#floatingStart").isVisible(),name+": compact start restored on pause");
     assert.equal(await page.evaluate(()=>window.scrollY),pinnedScroll, name+": pause unexpectedly scrolled page");
     await page.locator("#start").click();
     assert.equal(await page.evaluate(()=>window.scrollY),pinnedScroll, name+": resume unexpectedly scrolled page");
@@ -559,6 +562,21 @@ async function checkDojo(browser, name, width, height) {
       });
       assert(await page.locator("#floatingTimer").evaluate(e=>e.getBoundingClientRect().top>=window.visualViewport.offsetTop),name+": timer must follow viewport panning");
       assert.equal(await page.evaluate(()=>window.scrollY),before,name+": viewport correction must not scroll the page");
+      assert.equal(await page.locator("#floatingClock").textContent(),"05:00");
+      assert(await page.locator("#floatingStart").isVisible(),name+": compact start available while typing");
+      const memoBefore=await page.locator("#memo-free").inputValue();
+      await page.locator("#floatingStart").click();
+      assert.equal(await page.locator("#memo-free").evaluate(e=>document.activeElement===e),true,name+": tapping start must preserve input focus");
+      assert.equal(await page.evaluate(()=>window.scrollY),before,name+": compact start must not scroll");
+      assert.equal(await page.locator("#floatingStart").isVisible(),false);
+      await page.waitForFunction(()=>document.getElementById("floatingClock").textContent!=="05:00");
+      assert.equal(await page.locator("#memo-free").inputValue(),memoBefore);
+      await page.evaluate(()=>document.getElementById("pause").click());
+      assert(await page.locator("#floatingStart").isVisible(),name+": compact resume available");
+      await page.locator("#floatingStart").click();
+      assert.equal(await page.locator("#memo-free").evaluate(e=>document.activeElement===e),true);
+      assert.equal(await page.locator("#floatingStart").isVisible(),false);
+      await page.evaluate(()=>document.getElementById("reset").click());
       assert.equal(await page.locator("#floatingClock").textContent(),"05:00");
       await page.evaluate(()=>{
         const vv=window.visualViewport;delete vv.offsetTop;delete vv.height;
