@@ -233,7 +233,7 @@ async function checkDojo(browser, name, width, height) {
     });
     assert(timerLayout.groupsAligned&&timerLayout.contained&&(width<390||timerLayout.sameLine),name+": timer controls must fit with each group on one line: "+JSON.stringify(timerLayout));
     const expectedGap=width<=360?5:width<=560?6:12;
-    const gapAdjustment=index=>index===1?(width<=560?1.5:name==="tablet"?-11:-8):index===2?(width<=560?1.5:3):0;
+    const gapAdjustment=index=>index===1||index===2?(width<=560?1.5:name==="tablet"?-4:-2.5):0;
     assert(timerLayout.gaps.every(({index,gap})=>Math.abs(gap-expectedGap-gapAdjustment(index))<0.75),name+": timer control gaps must match spacing before and after clock: "+JSON.stringify(timerLayout));
     if(width<=1024){
       for(const selector of ["#start","#pause","#reset"]){
@@ -257,7 +257,7 @@ async function checkDojo(browser, name, width, height) {
       return {initial,frames};
     });
     for(const frame of overtimeLayout.frames)assert.deepEqual(frame,overtimeLayout.initial,name+": overtime must not reflow timer controls");
-    if(width<=560&&timerLayout.sameLine){
+    if(timerLayout.sameLine){
       const gaps=await page.evaluate(()=>{
         remaining=-5;draw();
         const unit=document.querySelector(".timer-unit").getBoundingClientRect(),clock=document.getElementById("clock").getBoundingClientRect(),start=document.getElementById("start").getBoundingClientRect();
@@ -265,7 +265,7 @@ async function checkDojo(browser, name, width, height) {
         reset();return result;
       });
       assert.equal(gaps.display,"+00:05");
-      assert(gaps.left>0&&Math.abs(gaps.left-gaps.right)<.75,name+": equal portrait overtime gaps");
+      assert(gaps.left>0&&Math.abs(gaps.left-gaps.right)<.75,name+": equal overtime gaps");
     }
     assert.equal(await page.locator("#start").getAttribute("aria-label"),"開始");
     assert.equal(await page.locator("#pause").getAttribute("aria-label"),"一時停止");
