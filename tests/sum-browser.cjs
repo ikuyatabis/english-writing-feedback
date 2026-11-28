@@ -185,6 +185,14 @@ async function checkDojo(browser, name, width, height) {
     assert.equal(await page.locator("#minutes").inputValue(),"5");
     assert.equal(await page.locator("#floatingTimer").isVisible(),false);
     assert(await page.locator(".timer-guidance summary").isVisible());
+    const disclosureMarkers=await page.evaluate(()=>{
+      return [".tool-howto summary",".timer-guidance summary"].map(selector=>{
+        const e=document.querySelector(selector),marker=getComputedStyle(e,"::before");
+        return {x:e.getBoundingClientRect().left+parseFloat(marker.left),position:marker.position,width:marker.borderLeftWidth};
+      });
+    });
+    assert(disclosureMarkers.every(m=>m.position==="absolute"&&m.width==="7px"),name+": disclosure markers must use the same positioning");
+    assert(Math.abs(disclosureMarkers[0].x-disclosureMarkers[1].x)<.75,name+": disclosure markers must align: "+JSON.stringify(disclosureMarkers));
     assert.equal(await page.locator(".timer-guidance").evaluate(e=>e.open),false);
     await page.locator(".timer-guidance summary").click();
     assert(await page.locator(".timer-guidance .note").isVisible());

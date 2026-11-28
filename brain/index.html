@@ -61,12 +61,12 @@ h1{
   margin:0;font-family:var(--font-serif);font-size:.88rem;
   font-weight:700;color:var(--teal-dark);cursor:pointer;line-height:1.45
 }
-.tool-howto > summary.tool-howto-title,.timer-guidance > summary.tool-howto-title{list-style:none}
+.tool-howto > summary.tool-howto-title,.timer-guidance > summary.tool-howto-title{list-style:none;position:relative;padding-left:15px}
 .tool-howto > summary.tool-howto-title::-webkit-details-marker,.timer-guidance > summary.tool-howto-title::-webkit-details-marker{display:none}
 .tool-howto > summary.tool-howto-title::before,.timer-guidance > summary.tool-howto-title::before{
-  content:"";display:inline-block;width:0;height:0;
+  content:"";display:block;position:absolute;left:0;top:calc(.725em - 4.5px);width:0;height:0;
   border-top:4.5px solid transparent;border-bottom:4.5px solid transparent;
-  border-left:7px solid currentColor;margin-right:8px;vertical-align:1px
+  border-left:7px solid currentColor
 }
 .tool-howto[open] > summary.tool-howto-title::before,.timer-guidance[open] > summary.tool-howto-title::before{transform:rotate(90deg);transform-origin:3px 4.5px}
 .tool-howto[open] .tool-howto-title{margin-bottom:7px}
@@ -152,7 +152,7 @@ main :is(input,textarea,select,button,summary,a){scroll-margin-top:var(--dock-he
 @media(max-width:560px){.login-guide{padding:6px 0 0}.control-dock{padding:8px 0 10px}}
 .timer-guidance{margin:6px 0 0}
 .timer-guidance > summary.tool-howto-title{font-size:.78rem}
-.timer-guidance > summary.tool-howto-title::before{margin-right:0}
+.timer-guidance > summary.tool-howto-title{padding-left:7px}
 .timer-guidance[open] > summary.tool-howto-title{margin-bottom:4px}
 .panel label.lbl:not(:first-child),#fields label,#conclusionFields label{margin-top:16px}
 #own > .lbl,#original > .lbl:first-child{margin-top:16px}
@@ -187,6 +187,8 @@ button:disabled{opacity:.5;cursor:default}
 #timerMessage{margin:0;font-size:.78rem;color:var(--alert)}
 @media(max-width:560px){
   .timer-setup{margin-left:26px;margin-right:26px;padding:6px 8px}
+  /* Keep both disclosure triangles at the same horizontal position. */
+  .timer-guidance{margin-left:4px}
   .timer-options{gap:4px 8px}.timer-setup .choice{padding:3px 5px}
   .timer-controls{gap:6px;font-size:.82rem;flex-wrap:wrap}
   /* Balance both sides of the fixed six-character overtime clock. */
@@ -211,6 +213,7 @@ button:disabled{opacity:.5;cursor:default}
 }
 @media(max-width:360px){
   .timer-setup{padding-inline:3px}
+  .timer-guidance{margin-left:9px}
   .timer-controls{gap:5px}
   #minutes{padding:2px}
   #start,#pause{min-width:44px;padding:5px 6px}
