@@ -213,10 +213,11 @@ button:disabled{opacity:.5;cursor:default}
   #reset{min-width:44px;padding:5px 2px}
   .timer-controls #clock{font-size:1rem}
 }
-.reset-landscape{display:none}
-@media (orientation:landscape) and (max-height:560px) and (pointer:coarse){
-  .reset-short{display:none}
-  .reset-landscape{display:inline}
+.reset-short{display:none}
+.reset-landscape{display:inline}
+@media (orientation:portrait) and (max-width:560px) and (pointer:coarse){
+  .reset-short{display:inline}
+  .reset-landscape{display:none}
 }
 /* Reserve space for +MM:SS before overtime; changing digits must never wrap the controls. */
 #clock,#floatingClock{display:inline-block;inline-size:6ch;text-align:right;font-family:ui-monospace,Menlo,Consolas,monospace;font-variant-numeric:tabular-nums;white-space:nowrap}

@@ -201,7 +201,7 @@ async function checkDojo(browser, name, width, height) {
     assert.equal(await page.locator("#start svg path").getAttribute("d"),"M4 1.5 L14 8 L4 14.5 Z");
     assert(await page.locator("#start svg").isVisible());
     assert.equal(await page.locator("#pause").innerText(),"Ⅱ");
-    assert.equal(await page.locator("#reset").innerText(),"ﾘｾｯﾄ");
+    assert.equal(await page.locator("#reset").innerText(),width<=560&&height>=width?"ﾘｾｯﾄ":"リセット");
     if(name==="iphone15pro-portrait"){
       await page.setViewportSize({width:height,height:width});
       assert.equal(await page.locator("#reset").innerText(),"リセット");
