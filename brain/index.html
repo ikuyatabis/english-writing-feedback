@@ -189,8 +189,9 @@ button:disabled{opacity:.5;cursor:default}
   .timer-setup{margin-left:26px;margin-right:26px;padding:6px 8px}
   .timer-options{gap:4px 8px}.timer-setup .choice{padding:3px 5px}
   .timer-controls{gap:6px;font-size:.82rem;flex-wrap:wrap}
-  .timer-group #clock{margin-left:-4px}
-  .timer-group:first-child{margin-right:7px}
+  /* Balance both sides of the fixed six-character overtime clock. */
+  .timer-group #clock{margin-left:1.5px}
+  .timer-group:first-child{margin-right:1.5px}
   #minutes{width:34px;min-width:0;padding:3px 2px;text-align:center;font-size:.9rem;appearance:textfield;-moz-appearance:textfield}
   #minutes::-webkit-inner-spin-button,#minutes::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
   #start,#pause{min-width:30px;padding:5px 6px}
@@ -220,8 +221,9 @@ button:disabled{opacity:.5;cursor:default}
 @media (min-width:561px) and (pointer:coarse){
   .timer-group #clock{margin-left:-11px}
 }
-@media (max-width:560px) and (orientation:landscape) and (pointer:coarse){
-  .timer-group #clock{margin-left:-5px}
+@media (min-width:561px) and (max-height:560px) and (orientation:landscape) and (pointer:coarse){
+  .timer-group #clock{margin-left:-4px}
+  .timer-group:first-child{margin-right:-4px}
 }
 .reset-short{display:none}
 .reset-landscape{display:inline}
