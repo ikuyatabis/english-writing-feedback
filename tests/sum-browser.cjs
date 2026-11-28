@@ -500,6 +500,35 @@ async function checkDojo(browser, name, width, height) {
     await page.locator("#reset").click();assert.equal(await page.locator("#clock").innerText(),"05:00");
     assert.equal(await page.evaluate(()=>window.scrollY),pinnedScroll, name+": pause/reset unexpectedly scrolled page");
     assert.equal(await page.locator("#floatingClock").textContent(),"05:00");
+    if(name==="iphone15pro-portrait"){
+      // Emulate an iOS keyboard changing only the visual viewport, not the layout viewport.
+      await page.locator("#memo-free").focus();
+      const before=await page.evaluate(()=>window.scrollY);
+      await page.evaluate(()=>{
+        const vv=window.visualViewport;
+        const top=Math.max(150,Math.ceil(document.getElementById("clock").getBoundingClientRect().bottom)+12);
+        Object.defineProperties(vv,{offsetTop:{configurable:true,value:top},height:{configurable:true,value:250}});
+        vv.dispatchEvent(new Event("resize"));
+      });
+      assert(await page.locator("#floatingTimer").isVisible(),name+": keyboard must not hide the timer");
+      assert(await page.locator("#floatingTimer").evaluate(e=>{
+        const r=e.getBoundingClientRect(),vv=window.visualViewport;
+        return r.top>=vv.offsetTop&&r.bottom<=vv.offsetTop+vv.height;
+      }),name+": compact timer must stay in the visible viewport");
+      await page.evaluate(()=>{
+        const vv=window.visualViewport;
+        Object.defineProperty(vv,"offsetTop",{configurable:true,value:vv.offsetTop+20});
+        vv.dispatchEvent(new Event("scroll"));
+      });
+      assert(await page.locator("#floatingTimer").evaluate(e=>e.getBoundingClientRect().top>=window.visualViewport.offsetTop),name+": timer must follow viewport panning");
+      assert.equal(await page.evaluate(()=>window.scrollY),before,name+": viewport correction must not scroll the page");
+      assert.equal(await page.locator("#floatingClock").textContent(),"05:00");
+      await page.evaluate(()=>{
+        const vv=window.visualViewport;delete vv.offsetTop;delete vv.height;
+        document.activeElement.blur();vv.dispatchEvent(new Event("resize"));
+      });
+      assert.equal(await page.locator("#floatingTimer").evaluate(e=>e.classList.contains("follow-viewport")),false);
+    }
     await page.locator('input[name="timer"][value="off"]').check();
     assert.equal(await page.locator(".control-dock").evaluate(e => getComputedStyle(e).position), "sticky");
     assert.equal(await page.locator("#floatingTimer").isVisible(),false);
