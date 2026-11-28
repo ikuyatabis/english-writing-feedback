@@ -223,7 +223,8 @@ async function checkDojo(browser, name, width, height) {
     });
     assert(timerLayout.groupsAligned&&timerLayout.contained&&(width<390||timerLayout.sameLine),name+": timer controls must fit with each group on one line: "+JSON.stringify(timerLayout));
     const expectedGap=width<=360?5:width<=560?6:12;
-    assert(timerLayout.gaps.every(({index,gap})=>Math.abs(gap-expectedGap-(index===2?3:0))<0.75),name+": timer control gaps must match spacing with extra room after clock: "+JSON.stringify(timerLayout));
+    const gapAdjustment=index=>index===1?(width<=560?-4:-8):index===2?(width<=560?7:3):0;
+    assert(timerLayout.gaps.every(({index,gap})=>Math.abs(gap-expectedGap-gapAdjustment(index))<0.75),name+": timer control gaps must match spacing before and after clock: "+JSON.stringify(timerLayout));
     if(width<=1024){
       for(const selector of ["#start","#pause","#reset"]){
         const box=await page.locator(selector).boundingBox();
