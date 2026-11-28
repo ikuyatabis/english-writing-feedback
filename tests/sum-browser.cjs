@@ -474,7 +474,7 @@ async function checkDojo(browser, name, width, height) {
     assert.equal(await page.locator(".timer-guidance summary").innerText(),"（使い方のヒント）");
     await page.locator(".timer-guidance summary").click();
     assert(await page.locator(".timer-guidance .note").isVisible());
-    assert.match(await page.locator(".timer-guidance").innerText(), /構想を練るのが苦手な人は、まずは時間制限を設けずに取り組むのがおすすめです。\s*慣れてきても、100words程度/);
+    assert.match(await page.locator(".timer-guidance").innerText(), /構想を練るのが苦手な人は、まずは時間制限を設けずに取り組むのがおすすめです。\s*慣れてきたら、まずは５分のタイマーを設定してみましょう。最終的には、100wordsで３分が目標です。/);
     await page.locator(".timer-guidance summary").click();
     assert.equal(await page.locator(".timer-guidance").evaluate(e=>e.open),false);
     await page.evaluate(()=>window.scrollTo(0,document.documentElement.scrollHeight));
