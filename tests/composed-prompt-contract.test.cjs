@@ -164,7 +164,7 @@ test("unavailable passage IV survives Mita's final handoff",async()=>{
 
 test("Ito and clinic: two non-scoring coaching rules reach final prompts in all modes",async()=>{
  for(const page of ["ito","misc"]){const html=fs.readFileSync(path.join(root,page,"index.html"),"utf8");
- for(const mode of modes){const prompt=await fullPrompt(page,html,mode);assert.match(prompt,/減点対象外の文章構成・表現への助言/);assert.match(prompt,/伝聞よりも断定/);assert.match(prompt,/末尾の一文が冒頭・本文/);assert.match(prompt,/振替減点も禁止/);}}
+ for(const mode of modes){const prompt=await fullPrompt(page,html,mode);assert.match(prompt,/減点対象外の文章構成・表現への助言/);assert.match(prompt,/伝聞よりも断定/);assert.match(prompt,/末尾の一文が冒頭・本文/);assert.match(prompt,/振替減点も禁止/);assert.match(prompt,/冒頭の意見表明：賛否の対象となる命題が設問に明示/);assert.match(prompt,/命題を明示する意見表明のいずれも認める/);assert.match(prompt,/80語程度など指定語数が限られる場合/);assert.match(prompt,/形式だけを理由に減点したり，答案の改善例で強制的に書き換えたりしない/);assert.match(prompt,/独立した採点条件に抵触する問題は従来どおり評価/);}}
 });
 test("Brain dojo: bank, syntax, defaults, mode and optional output contracts",()=>{
  const html=fs.readFileSync(path.join(root,"brain/index.html"),"utf8");
