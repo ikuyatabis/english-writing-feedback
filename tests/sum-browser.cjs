@@ -407,6 +407,10 @@ async function checkDojo(browser, name, width, height) {
     await page.locator("#memo-r1").fill("前の問題のメモ");
     const originalPrompt=await capturePrompt();
     assert.match(originalPrompt,/【学習モード】基礎/);
+    assert.match(originalPrompt,/【答案構成上の重要な指導方針：冒頭の意見表明】/);
+    assert.match(originalPrompt,/命題の内容を明示する意見表明のいずれも認めます/);
+    assert.match(originalPrompt,/一方の形式を一律に要求しないでください/);
+    assert.match(originalPrompt,/80語程度など指定語数が限られる問題/);
     assert.match(originalPrompt,/【答案構成上の重要な指導方針：譲歩パターン】/);
     assert.match(originalPrompt,/基礎では、平易なテーマで生徒が理解し自力で活用しやすい場合には、簡潔な譲歩パターンを提案してください/);
     assert.match(originalPrompt,/譲歩を機械的に要求したり、譲歩がないこと自体を欠点としたりしないでください/);
@@ -503,6 +507,10 @@ async function checkDojo(browser, name, width, height) {
     assert.match(p,/発展では、異なる立場の妥当性や自分の主張の限界・成立条件にも目を向け、譲歩を生かした説得力のある論理展開を積極的に検討し、有効な場合は提案してください/);
     assert.match(p,/何を認め、なぜそれでも自分の主張が成り立つのか/);
     assert.match(p,/譲歩のために主要な理由の説明や設問への対応が手薄にならないようにし/);
+    assert.match(p,/【答案構成上の重要な指導方針：冒頭の意見表明】/);
+    assert.match(p,/これは誤りの指摘ではなく、語数配分に関する助言として扱ってください/);
+    assert.match(p,/この方針は基礎・発展の両方、おすすめフレーズ・英語の解答例にも適用します/);
+    assert.match(p,/冒頭の意見表明は上記の指導方針に従い/);
     assert.match(p,/学習モード】発展/);assert.match(p,/おすすめフレーズ：希望あり/);assert(p.includes("テーマや文脈により的確な語彙・熟語・自然な語の組み合わせを選び、表現の幅を広げる。不必要な難語は避ける。"));assert(p.includes("論理を深め、内容に即した的確な語彙・多様な構文で表現力を高める。ただし、不必要な難語・複雑な構文は避け、高校生が学習して再現できる自然な英語にする。"));assert(!p.includes("高校生が自力で使いやすい、平易で汎用性の高い語彙・表現を優先する。"));assert(!p.includes("高校生が自力で再現しやすい平易な語彙・構文を用いる。大学入試の答案として十分な正確さ・明快さ・論理性を保つ。"));
     assert.match(p,/英語の解答例：希望あり/);assert.match(p,/JIS B5/);
     assert.match(p,/Word＋PDF/);assert.match(p,/友人と協力/);
