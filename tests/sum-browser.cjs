@@ -182,6 +182,7 @@ async function checkDojo(browser, name, width, height) {
     assert.deepEqual(await page.locator('input[name="timer"]').evaluateAll(es=>es.map(e=>e.value)), ["off","on"]);
     assert(await page.locator('input[name="timer"][value="off"]').isChecked());
     assert.equal(await page.locator("#timerPanel").isVisible(),false);
+    assert.equal(await page.locator("#minutes").inputValue(),"5");
     assert.equal(await page.locator("#floatingTimer").isVisible(),false);
     assert(await page.locator(".timer-guidance summary").isVisible());
     assert.equal(await page.locator(".timer-guidance").evaluate(e=>e.open),false);
@@ -196,7 +197,7 @@ async function checkDojo(browser, name, width, height) {
     await page.locator(".timer-guidance summary").click();
     await page.locator('input[name="timer"][value="on"]').check();
     assert(await page.locator("#timerPanel").isVisible());
-    assert.equal(await page.locator("#clock").innerText(),"03:00");
+    assert.equal(await page.locator("#clock").innerText(),"05:00");
     assert.equal(await page.locator("#start svg path").getAttribute("d"),"M4 1.5 L14 8 L4 14.5 Z");
     assert(await page.locator("#start svg").isVisible());
     assert.equal(await page.locator("#pause").innerText(),"Ⅱ");
@@ -204,7 +205,7 @@ async function checkDojo(browser, name, width, height) {
     if(name==="iphone15pro-portrait"){
       await page.setViewportSize({width:height,height:width});
       assert.equal(await page.locator("#reset").innerText(),"リセット");
-      assert.equal(await page.locator("#clock").innerText(),"03:00");
+      assert.equal(await page.locator("#clock").innerText(),"05:00");
       await page.setViewportSize({width,height});
       assert.equal(await page.locator("#reset").innerText(),"ﾘｾｯﾄ");
     }
@@ -466,7 +467,7 @@ async function checkDojo(browser, name, width, height) {
     assert.equal(await page.locator("#floatingTimer").isVisible(), false);
     await page.locator('input[name="timer"][value="on"]').check();
     assert.equal(await page.locator(".masthead").evaluate(e => getComputedStyle(e).position), "static");
-    assert.equal(await page.locator("#clock").innerText(),"03:00");
+    assert.equal(await page.locator("#clock").innerText(),"05:00");
     await page.evaluate(()=>window.scrollTo(0,0));
     await page.waitForFunction(()=>document.getElementById("floatingTimer").hidden && !document.querySelector(".control-dock").classList.contains("is-docked"));
     assert.equal(await page.locator(".timer-guidance").evaluate(e=>e.open),false);
@@ -496,9 +497,9 @@ async function checkDojo(browser, name, width, height) {
     await page.locator("#start").click();
     assert.equal(await page.evaluate(()=>window.scrollY),pinnedScroll, name+": resume unexpectedly scrolled page");
     await page.locator("#pause").click();
-    await page.locator("#reset").click();assert.equal(await page.locator("#clock").innerText(),"03:00");
+    await page.locator("#reset").click();assert.equal(await page.locator("#clock").innerText(),"05:00");
     assert.equal(await page.evaluate(()=>window.scrollY),pinnedScroll, name+": pause/reset unexpectedly scrolled page");
-    assert.equal(await page.locator("#floatingClock").textContent(),"03:00");
+    assert.equal(await page.locator("#floatingClock").textContent(),"05:00");
     await page.locator('input[name="timer"][value="off"]').check();
     assert.equal(await page.locator(".control-dock").evaluate(e => getComputedStyle(e).position), "sticky");
     assert.equal(await page.locator("#floatingTimer").isVisible(),false);
