@@ -222,7 +222,7 @@ async function checkDojo(browser, name, width, height) {
       return {sameLine:sameLine(centers),groupsAligned:sameLine(centers.slice(0,3))&&sameLine(centers.slice(3)),contained:rects.every(r=>r.left>=container.left-1&&r.right<=container.right+1),gaps:rects.slice(1).flatMap((r,i)=>Math.abs(centers[i+1]-centers[i])<3?[{index:i,gap:r.left-rects[i].right}]:[])};
     });
     assert(timerLayout.groupsAligned&&timerLayout.contained&&(width<390||timerLayout.sameLine),name+": timer controls must fit with each group on one line: "+JSON.stringify(timerLayout));
-    const expectedGap=width<=360?5:width<=560?8:12;
+    const expectedGap=width<=360?5:width<=560?6:12;
     assert(timerLayout.gaps.every(({index,gap})=>Math.abs(gap-expectedGap-(index===2?3:0))<0.75),name+": timer control gaps must match spacing with extra room after clock: "+JSON.stringify(timerLayout));
     if(width<=1024){
       for(const selector of ["#start","#pause","#reset"]){
@@ -230,6 +230,22 @@ async function checkDojo(browser, name, width, height) {
         assert(box&&box.width>=44&&box.height>=44,name+": touch target too small "+selector);
       }
     }
+    // The plus sign and changing overtime digits must not change the control layout.
+    const overtimeLayout=await page.evaluate(()=>{
+      const sizes=()=>[".timer-controls","#clock","#start","#pause","#reset","#floatingClock"].map(selector=>{
+        const r=document.querySelector(selector).getBoundingClientRect();
+        return [r.left,r.top,r.width,r.height];
+      });
+      const initial=sizes();
+      const frames=[];
+      for(const seconds of [0,-1,-8,-11,-22,-27,-32,-58,-61,-88]){
+        remaining=seconds;draw();
+        frames.push(sizes());
+      }
+      reset();
+      return {initial,frames};
+    });
+    for(const frame of overtimeLayout.frames)assert.deepEqual(frame,overtimeLayout.initial,name+": overtime must not reflow timer controls");
     assert.equal(await page.locator("#start").getAttribute("aria-label"),"開始");
     assert.equal(await page.locator("#pause").getAttribute("aria-label"),"一時停止");
     assert.equal(await page.locator("#start").isEnabled(),true);
